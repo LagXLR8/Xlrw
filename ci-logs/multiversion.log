@@ -1,5 +1,5 @@
 status: failure
-commit: 3cf53d66ed22f9b2283eaee664e404826a0f835f
+commit: cf69b70161db2b6fe009268ead329457052adb44
 
 Fetching distribution.
 Downloading https://services.gradle.org/distributions/gradle-9.8.0-bin.zip
@@ -40,60 +40,987 @@ Please make sure to read and understand the following license:
 
 Cannot remap modifiers because it does not exists in any of the targets [] or their parents.
 
+> Task :1.21.1:compileJava NO-SOURCE
+> Task :1.21.11:stonecutterPrepare
+> Task :1.21.11:stonecutterGenerate
+> Task :1.21.11:compileJava NO-SOURCE
+> Task :1.21.11:processResources
+> Task :1.21.1:processResources
+> Task :1.21.11:classes
+> Task :1.21.1:classes
+> Task :1.21.11:stonecutterPrepareClient
+> Task :1.21.11:stonecutterGenerateClient
+
+> Task :1.21.11:compileClientJava
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:13: error: cannot find symbol
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+                                                  ^
+  symbol:   class WorldRenderContext
+  location: package net.fabricmc.fabric.api.client.rendering.v1
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:14: error: cannot find symbol
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+                                                  ^
+  symbol:   class WorldRenderEvents
+  location: package net.fabricmc.fabric.api.client.rendering.v1
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:21: error: cannot find symbol
+import net.minecraft.client.renderer.RenderType;
+                                    ^
+  symbol:   class RenderType
+  location: package net.minecraft.client.renderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:24: error: cannot find symbol
+import net.minecraft.client.resources.model.BakedModel;
+                                           ^
+  symbol:   class BakedModel
+  location: package net.minecraft.client.resources.model
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:16: error: cannot find symbol
+import net.minecraft.client.renderer.RenderType;
+                                    ^
+  symbol:   class RenderType
+  location: package net.minecraft.client.renderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:54: error: cannot find symbol
+    private static void render(WorldRenderContext context) {
+                               ^
+  symbol:   class WorldRenderContext
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:130: error: cannot find symbol
+    private static void flush(MultiBufferSource consumers, RenderType type) {
+                                                           ^
+  symbol:   class RenderType
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:10: error: cannot find symbol
+import net.minecraft.client.renderer.FogRenderer;
+                                    ^
+  symbol:   class FogRenderer
+  location: package net.minecraft.client.renderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:13: error: cannot find symbol
+import net.minecraft.client.renderer.RenderType;
+                                    ^
+  symbol:   class RenderType
+  location: package net.minecraft.client.renderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:16: error: cannot find symbol
+import net.minecraft.client.resources.model.BakedModel;
+                                           ^
+  symbol:   class BakedModel
+  location: package net.minecraft.client.resources.model
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/XlrwScreen.java:6: error: cannot find symbol
+import com.mojang.blaze3d.vertex.BufferUploader;
+                                ^
+  symbol:   class BufferUploader
+  location: package com.mojang.blaze3d.vertex
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/BuilderHud.java:82: error: cannot find symbol
+                        diagnostic = "Thiếu vật liệu: " + item.getDescription().getString();
+                                                              ^
+  symbol:   method getDescription()
+  location: variable item of type Item
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:51: error: package WorldRenderEvents does not exist
+        WorldRenderEvents.AFTER_TRANSLUCENT.register(SchematicRenderer::render);
+                         ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:65: error: cannot find symbol
+        Vec3 cam = camera.getPosition();
+                         ^
+  symbol:   method getPosition()
+  location: variable camera of type Camera
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:74: error: cannot find symbol
+        flush(consumers, net.minecraft.client.renderer.Sheets.translucentCullBlockSheet());
+                                                             ^
+  symbol:   method translucentCullBlockSheet()
+  location: class Sheets
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:75: error: cannot find symbol
+        flush(consumers, RenderType.debugQuads());
+                         ^
+  symbol:   variable RenderType
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:77: error: cannot find symbol
+        VertexConsumer lines = consumers.getBuffer(RenderType.lines());
+                                                   ^
+  symbol:   variable RenderType
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:89: error: cannot find symbol
+            LevelRenderer.renderLineBox(ps, lines, new AABB(t).inflate(0.02 + 0.03 * p), 0.95f, 0.44f, 0.12f, 0.6f + 0.4f * p);
+                         ^
+  symbol:   method renderLineBox(PoseStack,VertexConsumer,AABB,float,float,float,float)
+  location: class LevelRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:93: error: cannot find symbol
+            LevelRenderer.renderLineBox(ps, lines, new AABB(chestPos).inflate(0.01), 0.91f, 0.85f, 0.79f, 0.8f);
+                         ^
+  symbol:   method renderLineBox(PoseStack,VertexConsumer,AABB,float,float,float,float)
+  location: class LevelRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:101: error: cannot find symbol
+                LevelRenderer.renderLineBox(ps, lines, new AABB(p).inflate(0.04), 1.0f, 0.15f, 0.15f, pulse);
+                             ^
+  symbol:   method renderLineBox(PoseStack,VertexConsumer,AABB,float,float,float,float)
+  location: class LevelRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:105: error: cannot find symbol
+                LevelRenderer.renderLineBox(ps, lines, new AABB(p).inflate(0.02), 1.0f, 0.6f, 0.1f, 0.8f);
+                             ^
+  symbol:   method renderLineBox(PoseStack,VertexConsumer,AABB,float,float,float,float)
+  location: class LevelRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:109: error: cannot find symbol
+                LevelRenderer.renderLineBox(ps, lines, new AABB(t.base.getX() + 0.15, t.base.getY(), t.base.getZ() + 0.15,
+                             ^
+  symbol:   method renderLineBox(PoseStack,VertexConsumer,AABB,float,float,float,float)
+  location: class LevelRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:114: error: cannot find symbol
+                LevelRenderer.renderLineBox(ps, lines, new AABB(p.getX() + 0.35, p.getY(), p.getZ() + 0.35,
+                             ^
+  symbol:   method renderLineBox(PoseStack,VertexConsumer,AABB,float,float,float,float)
+  location: class LevelRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:118: error: cannot find symbol
+        flush(consumers, RenderType.lines());
+                         ^
+  symbol:   variable RenderType
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:122: error: cannot find symbol
+            RenderSystem.clear(256, Minecraft.ON_OSX); // GL_DEPTH_BUFFER_BIT: the gizmo must never hide inside blocks
+                                             ^
+  symbol:   variable ON_OSX
+  location: class Minecraft
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:124: error: cannot find symbol
+            flush(consumers, RenderType.debugQuads());
+                             ^
+  symbol:   variable RenderType
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:125: error: cannot find symbol
+            flush(consumers, RenderType.lines());
+                             ^
+  symbol:   variable RenderType
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:143: error: cannot find symbol
+        VertexConsumer quads = consumers.getBuffer(RenderType.debugQuads());
+                                                   ^
+  symbol:   variable RenderType
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:182: error: cannot find symbol
+        flush(consumers, RenderType.debugQuads());
+                         ^
+  symbol:   variable RenderType
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:188: error: cannot find symbol
+        VertexConsumer holo = consumers.getBuffer(net.minecraft.client.renderer.Sheets.translucentCullBlockSheet());
+                                                                                      ^
+  symbol:   method translucentCullBlockSheet()
+  location: class Sheets
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:194: error: cannot find symbol
+        flush(consumers, net.minecraft.client.renderer.Sheets.translucentCullBlockSheet());
+                                                             ^
+  symbol:   method translucentCullBlockSheet()
+  location: class Sheets
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:197: error: cannot find symbol
+        quads = consumers.getBuffer(RenderType.debugQuads());
+                                    ^
+  symbol:   variable RenderType
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:203: error: cannot find symbol
+        flush(consumers, RenderType.debugQuads());
+                         ^
+  symbol:   variable RenderType
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:209: error: cannot find symbol
+        BakedModel model = mc.getBlockRenderer().getBlockModel(state);
+        ^
+  symbol:   class BakedModel
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:260: error: cannot find symbol
+        LevelRenderer.renderLineBox(ps, lines, b.minX, b.minY, b.minZ, b.maxX, b.maxY, b.maxZ, 0.29f, 0.38f, 0.5f, a);
+                     ^
+  symbol:   method renderLineBox(PoseStack,VertexConsumer,double,double,double,double,double,double,float,float,float,float)
+  location: class LevelRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:274: error: cannot find symbol
+        LevelRenderer.renderLineBox(ps, lines, b.minX - 0.05, yy, b.minZ - 0.05, b.maxX + 0.05, yy + 1, b.maxZ + 0.05, 0.95f, 0.44f, 0.12f, 0.55f);
+                     ^
+  symbol:   method renderLineBox(PoseStack,VertexConsumer,double,double,double,double,double,double,float,float,float,float)
+  location: class LevelRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:127: error: cannot find symbol
+        long w = Minecraft.getInstance().getWindow().getWindow();
+                                                    ^
+  symbol:   method getWindow()
+  location: class Window
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:129: error: incompatible types: long cannot be converted to Window
+        if (InputConstants.isKeyDown(w, InputConstants.KEY_W)) f += 1;
+                                     ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:130: error: incompatible types: long cannot be converted to Window
+        if (InputConstants.isKeyDown(w, InputConstants.KEY_S)) f -= 1;
+                                     ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:131: error: incompatible types: long cannot be converted to Window
+        if (InputConstants.isKeyDown(w, InputConstants.KEY_A)) s += 1;
+                                     ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:132: error: incompatible types: long cannot be converted to Window
+        if (InputConstants.isKeyDown(w, InputConstants.KEY_D)) s -= 1;
+                                     ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:133: error: incompatible types: long cannot be converted to Window
+        if (InputConstants.isKeyDown(w, InputConstants.KEY_SPACE)) u += 1;
+                                     ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:134: error: incompatible types: long cannot be converted to Window
+        if (InputConstants.isKeyDown(w, InputConstants.KEY_LSHIFT)) u -= 1;
+                                     ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:135: error: incompatible types: long cannot be converted to Window
+        double boost = InputConstants.isKeyDown(w, InputConstants.KEY_LCONTROL) ? 2.5 : 1.0;
+                                                ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:248: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:318: error: cannot find symbol
+        VertexConsumer q = consumers.getBuffer(RenderType.debugQuads());
+                                               ^
+  symbol:   variable RenderType
+  location: class SchematicEditorScreen
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:352: error: cannot find symbol
+            VertexConsumer lines = consumers.getBuffer(RenderType.lines());
+                                                       ^
+  symbol:   variable RenderType
+  location: class SchematicEditorScreen
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:353: error: cannot find symbol
+            net.minecraft.client.renderer.LevelRenderer.renderLineBox(ps, lines, b.minX - 0.05, b.minY - 0.05, b.minZ - 0.05,
+                                                       ^
+  symbol:   method renderLineBox(PoseStack,VertexConsumer,double,double,double,double,double,double,float,float,float,float)
+  location: class LevelRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:430: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:472: error: method mouseClicked in interface ContainerEventHandler cannot be applied to given types;
+        return super.mouseClicked(mx, my, button);
+                    ^
+  required: MouseButtonEvent,boolean
+  found:    double,double,int
+  reason: actual and formal argument lists differ in length
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:475: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:482: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:499: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:520: error: method keyPressed in class Screen cannot be applied to given types;
+        return super.keyPressed(key, scan, mods); // ESC -> onClose (keeps changes)
+                    ^
+  required: KeyEvent
+  found:    int,int,int
+  reason: actual and formal argument lists differ in length
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/ExternalMusic.java:59: error: cannot find symbol
+            net.minecraft.Util.getPlatform().openFile(dir());
+                         ^
+  symbol:   class Util
+  location: package net.minecraft
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:96: error: cannot find symbol
+        g.pose().pushPose();
+                ^
+  symbol:   method pushPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:97: error: incompatible types: int cannot be converted to Matrix3x2f
+        g.pose().translate(fx, fy, 0);
+                                   ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:99: error: cannot find symbol
+        g.pose().popPose();
+                ^
+  symbol:   method popPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:123: error: cannot find symbol
+            g.pose().pushPose();
+                    ^
+  symbol:   method pushPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:124: error: incompatible types: int cannot be converted to Matrix3x2f
+            g.pose().translate(tx - lift + 6, ty - lift + (th - 10) / 2f, 0);
+                                                                          ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:126: error: cannot find symbol
+            g.pose().popPose();
+                    ^
+  symbol:   method popPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:127: error: cannot find symbol
+            g.pose().pushPose();
+                    ^
+  symbol:   method pushPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:128: error: incompatible types: int cannot be converted to Matrix3x2f
+            g.pose().translate(tx - lift + 22, ty - lift + th / 2f - (gm.best > 0 ? 6 : 3), 0);
+                                                                                            ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:129: error: incompatible types: float cannot be converted to Matrix3x2f
+            g.pose().scale(0.75f, 0.75f, 1f);
+                                         ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:132: error: cannot find symbol
+            g.pose().popPose();
+                    ^
+  symbol:   method popPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HubWidgets.java:75: error: cannot find symbol
+        g.pose().pushPose();
+                ^
+  symbol:   method pushPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HubWidgets.java:76: error: incompatible types: int cannot be converted to Matrix3x2f
+        g.pose().translate(x + 8, y + 17, 0);
+                                          ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HubWidgets.java:77: error: incompatible types: float cannot be converted to Matrix3x2f
+        g.pose().scale(2f, 2f, 1f);
+                               ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HubWidgets.java:79: error: cannot find symbol
+        g.pose().popPose();
+                ^
+  symbol:   method popPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:80: error: method isSolidRender in class BlockStateBase cannot be applied to given types;
+                    if (n == null || !n.isSolidRender(EmptyBlockGetter.INSTANCE, BlockPos.ZERO)) mask |= 1 << d.ordinal();
+                                       ^
+  required: no arguments
+  found:    EmptyBlockGetter,BlockPos
+  reason: actual and formal argument lists differ in length
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:82: error: method isSolidRender in class BlockStateBase cannot be applied to given types;
+                boolean solid = st.isSolidRender(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+                                  ^
+  required: no arguments
+  found:    EmptyBlockGetter,BlockPos
+  reason: actual and formal argument lists differ in length
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:117: error: cannot find symbol
+        g.flush();
+         ^
+  symbol:   method flush()
+  location: variable g of type GuiGraphics
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:118: error: cannot find symbol
+        FogRenderer.setupNoFog();
+        ^
+  symbol:   variable FogRenderer
+  location: class HoloPreview
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:119: error: cannot find symbol
+        RenderSystem.clear(256, Minecraft.ON_OSX); // depth only: the HUD below may have written depth here
+                                         ^
+  symbol:   variable ON_OSX
+  location: class Minecraft
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:120: error: incompatible types: Matrix3x2fStack cannot be converted to PoseStack
+        PoseStack ps = g.pose();
+                             ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:129: error: cannot find symbol
+        MultiBufferSource.BufferSource bs = g.bufferSource();
+                                             ^
+  symbol:   method bufferSource()
+  location: variable g of type GuiGraphics
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:130: error: cannot find symbol
+        VertexConsumer vc = bs.getBuffer(RenderType.cutout());
+                                         ^
+  symbol:   variable RenderType
+  location: class HoloPreview
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:134: error: cannot find symbol
+            BakedModel model = br.getBlockModel(c.state);
+            ^
+  symbol:   class BakedModel
+  location: class HoloPreview
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:152: error: cannot find symbol
+                    float shade = q.isShade() ? faceShade(q.getDirection()) : 1f;
+                                   ^
+  symbol:   method isShade()
+  location: variable q of type BakedQuad
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:152: error: cannot find symbol
+                    float shade = q.isShade() ? faceShade(q.getDirection()) : 1f;
+                                                           ^
+  symbol:   method getDirection()
+  location: variable q of type BakedQuad
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:155: error: cannot find symbol
+                        int col = tint(mc, c.state, q.getTintIndex());
+                                                     ^
+  symbol:   method getTintIndex()
+  location: variable q of type BakedQuad
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:165: error: cannot find symbol
+        bs.endBatch(RenderType.cutout());
+                    ^
+  symbol:   variable RenderType
+  location: class HoloPreview
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:170: error: cannot find symbol
+            VertexConsumer q = bs.getBuffer(RenderType.gui());
+                                            ^
+  symbol:   variable RenderType
+  location: class HoloPreview
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:183: error: cannot find symbol
+            bs.endBatch(RenderType.gui());
+                        ^
+  symbol:   variable RenderType
+  location: class HoloPreview
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:446: error: cannot find symbol
+        g.pose().pushPose();
+                ^
+  symbol:   method pushPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:447: error: incompatible types: int cannot be converted to Matrix3x2f
+        g.pose().translate(0, 0, 300);
+                                 ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:449: error: incompatible types: int cannot be converted to Matrix3x2f
+            g.pose().translate(x, sy, 0);
+                                      ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:450: error: cannot find symbol
+            g.pose().mulPose(com.mojang.math.Axis.ZP.rotationDegrees(Math.max(-35, Math.min(35, swing))));
+                    ^
+  symbol:   method mulPose(Quaternionf)
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:451: error: incompatible types: int cannot be converted to Matrix3x2f
+            g.pose().translate(-x, -sy, 0);
+                                        ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:456: error: cannot find symbol
+        g.pose().popPose();
+                ^
+  symbol:   method popPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:461: error: cannot find symbol
+            g.pose().pushPose();
+                    ^
+  symbol:   method pushPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:462: error: incompatible types: int cannot be converted to Matrix3x2f
+            g.pose().translate(0, 0, 310);
+                                     ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:468: error: cannot find symbol
+            g.pose().popPose();
+                    ^
+  symbol:   method popPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:578: error: no suitable constructor found for DynamicTexture(NativeImage)
+                Minecraft.getInstance().getTextureManager().register(loc, new DynamicTexture(img));
+                                                                          ^
+    constructor DynamicTexture.DynamicTexture(Supplier<String>,NativeImage) is not applicable
+      (actual and formal argument lists differ in length)
+    constructor DynamicTexture.DynamicTexture(String,int,int,boolean) is not applicable
+      (actual and formal argument lists differ in length)
+    constructor DynamicTexture.DynamicTexture(Supplier<String>,int,int,boolean) is not applicable
+      (actual and formal argument lists differ in length)
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:591: error: incompatible types: Identifier cannot be converted to RenderPipeline
+        if (dir < 0) g.blit(skin, dx, dy, w, h, skinW, 0, -skinW, skinH, skinW, skinH);
+                            ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:592: error: incompatible types: Identifier cannot be converted to RenderPipeline
+        else g.blit(skin, dx, dy, w, h, 0, 0, skinW, skinH, skinW, skinH);
+                    ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/XlrwScreen.java:169: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/XlrwScreen.java:216: error: cannot find symbol
+        g.pose().pushPose();
+                ^
+  symbol:   method pushPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/XlrwScreen.java:217: error: incompatible types: int cannot be converted to Matrix3x2f
+        g.pose().translate((1f - tIn) * 14f, 0, 0);
+                                                ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/XlrwScreen.java:220: error: cannot find symbol
+        g.pose().pushPose();
+                ^
+  symbol:   method pushPose()
+  location: class Matrix3x2fStack
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+100 errors
+
+> Task :1.21.11:compileClientJava FAILED
+> Task :1.21.11:processClientResources
+> Task :1.21.11:processIncludeJars
+> Task :1.21.11:sourcesJar
+> Task :1.21.11:stonecutterPrepareTest
+> Task :1.21.11:stonecutterGenerateTest NO-SOURCE
+> Task :1.21.11:processTestResources NO-SOURCE
+> Task :1.21.11:validateAccessWidener NO-SOURCE
+
+> Task :1.21.1:compileClientJava
+Note: /home/runner/work/Xlrw/Xlrw/src/client/java/com/xlrw/builder/DryRun.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :1.21.11:remapSourcesJar
+> Task :1.21.1:processClientResources
+> Task :1.21.1:jar
+> Task :1.21.1:processIncludeJars
+> Task :1.21.1:sourcesJar
+> Task :1.21.1:clientClasses
+> Task :1.21.1:compileTestJava NO-SOURCE
+> Task :1.21.1:processTestResources NO-SOURCE
+> Task :1.21.1:testClasses UP-TO-DATE
+> Task :1.21.1:test NO-SOURCE
+> Task :1.21.1:validateAccessWidener NO-SOURCE
+> Task :1.21.1:check UP-TO-DATE
+> Task :1.21.1:remapJar
+> Task :1.21.1:remapSourcesJar
+> Task :1.21.1:assemble
+> Task :1.21.1:build
+
 [Incubating] Problems report is available at: file:///home/runner/work/Xlrw/Xlrw/build/reports/problems/problems-report.html
 
 FAILURE: Build failed with an exception.
 
 * What went wrong:
-Could not determine the dependencies of task ':1.21.1:classes'.
-> Could not create task ':1.21.1:processResources'.
-   > Could not get unknown property 'mod.mc_compat' for task ':1.21.1:processResources' of type org.gradle.language.jvm.tasks.ProcessResources.
+Execution failed for task ':1.21.11:compileClientJava' (registered by plugin class 'org.gradle.api.plugins.JavaBasePlugin').
+> Compilation failed; see the compiler output below.
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:13: error: cannot find symbol
+  import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+                                                    ^
+    symbol:   class WorldRenderContext
+    location: package net.fabricmc.fabric.api.client.rendering.v1
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:14: error: cannot find symbol
+  import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+                                                    ^
+    symbol:   class WorldRenderEvents
+    location: package net.fabricmc.fabric.api.client.rendering.v1
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:21: error: cannot find symbol
+  import net.minecraft.client.renderer.RenderType;
+                                      ^
+    symbol:   class RenderType
+    location: package net.minecraft.client.renderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:24: error: cannot find symbol
+  import net.minecraft.client.resources.model.BakedModel;
+                                             ^
+    symbol:   class BakedModel
+    location: package net.minecraft.client.resources.model
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:16: error: cannot find symbol
+  import net.minecraft.client.renderer.RenderType;
+                                      ^
+    symbol:   class RenderType
+    location: package net.minecraft.client.renderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:54: error: cannot find symbol
+      private static void render(WorldRenderContext context) {
+                                 ^
+    symbol:   class WorldRenderContext
+    location: class SchematicRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:130: error: cannot find symbol
+      private static void flush(MultiBufferSource consumers, RenderType type) {
+                                                             ^
+    symbol:   class RenderType
+    location: class SchematicRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:10: error: cannot find symbol
+  import net.minecraft.client.renderer.FogRenderer;
+                                      ^
+    symbol:   class FogRenderer
+    location: package net.minecraft.client.renderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:13: error: cannot find symbol
+  import net.minecraft.client.renderer.RenderType;
+                                      ^
+    symbol:   class RenderType
+    location: package net.minecraft.client.renderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:16: error: cannot find symbol
+  import net.minecraft.client.resources.model.BakedModel;
+                                             ^
+    symbol:   class BakedModel
+    location: package net.minecraft.client.resources.model
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/XlrwScreen.java:6: error: cannot find symbol
+  import com.mojang.blaze3d.vertex.BufferUploader;
+                                  ^
+    symbol:   class BufferUploader
+    location: package com.mojang.blaze3d.vertex
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:75: error: cannot find symbol
+          flush(consumers, RenderType.debugQuads());
+                           ^
+    symbol:   variable RenderType
+    location: class SchematicRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:77: error: cannot find symbol
+          VertexConsumer lines = consumers.getBuffer(RenderType.lines());
+                                                     ^
+    symbol:   variable RenderType
+    location: class SchematicRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:118: error: cannot find symbol
+          flush(consumers, RenderType.lines());
+                           ^
+    symbol:   variable RenderType
+    location: class SchematicRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:122: error: cannot find symbol
+              RenderSystem.clear(256, Minecraft.ON_OSX); // GL_DEPTH_BUFFER_BIT: the gizmo must never hide inside blocks
+                                               ^
+    symbol:   variable ON_OSX
+    location: class Minecraft
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:124: error: cannot find symbol
+              flush(consumers, RenderType.debugQuads());
+                               ^
+    symbol:   variable RenderType
+    location: class SchematicRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:125: error: cannot find symbol
+              flush(consumers, RenderType.lines());
+                               ^
+    symbol:   variable RenderType
+    location: class SchematicRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:143: error: cannot find symbol
+          VertexConsumer quads = consumers.getBuffer(RenderType.debugQuads());
+                                                     ^
+    symbol:   variable RenderType
+    location: class SchematicRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:182: error: cannot find symbol
+          flush(consumers, RenderType.debugQuads());
+                           ^
+    symbol:   variable RenderType
+    location: class SchematicRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:197: error: cannot find symbol
+          quads = consumers.getBuffer(RenderType.debugQuads());
+                                      ^
+    symbol:   variable RenderType
+    location: class SchematicRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:203: error: cannot find symbol
+          flush(consumers, RenderType.debugQuads());
+                           ^
+    symbol:   variable RenderType
+    location: class SchematicRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:209: error: cannot find symbol
+          BakedModel model = mc.getBlockRenderer().getBlockModel(state);
+          ^
+    symbol:   class BakedModel
+    location: class SchematicRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:318: error: cannot find symbol
+          VertexConsumer q = consumers.getBuffer(RenderType.debugQuads());
+                                                 ^
+    symbol:   variable RenderType
+    location: class SchematicEditorScreen
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:352: error: cannot find symbol
+              VertexConsumer lines = consumers.getBuffer(RenderType.lines());
+                                                         ^
+    symbol:   variable RenderType
+    location: class SchematicEditorScreen
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/ExternalMusic.java:59: error: cannot find symbol
+              net.minecraft.Util.getPlatform().openFile(dir());
+                           ^
+    symbol:   class Util
+    location: package net.minecraft
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:118: error: cannot find symbol
+          FogRenderer.setupNoFog();
+          ^
+    symbol:   variable FogRenderer
+    location: class HoloPreview
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:119: error: cannot find symbol
+          RenderSystem.clear(256, Minecraft.ON_OSX); // depth only: the HUD below may have written depth here
+                                           ^
+    symbol:   variable ON_OSX
+    location: class Minecraft
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:130: error: cannot find symbol
+          VertexConsumer vc = bs.getBuffer(RenderType.cutout());
+                                           ^
+    symbol:   variable RenderType
+    location: class HoloPreview
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:134: error: cannot find symbol
+              BakedModel model = br.getBlockModel(c.state);
+              ^
+    symbol:   class BakedModel
+    location: class HoloPreview
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:165: error: cannot find symbol
+          bs.endBatch(RenderType.cutout());
+                      ^
+    symbol:   variable RenderType
+    location: class HoloPreview
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:170: error: cannot find symbol
+              VertexConsumer q = bs.getBuffer(RenderType.gui());
+                                              ^
+    symbol:   variable RenderType
+    location: class HoloPreview
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:183: error: cannot find symbol
+              bs.endBatch(RenderType.gui());
+                          ^
+    symbol:   variable RenderType
+    location: class HoloPreview
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/BuilderHud.java:82: error: cannot find symbol
+                          diagnostic = "Thiếu vật liệu: " + item.getDescription().getString();
+                                                                ^
+    symbol:   method getDescription()
+    location: variable item of type Item
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:65: error: cannot find symbol
+          Vec3 cam = camera.getPosition();
+                           ^
+    symbol:   method getPosition()
+    location: variable camera of type Camera
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:74: error: cannot find symbol
+          flush(consumers, net.minecraft.client.renderer.Sheets.translucentCullBlockSheet());
+                                                               ^
+    symbol:   method translucentCullBlockSheet()
+    location: class Sheets
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:89: error: cannot find symbol
+              LevelRenderer.renderLineBox(ps, lines, new AABB(t).inflate(0.02 + 0.03 * p), 0.95f, 0.44f, 0.12f, 0.6f + 0.4f * p);
+                           ^
+    symbol:   method renderLineBox(PoseStack,VertexConsumer,AABB,float,float,float,float)
+    location: class LevelRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:93: error: cannot find symbol
+              LevelRenderer.renderLineBox(ps, lines, new AABB(chestPos).inflate(0.01), 0.91f, 0.85f, 0.79f, 0.8f);
+                           ^
+    symbol:   method renderLineBox(PoseStack,VertexConsumer,AABB,float,float,float,float)
+    location: class LevelRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:101: error: cannot find symbol
+                  LevelRenderer.renderLineBox(ps, lines, new AABB(p).inflate(0.04), 1.0f, 0.15f, 0.15f, pulse);
+                               ^
+    symbol:   method renderLineBox(PoseStack,VertexConsumer,AABB,float,float,float,float)
+    location: class LevelRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:105: error: cannot find symbol
+                  LevelRenderer.renderLineBox(ps, lines, new AABB(p).inflate(0.02), 1.0f, 0.6f, 0.1f, 0.8f);
+                               ^
+    symbol:   method renderLineBox(PoseStack,VertexConsumer,AABB,float,float,float,float)
+    location: class LevelRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:109: error: cannot find symbol
+                  LevelRenderer.renderLineBox(ps, lines, new AABB(t.base.getX() + 0.15, t.base.getY(), t.base.getZ() + 0.15,
+                               ^
+    symbol:   method renderLineBox(PoseStack,VertexConsumer,AABB,float,float,float,float)
+    location: class LevelRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:114: error: cannot find symbol
+                  LevelRenderer.renderLineBox(ps, lines, new AABB(p.getX() + 0.35, p.getY(), p.getZ() + 0.35,
+                               ^
+    symbol:   method renderLineBox(PoseStack,VertexConsumer,AABB,float,float,float,float)
+    location: class LevelRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:188: error: cannot find symbol
+          VertexConsumer holo = consumers.getBuffer(net.minecraft.client.renderer.Sheets.translucentCullBlockSheet());
+                                                                                        ^
+    symbol:   method translucentCullBlockSheet()
+    location: class Sheets
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:194: error: cannot find symbol
+          flush(consumers, net.minecraft.client.renderer.Sheets.translucentCullBlockSheet());
+                                                               ^
+    symbol:   method translucentCullBlockSheet()
+    location: class Sheets
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:260: error: cannot find symbol
+          LevelRenderer.renderLineBox(ps, lines, b.minX, b.minY, b.minZ, b.maxX, b.maxY, b.maxZ, 0.29f, 0.38f, 0.5f, a);
+                       ^
+    symbol:   method renderLineBox(PoseStack,VertexConsumer,double,double,double,double,double,double,float,float,float,float)
+    location: class LevelRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:274: error: cannot find symbol
+          LevelRenderer.renderLineBox(ps, lines, b.minX - 0.05, yy, b.minZ - 0.05, b.maxX + 0.05, yy + 1, b.maxZ + 0.05, 0.95f, 0.44f, 0.12f, 0.55f);
+                       ^
+    symbol:   method renderLineBox(PoseStack,VertexConsumer,double,double,double,double,double,double,float,float,float,float)
+    location: class LevelRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:127: error: cannot find symbol
+          long w = Minecraft.getInstance().getWindow().getWindow();
+                                                      ^
+    symbol:   method getWindow()
+    location: class Window
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:353: error: cannot find symbol
+              net.minecraft.client.renderer.LevelRenderer.renderLineBox(ps, lines, b.minX - 0.05, b.minY - 0.05, b.minZ - 0.05,
+                                                         ^
+    symbol:   method renderLineBox(PoseStack,VertexConsumer,double,double,double,double,double,double,float,float,float,float)
+    location: class LevelRenderer
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:96: error: cannot find symbol
+          g.pose().pushPose();
+                  ^
+    symbol:   method pushPose()
+    location: class Matrix3x2fStack
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:99: error: cannot find symbol
+          g.pose().popPose();
+                  ^
+    symbol:   method popPose()
+    location: class Matrix3x2fStack
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:123: error: cannot find symbol
+              g.pose().pushPose();
+                      ^
+    symbol:   method pushPose()
+    location: class Matrix3x2fStack
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:126: error: cannot find symbol
+              g.pose().popPose();
+                      ^
+    symbol:   method popPose()
+    location: class Matrix3x2fStack
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:127: error: cannot find symbol
+              g.pose().pushPose();
+                      ^
+    symbol:   method pushPose()
+    location: class Matrix3x2fStack
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:132: error: cannot find symbol
+              g.pose().popPose();
+                      ^
+    symbol:   method popPose()
+    location: class Matrix3x2fStack
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HubWidgets.java:75: error: cannot find symbol
+          g.pose().pushPose();
+                  ^
+    symbol:   method pushPose()
+    location: class Matrix3x2fStack
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HubWidgets.java:79: error: cannot find symbol
+          g.pose().popPose();
+                  ^
+    symbol:   method popPose()
+    location: class Matrix3x2fStack
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:117: error: cannot find symbol
+          g.flush();
+           ^
+    symbol:   method flush()
+    location: variable g of type GuiGraphics
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:129: error: cannot find symbol
+          MultiBufferSource.BufferSource bs = g.bufferSource();
+                                               ^
+    symbol:   method bufferSource()
+    location: variable g of type GuiGraphics
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:152: error: cannot find symbol
+                      float shade = q.isShade() ? faceShade(q.getDirection()) : 1f;
+                                     ^
+    symbol:   method isShade()
+    location: variable q of type BakedQuad
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:152: error: cannot find symbol
+                      float shade = q.isShade() ? faceShade(q.getDirection()) : 1f;
+                                                             ^
+    symbol:   method getDirection()
+    location: variable q of type BakedQuad
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:155: error: cannot find symbol
+                          int col = tint(mc, c.state, q.getTintIndex());
+                                                       ^
+    symbol:   method getTintIndex()
+    location: variable q of type BakedQuad
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:446: error: cannot find symbol
+          g.pose().pushPose();
+                  ^
+    symbol:   method pushPose()
+    location: class Matrix3x2fStack
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:450: error: cannot find symbol
+              g.pose().mulPose(com.mojang.math.Axis.ZP.rotationDegrees(Math.max(-35, Math.min(35, swing))));
+                      ^
+    symbol:   method mulPose(Quaternionf)
+    location: class Matrix3x2fStack
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:456: error: cannot find symbol
+          g.pose().popPose();
+                  ^
+    symbol:   method popPose()
+    location: class Matrix3x2fStack
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:461: error: cannot find symbol
+              g.pose().pushPose();
+                      ^
+    symbol:   method pushPose()
+    location: class Matrix3x2fStack
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:468: error: cannot find symbol
+              g.pose().popPose();
+                      ^
+    symbol:   method popPose()
+    location: class Matrix3x2fStack
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/XlrwScreen.java:216: error: cannot find symbol
+          g.pose().pushPose();
+                  ^
+    symbol:   method pushPose()
+    location: class Matrix3x2fStack
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/XlrwScreen.java:220: error: cannot find symbol
+          g.pose().pushPose();
+                  ^
+    symbol:   method pushPose()
+    location: class Matrix3x2fStack
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:51: error: package WorldRenderEvents does not exist
+          WorldRenderEvents.AFTER_TRANSLUCENT.register(SchematicRenderer::render);
+                           ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:129: error: incompatible types: long cannot be converted to Window
+          if (InputConstants.isKeyDown(w, InputConstants.KEY_W)) f += 1;
+                                       ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:130: error: incompatible types: long cannot be converted to Window
+          if (InputConstants.isKeyDown(w, InputConstants.KEY_S)) f -= 1;
+                                       ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:131: error: incompatible types: long cannot be converted to Window
+          if (InputConstants.isKeyDown(w, InputConstants.KEY_A)) s += 1;
+                                       ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:132: error: incompatible types: long cannot be converted to Window
+          if (InputConstants.isKeyDown(w, InputConstants.KEY_D)) s -= 1;
+                                       ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:133: error: incompatible types: long cannot be converted to Window
+          if (InputConstants.isKeyDown(w, InputConstants.KEY_SPACE)) u += 1;
+                                       ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:134: error: incompatible types: long cannot be converted to Window
+          if (InputConstants.isKeyDown(w, InputConstants.KEY_LSHIFT)) u -= 1;
+                                       ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:135: error: incompatible types: long cannot be converted to Window
+          double boost = InputConstants.isKeyDown(w, InputConstants.KEY_LCONTROL) ? 2.5 : 1.0;
+                                                  ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:97: error: incompatible types: int cannot be converted to Matrix3x2f
+          g.pose().translate(fx, fy, 0);
+                                     ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:124: error: incompatible types: int cannot be converted to Matrix3x2f
+              g.pose().translate(tx - lift + 6, ty - lift + (th - 10) / 2f, 0);
+                                                                            ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:128: error: incompatible types: int cannot be converted to Matrix3x2f
+              g.pose().translate(tx - lift + 22, ty - lift + th / 2f - (gm.best > 0 ? 6 : 3), 0);
+                                                                                              ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:129: error: incompatible types: float cannot be converted to Matrix3x2f
+              g.pose().scale(0.75f, 0.75f, 1f);
+                                           ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HubWidgets.java:76: error: incompatible types: int cannot be converted to Matrix3x2f
+          g.pose().translate(x + 8, y + 17, 0);
+                                            ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HubWidgets.java:77: error: incompatible types: float cannot be converted to Matrix3x2f
+          g.pose().scale(2f, 2f, 1f);
+                                 ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:120: error: incompatible types: Matrix3x2fStack cannot be converted to PoseStack
+          PoseStack ps = g.pose();
+                               ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:447: error: incompatible types: int cannot be converted to Matrix3x2f
+          g.pose().translate(0, 0, 300);
+                                   ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:449: error: incompatible types: int cannot be converted to Matrix3x2f
+              g.pose().translate(x, sy, 0);
+                                        ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:451: error: incompatible types: int cannot be converted to Matrix3x2f
+              g.pose().translate(-x, -sy, 0);
+                                          ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:462: error: incompatible types: int cannot be converted to Matrix3x2f
+              g.pose().translate(0, 0, 310);
+                                       ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:591: error: incompatible types: Identifier cannot be converted to RenderPipeline
+          if (dir < 0) g.blit(skin, dx, dy, w, h, skinW, 0, -skinW, skinH, skinW, skinH);
+                              ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:592: error: incompatible types: Identifier cannot be converted to RenderPipeline
+          else g.blit(skin, dx, dy, w, h, 0, 0, skinW, skinH, skinW, skinH);
+                      ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/XlrwScreen.java:217: error: incompatible types: int cannot be converted to Matrix3x2f
+          g.pose().translate((1f - tIn) * 14f, 0, 0);
+                                                  ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:248: error: method does not override or implement a method from a supertype
+      @Override
+      ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:430: error: method does not override or implement a method from a supertype
+      @Override
+      ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:475: error: method does not override or implement a method from a supertype
+      @Override
+      ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:482: error: method does not override or implement a method from a supertype
+      @Override
+      ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:499: error: method does not override or implement a method from a supertype
+      @Override
+      ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/XlrwScreen.java:169: error: method does not override or implement a method from a supertype
+      @Override
+      ^
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:472: error: method mouseClicked in interface ContainerEventHandler cannot be applied to given types;
+          return super.mouseClicked(mx, my, button);
+                      ^
+    required: MouseButtonEvent,boolean
+    found:    double,double,int
+    reason: actual and formal argument lists differ in length
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:520: error: method keyPressed in class Screen cannot be applied to given types;
+          return super.keyPressed(key, scan, mods); // ESC -> onClose (keeps changes)
+                      ^
+    required: KeyEvent
+    found:    int,int,int
+    reason: actual and formal argument lists differ in length
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:80: error: method isSolidRender in class BlockStateBase cannot be applied to given types;
+                      if (n == null || !n.isSolidRender(EmptyBlockGetter.INSTANCE, BlockPos.ZERO)) mask |= 1 << d.ordinal();
+                                         ^
+    required: no arguments
+    found:    EmptyBlockGetter,BlockPos
+    reason: actual and formal argument lists differ in length
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:82: error: method isSolidRender in class BlockStateBase cannot be applied to given types;
+                  boolean solid = st.isSolidRender(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+                                    ^
+    required: no arguments
+    found:    EmptyBlockGetter,BlockPos
+    reason: actual and formal argument lists differ in length
+  /home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:578: error: no suitable constructor found for DynamicTexture(NativeImage)
+                  Minecraft.getInstance().getTextureManager().register(loc, new DynamicTexture(img));
+                                                                            ^
+      constructor DynamicTexture.DynamicTexture(Supplier<String>,NativeImage) is not applicable
+        (actual and formal argument lists differ in length)
+      constructor DynamicTexture.DynamicTexture(String,int,int,boolean) is not applicable
+        (actual and formal argument lists differ in length)
+      constructor DynamicTexture.DynamicTexture(Supplier<String>,int,int,boolean) is not applicable
+        (actual and formal argument lists differ in length)
+  Note: Some input files use or override a deprecated API.
+  Note: Recompile with -Xlint:deprecation for details.
+  Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+  100 errors
 
 * Try:
-> Run with --info or --debug option to get more log output.
+> Check your code and dependencies to fix the compilation error(s)
 > Run with --scan to get full insights from a Build Scan (powered by Develocity).
-> Get more help at https://help.gradle.org.
 
 * Exception is:
-org.gradle.api.internal.tasks.TaskDependencyResolveException: Could not determine the dependencies of task ':1.21.1:classes'.
-	at org.gradle.api.internal.tasks.CachingTaskDependencyResolveContext.getDependencies(CachingTaskDependencyResolveContext.java:70)
-	at org.gradle.execution.plan.TaskDependencyResolver.resolveDependenciesFor(TaskDependencyResolver.java:49)
-	at org.gradle.execution.plan.LocalTaskNode.getDependencies(LocalTaskNode.java:153)
-	at org.gradle.execution.plan.LocalTaskNode.resolveDependencies(LocalTaskNode.java:127)
-	at org.gradle.execution.plan.DefaultExecutionPlan.discoverNodeRelationships(DefaultExecutionPlan.java:190)
-	at org.gradle.execution.plan.DefaultExecutionPlan.doAddEntryNodes(DefaultExecutionPlan.java:161)
-	at org.gradle.execution.plan.DefaultExecutionPlan.addEntryTasks(DefaultExecutionPlan.java:136)
-	at org.gradle.execution.plan.DefaultExecutionPlan.addEntryTasks(DefaultExecutionPlan.java:128)
-	at org.gradle.execution.TaskNameResolvingBuildTaskScheduler.scheduleRequestedTasks(TaskNameResolvingBuildTaskScheduler.java:68)
-	at org.gradle.execution.DefaultTasksBuildTaskScheduler.scheduleRequestedTasks(DefaultTasksBuildTaskScheduler.java:69)
-	at org.gradle.initialization.DefaultTaskExecutionPreparer.lambda$scheduleRequestedTasks$0(DefaultTaskExecutionPreparer.java:47)
-	at org.gradle.internal.build.BuildProjectRegistry.lambda$withMutableStateOfAllProjects$0(BuildProjectRegistry.java:63)
-	at org.gradle.internal.build.BuildProjectRegistry.lambda$applyToMutableStateOfAllProjects$0(BuildProjectRegistry.java:81)
-	at org.gradle.api.internal.project.DefaultProjectStateRegistry$DefaultBuildProjectRegistry.lambda$fromMutableStateOfAllProjects$0(DefaultProjectStateRegistry.java:272)
-	at org.gradle.internal.work.DefaultWorkerLeaseService.lambda$runAndReleaseLocks$0(DefaultWorkerLeaseService.java:296)
-	at org.gradle.internal.work.ResourceLockStatistics$1.measure(ResourceLockStatistics.java:43)
-	at org.gradle.internal.work.DefaultWorkerLeaseService.runAndReleaseLocks(DefaultWorkerLeaseService.java:294)
-	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocksAcquired(DefaultWorkerLeaseService.java:290)
-	at org.gradle.internal.work.DefaultWorkerLeaseService.lambda$withReplacedLocks$0(DefaultWorkerLeaseService.java:446)
-	at org.gradle.internal.work.DefaultWorkerLeaseService.withoutLocks(DefaultWorkerLeaseService.java:368)
-	at org.gradle.internal.work.DefaultWorkerLeaseService.withReplacedLocks(DefaultWorkerLeaseService.java:445)
-	at org.gradle.api.internal.project.DefaultProjectStateRegistry$DefaultBuildProjectRegistry.fromMutableStateOfAllProjects(DefaultProjectStateRegistry.java:271)
-	at org.gradle.internal.build.BuildProjectRegistry.applyToMutableStateOfAllProjects(BuildProjectRegistry.java:80)
-	at org.gradle.internal.build.BuildProjectRegistry.withMutableStateOfAllProjects(BuildProjectRegistry.java:63)
-	at org.gradle.initialization.DefaultTaskExecutionPreparer.scheduleRequestedTasks(DefaultTaskExecutionPreparer.java:46)
-	at org.gradle.initialization.VintageBuildModelController.lambda$scheduleRequestedTasks$0(VintageBuildModelController.java:75)
-	at org.gradle.internal.model.StateTransitionController.lambda$inState$0(StateTransitionController.java:139)
-	at org.gradle.internal.model.StateTransitionController.lambda$inState$1(StateTransitionController.java:154)
-	at org.gradle.internal.work.DefaultSynchronizer.withLock(DefaultSynchronizer.java:45)
-	at org.gradle.internal.model.StateTransitionController.inState(StateTransitionController.java:150)
-	at org.gradle.internal.model.StateTransitionController.inState(StateTransitionController.java:138)
-	at org.gradle.initialization.VintageBuildModelController.scheduleRequestedTasks(VintageBuildModelController.java:75)
-	at org.gradle.internal.build.DefaultBuildLifecycleController$DefaultWorkGraphBuilder.addRequestedTasks(DefaultBuildLifecycleController.java:414)
-	at org.gradle.internal.buildtree.DefaultBuildTreeWorkPreparer.lambda$scheduleRequestedTasks$1(DefaultBuildTreeWorkPreparer.java:40)
-	at org.gradle.internal.build.DefaultBuildLifecycleController.lambda$populateWorkGraph$1(DefaultBuildLifecycleController.java:199)
-	at org.gradle.internal.build.DefaultBuildWorkPreparer.populateWorkGraph(DefaultBuildWorkPreparer.java:47)
-	at org.gradle.internal.build.BuildOperationFiringBuildWorkPreparer$PopulateWorkGraph.populateTaskGraph(BuildOperationFiringBuildWorkPreparer.java:107)
-	at org.gradle.internal.build.BuildOperationFiringBuildWorkPreparer$PopulateWorkGraph.run(BuildOperationFiringBuildWorkPreparer.java:93)
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':1.21.11:compileClientJava' (registered by plugin class 'org.gradle.api.plugins.JavaBasePlugin').
+	at org.gradle.api.internal.tasks.execution.DefaultTaskNodeExecutor.lambda$doExecute$1(DefaultTaskNodeExecutor.java:367)
+	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:288)
+	at org.gradle.api.internal.tasks.execution.DefaultTaskNodeExecutor.doExecute(DefaultTaskNodeExecutor.java:365)
+	at org.gradle.api.internal.tasks.execution.DefaultTaskNodeExecutor.executeTrackingTaskIdentity(DefaultTaskNodeExecutor.java:332)
+	at org.gradle.api.internal.tasks.execution.DefaultTaskNodeExecutor.executeFinalizingProperties(DefaultTaskNodeExecutor.java:318)
+	at org.gradle.api.internal.tasks.execution.DefaultTaskNodeExecutor.executeSkippingWithNoActions(DefaultTaskNodeExecutor.java:289)
+	at org.gradle.api.internal.tasks.execution.DefaultTaskNodeExecutor.executeSkippingOnlyIf(DefaultTaskNodeExecutor.java:272)
+	at org.gradle.api.internal.tasks.execution.DefaultTaskNodeExecutor.executeCatchingFailures(DefaultTaskNodeExecutor.java:228)
+	at org.gradle.api.internal.tasks.execution.DefaultTaskNodeExecutor.executeWithFallbackOperationId(DefaultTaskNodeExecutor.java:197)
+	at org.gradle.api.internal.tasks.execution.DefaultTaskNodeExecutor.executeWithLifecycle(DefaultTaskNodeExecutor.java:171)
+	at org.gradle.api.internal.tasks.execution.DefaultTaskNodeExecutor.access$000(DefaultTaskNodeExecutor.java:67)
+	at org.gradle.api.internal.tasks.execution.DefaultTaskNodeExecutor$1.run(DefaultTaskNodeExecutor.java:136)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:30)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:27)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
@@ -101,61 +1028,491 @@ org.gradle.api.internal.tasks.TaskDependencyResolveException: Could not determin
 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner.run(DefaultBuildOperationRunner.java:48)
-	at org.gradle.internal.build.BuildOperationFiringBuildWorkPreparer.populateWorkGraph(BuildOperationFiringBuildWorkPreparer.java:68)
-	at org.gradle.internal.build.DefaultBuildLifecycleController.lambda$populateWorkGraph$0(DefaultBuildLifecycleController.java:199)
-	at org.gradle.internal.model.StateTransitionController.lambda$inState$0(StateTransitionController.java:139)
-	at org.gradle.internal.model.StateTransitionController.lambda$inState$1(StateTransitionController.java:154)
-	at org.gradle.internal.work.DefaultSynchronizer.withLock(DefaultSynchronizer.java:45)
-	at org.gradle.internal.model.StateTransitionController.inState(StateTransitionController.java:150)
-	at org.gradle.internal.model.StateTransitionController.inState(StateTransitionController.java:138)
-	at org.gradle.internal.build.DefaultBuildLifecycleController.populateWorkGraph(DefaultBuildLifecycleController.java:199)
-	at org.gradle.internal.build.DefaultBuildWorkGraphController$DefaultBuildWorkGraph.populateWorkGraph(DefaultBuildWorkGraphController.java:156)
-	at org.gradle.composite.internal.DefaultBuildController.populateWorkGraph(DefaultBuildController.java:76)
-	at org.gradle.composite.internal.DefaultIncludedBuildTaskGraph$DefaultBuildTreeWorkGraphBuilder.withWorkGraph(DefaultIncludedBuildTaskGraph.java:156)
-	at org.gradle.internal.buildtree.DefaultBuildTreeWorkPreparer.lambda$scheduleRequestedTasks$0(DefaultBuildTreeWorkPreparer.java:40)
-	at org.gradle.composite.internal.DefaultIncludedBuildTaskGraph$DefaultBuildTreeWorkGraph$1.run(DefaultIncludedBuildTaskGraph.java:212)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:30)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:27)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.run(DefaultBuildOperationRunner.java:48)
-	at org.gradle.composite.internal.DefaultIncludedBuildTaskGraph$DefaultBuildTreeWorkGraph.scheduleWork(DefaultIncludedBuildTaskGraph.java:207)
-	at org.gradle.internal.buildtree.DefaultBuildTreeWorkPreparer.scheduleRequestedTasks(DefaultBuildTreeWorkPreparer.java:36)
-	at org.gradle.internal.cc.impl.barrier.BarrierAwareBuildTreeWorkPreparer.scheduleRequestedTasks$lambda$0(BarrierAwareBuildTreeWorkPreparer.kt:34)
-	at org.gradle.internal.cc.impl.barrier.VintageConfigurationTimeActionRunner.runConfigurationTimeAction(VintageConfigurationTimeActionRunner.kt:48)
-	at org.gradle.internal.cc.impl.barrier.BarrierAwareBuildTreeWorkPreparer.scheduleRequestedTasks(BarrierAwareBuildTreeWorkPreparer.kt:33)
-	at org.gradle.internal.cc.impl.VintageBuildTreeWorkController$scheduleAndRunRequestedTasks$1$finalizedGraph$1.call(VintageBuildTreeWorkController.kt:37)
-	at org.gradle.internal.cc.impl.VintageBuildTreeWorkController$scheduleAndRunRequestedTasks$1$finalizedGraph$1.call(VintageBuildTreeWorkController.kt:37)
-	at org.gradle.internal.Try.ofFailable(Try.java:46)
-	at org.gradle.internal.cc.impl.VintageBuildTreeWorkController$scheduleAndRunRequestedTasks$1.apply(VintageBuildTreeWorkController.kt:37)
-	at org.gradle.internal.cc.impl.VintageBuildTreeWorkController$scheduleAndRunRequestedTasks$1.apply(VintageBuildTreeWorkController.kt:36)
-	at org.gradle.composite.internal.DefaultIncludedBuildTaskGraph.withNewWorkGraph(DefaultIncludedBuildTaskGraph.java:115)
-	at org.gradle.internal.cc.impl.VintageBuildTreeWorkController.scheduleAndRunRequestedTasks(VintageBuildTreeWorkController.kt:36)
-	at org.gradle.internal.buildtree.DefaultBuildTreeLifecycleController.lambda$scheduleAndRunTasks$0(DefaultBuildTreeLifecycleController.java:79)
-	at org.gradle.internal.buildtree.DefaultBuildTreeLifecycleController.lambda$runBuild$0(DefaultBuildTreeLifecycleController.java:159)
-	at org.gradle.internal.model.StateTransitionController.lambda$transition$2(StateTransitionController.java:227)
-	at org.gradle.internal.model.StateTransitionController.doTransition(StateTransitionController.java:324)
-	at org.gradle.internal.model.StateTransitionController.lambda$transition$1(StateTransitionController.java:227)
-	at org.gradle.internal.work.DefaultSynchronizer.withLock(DefaultSynchronizer.java:45)
-	at org.gradle.internal.model.StateTransitionController.transition(StateTransitionController.java:227)
-	at org.gradle.internal.buildtree.DefaultBuildTreeLifecycleController.runBuild(DefaultBuildTreeLifecycleController.java:156)
-	at org.gradle.internal.buildtree.DefaultBuildTreeLifecycleController.scheduleAndRunTasks(DefaultBuildTreeLifecycleController.java:79)
-	at org.gradle.internal.buildtree.DefaultBuildTreeLifecycleController.scheduleAndRunTasks(DefaultBuildTreeLifecycleController.java:74)
-	at org.gradle.tooling.internal.provider.ExecuteBuildActionRunner.run(ExecuteBuildActionRunner.java:31)
-	at org.gradle.launcher.exec.ChainingBuildActionRunner.run(ChainingBuildActionRunner.java:35)
-	at org.gradle.internal.buildtree.ProblemReportingBuildActionRunner.run(ProblemReportingBuildActionRunner.java:55)
-	at org.gradle.launcher.exec.BuildOutcomeReportingBuildActionRunner.run(BuildOutcomeReportingBuildActionRunner.java:83)
-	at org.gradle.tooling.internal.provider.FileSystemWatchingBuildActionRunner.run(FileSystemWatchingBuildActionRunner.java:118)
-	at org.gradle.launcher.exec.BuildCompletionNotifyingBuildActionRunner.run(BuildCompletionNotifyingBuildActionRunner.java:64)
-	at org.gradle.launcher.exec.RootBuildLifecycleBuildActionExecutor.lambda$execute$0(RootBuildLifecycleBuildActionExecutor.java:99)
-	at org.gradle.composite.internal.DefaultRootBuildState.run(DefaultRootBuildState.java:119)
-	at org.gradle.launcher.exec.RootBuildLifecycleBuildActionExecutor.execute(RootBuildLifecycleBuildActionExecutor.java:99)
-	at org.gradle.launcher.exec.DefaultBuildTreeActionExecutor.runBuildTreeLifecycle(DefaultBuildTreeActionExecutor.java:132)
-	at org.gradle.launcher.exec.DefaultBuildTreeActionExecutor.access$200(DefaultBuildTreeActionExecutor.java:54)
-	at org.gradle.launcher.exec.DefaultBuildTreeActionExecutor$2.call(DefaultBuildTreeActionExecutor.java:104)
-	at org.gradle.launcher.exec.DefaultBuildTreeActionExecutor$2.call(DefaultBuildTreeActionExecutor.java:99)
+	at org.gradle.api.internal.tasks.execution.DefaultTaskNodeExecutor.execute(DefaultTaskNodeExecutor.java:133)
+	at org.gradle.execution.plan.LocalTaskNode.execute(LocalTaskNode.java:229)
+	at org.gradle.execution.DefaultBuildWorkExecutor.lambda$executePlan$0(DefaultBuildWorkExecutor.java:153)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.lambda$execute$0(DefaultPlanExecutor.java:476)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:85)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:475)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:392)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:65)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+Caused by: org.gradle.api.internal.tasks.compile.CompilationFailedException: Compilation failed; see the compiler output below.
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:13: error: cannot find symbol
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+                                                  ^
+  symbol:   class WorldRenderContext
+  location: package net.fabricmc.fabric.api.client.rendering.v1
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:14: error: cannot find symbol
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+                                                  ^
+  symbol:   class WorldRenderEvents
+  location: package net.fabricmc.fabric.api.client.rendering.v1
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:21: error: cannot find symbol
+import net.minecraft.client.renderer.RenderType;
+                                    ^
+  symbol:   class RenderType
+  location: package net.minecraft.client.renderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:24: error: cannot find symbol
+import net.minecraft.client.resources.model.BakedModel;
+                                           ^
+  symbol:   class BakedModel
+  location: package net.minecraft.client.resources.model
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:16: error: cannot find symbol
+import net.minecraft.client.renderer.RenderType;
+                                    ^
+  symbol:   class RenderType
+  location: package net.minecraft.client.renderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:54: error: cannot find symbol
+    private static void render(WorldRenderContext context) {
+                               ^
+  symbol:   class WorldRenderContext
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:130: error: cannot find symbol
+    private static void flush(MultiBufferSource consumers, RenderType type) {
+                                                           ^
+  symbol:   class RenderType
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:10: error: cannot find symbol
+import net.minecraft.client.renderer.FogRenderer;
+                                    ^
+  symbol:   class FogRenderer
+  location: package net.minecraft.client.renderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:13: error: cannot find symbol
+import net.minecraft.client.renderer.RenderType;
+                                    ^
+  symbol:   class RenderType
+  location: package net.minecraft.client.renderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:16: error: cannot find symbol
+import net.minecraft.client.resources.model.BakedModel;
+                                           ^
+  symbol:   class BakedModel
+  location: package net.minecraft.client.resources.model
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/XlrwScreen.java:6: error: cannot find symbol
+import com.mojang.blaze3d.vertex.BufferUploader;
+                                ^
+  symbol:   class BufferUploader
+  location: package com.mojang.blaze3d.vertex
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/BuilderHud.java:82: error: cannot find symbol
+                        diagnostic = "Thiếu vật liệu: " + item.getDescription().getString();
+                                                              ^
+  symbol:   method getDescription()
+  location: variable item of type Item
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:51: error: package WorldRenderEvents does not exist
+        WorldRenderEvents.AFTER_TRANSLUCENT.register(SchematicRenderer::render);
+                         ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:65: error: cannot find symbol
+        Vec3 cam = camera.getPosition();
+                         ^
+  symbol:   method getPosition()
+  location: variable camera of type Camera
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:74: error: cannot find symbol
+        flush(consumers, net.minecraft.client.renderer.Sheets.translucentCullBlockSheet());
+                                                             ^
+  symbol:   method translucentCullBlockSheet()
+  location: class Sheets
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:75: error: cannot find symbol
+        flush(consumers, RenderType.debugQuads());
+                         ^
+  symbol:   variable RenderType
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:77: error: cannot find symbol
+        VertexConsumer lines = consumers.getBuffer(RenderType.lines());
+                                                   ^
+  symbol:   variable RenderType
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:89: error: cannot find symbol
+            LevelRenderer.renderLineBox(ps, lines, new AABB(t).inflate(0.02 + 0.03 * p), 0.95f, 0.44f, 0.12f, 0.6f + 0.4f * p);
+                         ^
+  symbol:   method renderLineBox(PoseStack,VertexConsumer,AABB,float,float,float,float)
+  location: class LevelRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:93: error: cannot find symbol
+            LevelRenderer.renderLineBox(ps, lines, new AABB(chestPos).inflate(0.01), 0.91f, 0.85f, 0.79f, 0.8f);
+                         ^
+  symbol:   method renderLineBox(PoseStack,VertexConsumer,AABB,float,float,float,float)
+  location: class LevelRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:101: error: cannot find symbol
+                LevelRenderer.renderLineBox(ps, lines, new AABB(p).inflate(0.04), 1.0f, 0.15f, 0.15f, pulse);
+                             ^
+  symbol:   method renderLineBox(PoseStack,VertexConsumer,AABB,float,float,float,float)
+  location: class LevelRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:105: error: cannot find symbol
+                LevelRenderer.renderLineBox(ps, lines, new AABB(p).inflate(0.02), 1.0f, 0.6f, 0.1f, 0.8f);
+                             ^
+  symbol:   method renderLineBox(PoseStack,VertexConsumer,AABB,float,float,float,float)
+  location: class LevelRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:109: error: cannot find symbol
+                LevelRenderer.renderLineBox(ps, lines, new AABB(t.base.getX() + 0.15, t.base.getY(), t.base.getZ() + 0.15,
+                             ^
+  symbol:   method renderLineBox(PoseStack,VertexConsumer,AABB,float,float,float,float)
+  location: class LevelRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:114: error: cannot find symbol
+                LevelRenderer.renderLineBox(ps, lines, new AABB(p.getX() + 0.35, p.getY(), p.getZ() + 0.35,
+                             ^
+  symbol:   method renderLineBox(PoseStack,VertexConsumer,AABB,float,float,float,float)
+  location: class LevelRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:118: error: cannot find symbol
+        flush(consumers, RenderType.lines());
+                         ^
+  symbol:   variable RenderType
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:122: error: cannot find symbol
+            RenderSystem.clear(256, Minecraft.ON_OSX); // GL_DEPTH_BUFFER_BIT: the gizmo must never hide inside blocks
+                                             ^
+  symbol:   variable ON_OSX
+  location: class Minecraft
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:124: error: cannot find symbol
+            flush(consumers, RenderType.debugQuads());
+                             ^
+  symbol:   variable RenderType
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:125: error: cannot find symbol
+            flush(consumers, RenderType.lines());
+                             ^
+  symbol:   variable RenderType
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:143: error: cannot find symbol
+        VertexConsumer quads = consumers.getBuffer(RenderType.debugQuads());
+                                                   ^
+  symbol:   variable RenderType
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:182: error: cannot find symbol
+        flush(consumers, RenderType.debugQuads());
+                         ^
+  symbol:   variable RenderType
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:188: error: cannot find symbol
+        VertexConsumer holo = consumers.getBuffer(net.minecraft.client.renderer.Sheets.translucentCullBlockSheet());
+                                                                                      ^
+  symbol:   method translucentCullBlockSheet()
+  location: class Sheets
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:194: error: cannot find symbol
+        flush(consumers, net.minecraft.client.renderer.Sheets.translucentCullBlockSheet());
+                                                             ^
+  symbol:   method translucentCullBlockSheet()
+  location: class Sheets
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:197: error: cannot find symbol
+        quads = consumers.getBuffer(RenderType.debugQuads());
+                                    ^
+  symbol:   variable RenderType
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:203: error: cannot find symbol
+        flush(consumers, RenderType.debugQuads());
+                         ^
+  symbol:   variable RenderType
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:209: error: cannot find symbol
+        BakedModel model = mc.getBlockRenderer().getBlockModel(state);
+        ^
+  symbol:   class BakedModel
+  location: class SchematicRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:260: error: cannot find symbol
+        LevelRenderer.renderLineBox(ps, lines, b.minX, b.minY, b.minZ, b.maxX, b.maxY, b.maxZ, 0.29f, 0.38f, 0.5f, a);
+                     ^
+  symbol:   method renderLineBox(PoseStack,VertexConsumer,double,double,double,double,double,double,float,float,float,float)
+  location: class LevelRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/render/SchematicRenderer.java:274: error: cannot find symbol
+        LevelRenderer.renderLineBox(ps, lines, b.minX - 0.05, yy, b.minZ - 0.05, b.maxX + 0.05, yy + 1, b.maxZ + 0.05, 0.95f, 0.44f, 0.12f, 0.55f);
+                     ^
+  symbol:   method renderLineBox(PoseStack,VertexConsumer,double,double,double,double,double,double,float,float,float,float)
+  location: class LevelRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:127: error: cannot find symbol
+        long w = Minecraft.getInstance().getWindow().getWindow();
+                                                    ^
+  symbol:   method getWindow()
+  location: class Window
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:129: error: incompatible types: long cannot be converted to Window
+        if (InputConstants.isKeyDown(w, InputConstants.KEY_W)) f += 1;
+                                     ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:130: error: incompatible types: long cannot be converted to Window
+        if (InputConstants.isKeyDown(w, InputConstants.KEY_S)) f -= 1;
+                                     ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:131: error: incompatible types: long cannot be converted to Window
+        if (InputConstants.isKeyDown(w, InputConstants.KEY_A)) s += 1;
+                                     ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:132: error: incompatible types: long cannot be converted to Window
+        if (InputConstants.isKeyDown(w, InputConstants.KEY_D)) s -= 1;
+                                     ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:133: error: incompatible types: long cannot be converted to Window
+        if (InputConstants.isKeyDown(w, InputConstants.KEY_SPACE)) u += 1;
+                                     ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:134: error: incompatible types: long cannot be converted to Window
+        if (InputConstants.isKeyDown(w, InputConstants.KEY_LSHIFT)) u -= 1;
+                                     ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:135: error: incompatible types: long cannot be converted to Window
+        double boost = InputConstants.isKeyDown(w, InputConstants.KEY_LCONTROL) ? 2.5 : 1.0;
+                                                ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:248: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:318: error: cannot find symbol
+        VertexConsumer q = consumers.getBuffer(RenderType.debugQuads());
+                                               ^
+  symbol:   variable RenderType
+  location: class SchematicEditorScreen
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:352: error: cannot find symbol
+            VertexConsumer lines = consumers.getBuffer(RenderType.lines());
+                                                       ^
+  symbol:   variable RenderType
+  location: class SchematicEditorScreen
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:353: error: cannot find symbol
+            net.minecraft.client.renderer.LevelRenderer.renderLineBox(ps, lines, b.minX - 0.05, b.minY - 0.05, b.minZ - 0.05,
+                                                       ^
+  symbol:   method renderLineBox(PoseStack,VertexConsumer,double,double,double,double,double,double,float,float,float,float)
+  location: class LevelRenderer
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:430: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:472: error: method mouseClicked in interface ContainerEventHandler cannot be applied to given types;
+        return super.mouseClicked(mx, my, button);
+                    ^
+  required: MouseButtonEvent,boolean
+  found:    double,double,int
+  reason: actual and formal argument lists differ in length
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:475: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:482: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:499: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/SchematicEditorScreen.java:520: error: method keyPressed in class Screen cannot be applied to given types;
+        return super.keyPressed(key, scan, mods); // ESC -> onClose (keeps changes)
+                    ^
+  required: KeyEvent
+  found:    int,int,int
+  reason: actual and formal argument lists differ in length
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/ExternalMusic.java:59: error: cannot find symbol
+            net.minecraft.Util.getPlatform().openFile(dir());
+                         ^
+  symbol:   class Util
+  location: package net.minecraft
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:96: error: cannot find symbol
+        g.pose().pushPose();
+                ^
+  symbol:   method pushPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:97: error: incompatible types: int cannot be converted to Matrix3x2f
+        g.pose().translate(fx, fy, 0);
+                                   ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:99: error: cannot find symbol
+        g.pose().popPose();
+                ^
+  symbol:   method popPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:123: error: cannot find symbol
+            g.pose().pushPose();
+                    ^
+  symbol:   method pushPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:124: error: incompatible types: int cannot be converted to Matrix3x2f
+            g.pose().translate(tx - lift + 6, ty - lift + (th - 10) / 2f, 0);
+                                                                          ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:126: error: cannot find symbol
+            g.pose().popPose();
+                    ^
+  symbol:   method popPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:127: error: cannot find symbol
+            g.pose().pushPose();
+                    ^
+  symbol:   method pushPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:128: error: incompatible types: int cannot be converted to Matrix3x2f
+            g.pose().translate(tx - lift + 22, ty - lift + th / 2f - (gm.best > 0 ? 6 : 3), 0);
+                                                                                            ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:129: error: incompatible types: float cannot be converted to Matrix3x2f
+            g.pose().scale(0.75f, 0.75f, 1f);
+                                         ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Arcade.java:132: error: cannot find symbol
+            g.pose().popPose();
+                    ^
+  symbol:   method popPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HubWidgets.java:75: error: cannot find symbol
+        g.pose().pushPose();
+                ^
+  symbol:   method pushPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HubWidgets.java:76: error: incompatible types: int cannot be converted to Matrix3x2f
+        g.pose().translate(x + 8, y + 17, 0);
+                                          ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HubWidgets.java:77: error: incompatible types: float cannot be converted to Matrix3x2f
+        g.pose().scale(2f, 2f, 1f);
+                               ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HubWidgets.java:79: error: cannot find symbol
+        g.pose().popPose();
+                ^
+  symbol:   method popPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:80: error: method isSolidRender in class BlockStateBase cannot be applied to given types;
+                    if (n == null || !n.isSolidRender(EmptyBlockGetter.INSTANCE, BlockPos.ZERO)) mask |= 1 << d.ordinal();
+                                       ^
+  required: no arguments
+  found:    EmptyBlockGetter,BlockPos
+  reason: actual and formal argument lists differ in length
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:82: error: method isSolidRender in class BlockStateBase cannot be applied to given types;
+                boolean solid = st.isSolidRender(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+                                  ^
+  required: no arguments
+  found:    EmptyBlockGetter,BlockPos
+  reason: actual and formal argument lists differ in length
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:117: error: cannot find symbol
+        g.flush();
+         ^
+  symbol:   method flush()
+  location: variable g of type GuiGraphics
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:118: error: cannot find symbol
+        FogRenderer.setupNoFog();
+        ^
+  symbol:   variable FogRenderer
+  location: class HoloPreview
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:119: error: cannot find symbol
+        RenderSystem.clear(256, Minecraft.ON_OSX); // depth only: the HUD below may have written depth here
+                                         ^
+  symbol:   variable ON_OSX
+  location: class Minecraft
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:120: error: incompatible types: Matrix3x2fStack cannot be converted to PoseStack
+        PoseStack ps = g.pose();
+                             ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:129: error: cannot find symbol
+        MultiBufferSource.BufferSource bs = g.bufferSource();
+                                             ^
+  symbol:   method bufferSource()
+  location: variable g of type GuiGraphics
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:130: error: cannot find symbol
+        VertexConsumer vc = bs.getBuffer(RenderType.cutout());
+                                         ^
+  symbol:   variable RenderType
+  location: class HoloPreview
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:134: error: cannot find symbol
+            BakedModel model = br.getBlockModel(c.state);
+            ^
+  symbol:   class BakedModel
+  location: class HoloPreview
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:152: error: cannot find symbol
+                    float shade = q.isShade() ? faceShade(q.getDirection()) : 1f;
+                                   ^
+  symbol:   method isShade()
+  location: variable q of type BakedQuad
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:152: error: cannot find symbol
+                    float shade = q.isShade() ? faceShade(q.getDirection()) : 1f;
+                                                           ^
+  symbol:   method getDirection()
+  location: variable q of type BakedQuad
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:155: error: cannot find symbol
+                        int col = tint(mc, c.state, q.getTintIndex());
+                                                     ^
+  symbol:   method getTintIndex()
+  location: variable q of type BakedQuad
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:165: error: cannot find symbol
+        bs.endBatch(RenderType.cutout());
+                    ^
+  symbol:   variable RenderType
+  location: class HoloPreview
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:170: error: cannot find symbol
+            VertexConsumer q = bs.getBuffer(RenderType.gui());
+                                            ^
+  symbol:   variable RenderType
+  location: class HoloPreview
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/HoloPreview.java:183: error: cannot find symbol
+            bs.endBatch(RenderType.gui());
+                        ^
+  symbol:   variable RenderType
+  location: class HoloPreview
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:446: error: cannot find symbol
+        g.pose().pushPose();
+                ^
+  symbol:   method pushPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:447: error: incompatible types: int cannot be converted to Matrix3x2f
+        g.pose().translate(0, 0, 300);
+                                 ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:449: error: incompatible types: int cannot be converted to Matrix3x2f
+            g.pose().translate(x, sy, 0);
+                                      ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:450: error: cannot find symbol
+            g.pose().mulPose(com.mojang.math.Axis.ZP.rotationDegrees(Math.max(-35, Math.min(35, swing))));
+                    ^
+  symbol:   method mulPose(Quaternionf)
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:451: error: incompatible types: int cannot be converted to Matrix3x2f
+            g.pose().translate(-x, -sy, 0);
+                                        ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:456: error: cannot find symbol
+        g.pose().popPose();
+                ^
+  symbol:   method popPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:461: error: cannot find symbol
+            g.pose().pushPose();
+                    ^
+  symbol:   method pushPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:462: error: incompatible types: int cannot be converted to Matrix3x2f
+            g.pose().translate(0, 0, 310);
+                                     ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:468: error: cannot find symbol
+            g.pose().popPose();
+                    ^
+  symbol:   method popPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:578: error: no suitable constructor found for DynamicTexture(NativeImage)
+                Minecraft.getInstance().getTextureManager().register(loc, new DynamicTexture(img));
+                                                                          ^
+    constructor DynamicTexture.DynamicTexture(Supplier<String>,NativeImage) is not applicable
+      (actual and formal argument lists differ in length)
+    constructor DynamicTexture.DynamicTexture(String,int,int,boolean) is not applicable
+      (actual and formal argument lists differ in length)
+    constructor DynamicTexture.DynamicTexture(Supplier<String>,int,int,boolean) is not applicable
+      (actual and formal argument lists differ in length)
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:591: error: incompatible types: Identifier cannot be converted to RenderPipeline
+        if (dir < 0) g.blit(skin, dx, dy, w, h, skinW, 0, -skinW, skinH, skinW, skinH);
+                            ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/Mascot.java:592: error: incompatible types: Identifier cannot be converted to RenderPipeline
+        else g.blit(skin, dx, dy, w, h, 0, 0, skinW, skinH, skinW, skinH);
+                    ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/XlrwScreen.java:169: error: method does not override or implement a method from a supertype
+    @Override
+    ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/XlrwScreen.java:216: error: cannot find symbol
+        g.pose().pushPose();
+                ^
+  symbol:   method pushPose()
+  location: class Matrix3x2fStack
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/XlrwScreen.java:217: error: incompatible types: int cannot be converted to Matrix3x2f
+        g.pose().translate((1f - tIn) * 14f, 0, 0);
+                                                ^
+/home/runner/work/Xlrw/Xlrw/versions/1.21.11/build/generated/stonecutter/client/java/com/xlrw/gui/XlrwScreen.java:220: error: cannot find symbol
+        g.pose().pushPose();
+                ^
+  symbol:   method pushPose()
+  location: class Matrix3x2fStack
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+100 errors
+	at org.gradle.api.internal.tasks.compile.JdkJavaCompiler.execute(JdkJavaCompiler.java:88)
+	at org.gradle.api.internal.tasks.compile.JdkJavaCompiler.execute(JdkJavaCompiler.java:49)
+	at org.gradle.api.internal.tasks.compile.NormalizingJavaCompiler.delegateAndHandleErrors(NormalizingJavaCompiler.java:98)
+	at org.gradle.api.internal.tasks.compile.NormalizingJavaCompiler.execute(NormalizingJavaCompiler.java:52)
+	at org.gradle.api.internal.tasks.compile.NormalizingJavaCompiler.execute(NormalizingJavaCompiler.java:38)
+	at org.gradle.api.internal.tasks.compile.AnnotationProcessorDiscoveringCompiler.execute(AnnotationProcessorDiscoveringCompiler.java:52)
+	at org.gradle.api.internal.tasks.compile.AnnotationProcessorDiscoveringCompiler.execute(AnnotationProcessorDiscoveringCompiler.java:38)
+	at org.gradle.api.internal.tasks.compile.ModuleApplicationNameWritingCompiler.execute(ModuleApplicationNameWritingCompiler.java:46)
+	at org.gradle.api.internal.tasks.compile.ModuleApplicationNameWritingCompiler.execute(ModuleApplicationNameWritingCompiler.java:36)
+	at org.gradle.jvm.toolchain.internal.DefaultToolchainJavaCompiler.execute(DefaultToolchainJavaCompiler.java:57)
+	at org.gradle.api.tasks.compile.JavaCompile.lambda$createToolchainCompiler$0(JavaCompile.java:213)
+	at org.gradle.api.internal.tasks.compile.CleaningJavaCompiler.execute(CleaningJavaCompiler.java:53)
+	at org.gradle.api.internal.tasks.compile.incremental.IncrementalCompilerFactory.lambda$createRebuildAllCompiler$0(IncrementalCompilerFactory.java:55)
+	at org.gradle.api.internal.tasks.compile.incremental.SelectiveCompiler.execute(SelectiveCompiler.java:70)
+	at org.gradle.api.internal.tasks.compile.incremental.SelectiveCompiler.execute(SelectiveCompiler.java:44)
+	at org.gradle.api.internal.tasks.compile.incremental.IncrementalResultStoringCompiler.execute(IncrementalResultStoringCompiler.java:66)
+	at org.gradle.api.internal.tasks.compile.incremental.IncrementalResultStoringCompiler.execute(IncrementalResultStoringCompiler.java:52)
+	at org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler$CompileOperation.call(CompileJavaBuildOperationReportingCompiler.java:78)
+	at org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler$CompileOperation.call(CompileJavaBuildOperationReportingCompiler.java:52)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
@@ -163,64 +1520,16 @@ org.gradle.api.internal.tasks.TaskDependencyResolveException: Could not determin
 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
-	at org.gradle.launcher.exec.DefaultBuildTreeActionExecutor.runAsBuildOperation(DefaultBuildTreeActionExecutor.java:99)
-	at org.gradle.launcher.exec.DefaultBuildTreeActionExecutor.lambda$runBuildTreeAction$0(DefaultBuildTreeActionExecutor.java:93)
-	at org.gradle.internal.work.DefaultWorkerLeaseService.lambda$runAndReleaseLocks$0(DefaultWorkerLeaseService.java:296)
-	at org.gradle.internal.work.ResourceLockStatistics$1.measure(ResourceLockStatistics.java:43)
-	at org.gradle.internal.work.DefaultWorkerLeaseService.runAndReleaseLocks(DefaultWorkerLeaseService.java:294)
-	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocksAcquired(DefaultWorkerLeaseService.java:290)
-	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:282)
-	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:132)
-	at org.gradle.launcher.exec.DefaultBuildTreeActionExecutor.runBuildTreeAction(DefaultBuildTreeActionExecutor.java:93)
-	at org.gradle.tooling.internal.provider.continuous.ContinuousBuildActionExecutor.execute(ContinuousBuildActionExecutor.java:111)
-	at org.gradle.tooling.internal.provider.SubscribableBuildActionExecutor.execute(SubscribableBuildActionExecutor.java:64)
-	at org.gradle.internal.session.DefaultBuildSessionContext.execute(DefaultBuildSessionContext.java:46)
-	at org.gradle.internal.buildprocess.execution.BuildSessionLifecycleBuildActionExecutor$ActionImpl.apply(BuildSessionLifecycleBuildActionExecutor.java:106)
-	at org.gradle.internal.buildprocess.execution.BuildSessionLifecycleBuildActionExecutor$ActionImpl.apply(BuildSessionLifecycleBuildActionExecutor.java:94)
-	at org.gradle.internal.session.BuildSessionState.run(BuildSessionState.java:73)
-	at org.gradle.internal.buildprocess.execution.BuildSessionLifecycleBuildActionExecutor.execute(BuildSessionLifecycleBuildActionExecutor.java:67)
-	at org.gradle.internal.buildprocess.execution.BuildSessionLifecycleBuildActionExecutor.execute(BuildSessionLifecycleBuildActionExecutor.java:45)
-	at org.gradle.internal.buildprocess.execution.StartParamsValidatingActionExecutor.execute(StartParamsValidatingActionExecutor.java:57)
-	at org.gradle.internal.buildprocess.execution.StartParamsValidatingActionExecutor.execute(StartParamsValidatingActionExecutor.java:32)
-	at org.gradle.internal.buildprocess.execution.SessionFailureReportingActionExecutor.execute(SessionFailureReportingActionExecutor.java:51)
-	at org.gradle.internal.buildprocess.execution.SessionFailureReportingActionExecutor.execute(SessionFailureReportingActionExecutor.java:39)
-	at org.gradle.internal.buildprocess.execution.SetupLoggingActionExecutor.execute(SetupLoggingActionExecutor.java:47)
-	at org.gradle.internal.buildprocess.execution.SetupLoggingActionExecutor.execute(SetupLoggingActionExecutor.java:31)
-	at org.gradle.launcher.daemon.server.exec.ExecuteBuild.doBuild(ExecuteBuild.java:70)
-	at org.gradle.launcher.daemon.server.exec.BuildCommandOnly.execute(BuildCommandOnly.java:37)
-	at org.gradle.launcher.daemon.server.api.DaemonCommandExecution.proceed(DaemonCommandExecution.java:104)
-	at org.gradle.launcher.daemon.server.exec.WatchForDisconnection.execute(WatchForDisconnection.java:39)
-	at org.gradle.launcher.daemon.server.api.DaemonCommandExecution.proceed(DaemonCommandExecution.java:104)
-	at org.gradle.launcher.daemon.server.exec.ResetDeprecationLogger.execute(ResetDeprecationLogger.java:29)
-	at org.gradle.launcher.daemon.server.api.DaemonCommandExecution.proceed(DaemonCommandExecution.java:104)
-	at org.gradle.launcher.daemon.server.exec.RequestStopIfSingleUsedDaemon.execute(RequestStopIfSingleUsedDaemon.java:35)
-	at org.gradle.launcher.daemon.server.api.DaemonCommandExecution.proceed(DaemonCommandExecution.java:104)
-	at org.gradle.launcher.daemon.server.exec.ForwardClientInput.lambda$execute$0(ForwardClientInput.java:40)
-	at org.gradle.internal.daemon.clientinput.ClientInputForwarder.forwardInput(ClientInputForwarder.java:80)
-	at org.gradle.launcher.daemon.server.exec.ForwardClientInput.execute(ForwardClientInput.java:37)
-	at org.gradle.launcher.daemon.server.api.DaemonCommandExecution.proceed(DaemonCommandExecution.java:104)
-	at org.gradle.launcher.daemon.server.exec.LogAndCheckHealth.execute(LogAndCheckHealth.java:53)
-	at org.gradle.launcher.daemon.server.api.DaemonCommandExecution.proceed(DaemonCommandExecution.java:104)
-	at org.gradle.launcher.daemon.server.exec.ApplyClientEnvironmentVariables.doBuild(ApplyClientEnvironmentVariables.java:82)
-	at org.gradle.launcher.daemon.server.exec.BuildCommandOnly.execute(BuildCommandOnly.java:37)
-	at org.gradle.launcher.daemon.server.api.DaemonCommandExecution.proceed(DaemonCommandExecution.java:104)
-	at org.gradle.launcher.daemon.server.exec.LogToClient.doBuild(LogToClient.java:63)
-	at org.gradle.launcher.daemon.server.exec.BuildCommandOnly.execute(BuildCommandOnly.java:37)
-	at org.gradle.launcher.daemon.server.api.DaemonCommandExecution.proceed(DaemonCommandExecution.java:104)
-	at org.gradle.launcher.daemon.server.exec.EstablishBuildEnvironment.doBuild(EstablishBuildEnvironment.java:74)
-	at org.gradle.launcher.daemon.server.exec.BuildCommandOnly.execute(BuildCommandOnly.java:37)
-	at org.gradle.launcher.daemon.server.api.DaemonCommandExecution.proceed(DaemonCommandExecution.java:104)
-	at org.gradle.launcher.daemon.server.exec.StartBuildOrRespondWithBusy$1.run(StartBuildOrRespondWithBusy.java:52)
-	at org.gradle.launcher.daemon.server.DaemonStateCoordinator.lambda$runCommand$0(DaemonStateCoordinator.java:321)
-	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:65)
-	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
-Caused by: org.gradle.api.internal.tasks.DefaultTaskContainer$TaskCreationException: Could not create task ':1.21.1:processResources'.
-	at org.gradle.api.internal.tasks.DefaultTaskContainer.taskCreationException(DefaultTaskContainer.java:778)
-	at org.gradle.api.internal.tasks.DefaultTaskContainer.access$600(DefaultTaskContainer.java:77)
-	at org.gradle.api.internal.tasks.DefaultTaskContainer$TaskCreatingProvider.domainObjectCreationException(DefaultTaskContainer.java:770)
-	at org.gradle.api.internal.DefaultNamedDomainObjectCollection$AbstractDomainObjectCreatingProvider.tryCreate(DefaultNamedDomainObjectCollection.java:1018)
-	at org.gradle.api.internal.tasks.DefaultTaskContainer$TaskCreatingProvider.access$1401(DefaultTaskContainer.java:717)
-	at org.gradle.api.internal.tasks.DefaultTaskContainer$TaskCreatingProvider$1.run(DefaultTaskContainer.java:743)
+	at org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler.execute(CompileJavaBuildOperationReportingCompiler.java:49)
+	at org.gradle.api.tasks.compile.JavaCompile.performCompilation(JavaCompile.java:231)
+	at org.gradle.api.tasks.compile.JavaCompile.performIncrementalCompilation(JavaCompile.java:172)
+	at org.gradle.api.tasks.compile.JavaCompile.compile(JavaCompile.java:157)
+	at org.gradle.internal.reflect.JavaMethod.invoke(JavaMethod.java:125)
+	at org.gradle.api.internal.project.taskfactory.IncrementalTaskAction.doExecute(IncrementalTaskAction.java:45)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:51)
+	at org.gradle.api.internal.project.taskfactory.IncrementalTaskAction.execute(IncrementalTaskAction.java:26)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:29)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$3.run(TaskExecution.java:268)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:30)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:27)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
@@ -228,46 +1537,95 @@ Caused by: org.gradle.api.internal.tasks.DefaultTaskContainer$TaskCreationExcept
 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner.run(DefaultBuildOperationRunner.java:48)
-	at org.gradle.api.internal.tasks.DefaultTaskContainer$TaskCreatingProvider.tryCreate(DefaultTaskContainer.java:739)
-	at org.gradle.api.internal.DefaultNamedDomainObjectCollection$AbstractDomainObjectCreatingProvider.calculateOwnValue(DefaultNamedDomainObjectCollection.java:992)
-	at org.gradle.api.internal.provider.AbstractMinimalProvider.getOrNull(AbstractMinimalProvider.java:105)
-	at org.gradle.api.internal.DefaultNamedDomainObjectCollection.findByName(DefaultNamedDomainObjectCollection.java:324)
-	at org.gradle.api.internal.tasks.DefaultTaskContainer.findByName(DefaultTaskContainer.java:621)
-	at org.gradle.api.internal.tasks.DefaultTaskContainer.findByName(DefaultTaskContainer.java:76)
-	at org.gradle.api.internal.DefaultNamedDomainObjectCollection.getByName(DefaultNamedDomainObjectCollection.java:360)
-	at org.gradle.api.internal.tasks.DefaultTaskCollection.getByName(DefaultTaskCollection.java:47)
-	at org.gradle.api.internal.project.ProjectScopedTaskResolver.resolveTask(ProjectScopedTaskResolver.java:53)
-	at org.gradle.api.internal.tasks.DefaultTaskDependency.visitDependencies(DefaultTaskDependency.java:162)
-	at org.gradle.api.internal.tasks.CachingTaskDependencyResolveContext$TaskGraphImpl.getNodeValues(CachingTaskDependencyResolveContext.java:108)
-	at org.gradle.internal.graph.CachingDirectedGraphWalker$GraphWithEmptyEdges.getNodeValues(CachingDirectedGraphWalker.java:221)
-	at org.gradle.internal.graph.CachingDirectedGraphWalker.doSearch(CachingDirectedGraphWalker.java:129)
-	at org.gradle.internal.graph.CachingDirectedGraphWalker.findValues(CachingDirectedGraphWalker.java:81)
-	at org.gradle.api.internal.tasks.CachingTaskDependencyResolveContext.getDependencies(CachingTaskDependencyResolveContext.java:67)
-	... 157 more
-Caused by: groovy.lang.MissingPropertyException: Could not get unknown property 'mod.mc_compat' for task ':1.21.1:processResources' of type org.gradle.language.jvm.tasks.ProcessResources.
-	at org.gradle.internal.metaobject.AbstractDynamicObject.getMissingProperty(AbstractDynamicObject.java:91)
-	at org.gradle.internal.metaobject.AbstractDynamicObject.getProperty(AbstractDynamicObject.java:63)
-	at org.gradle.api.internal.AbstractTask.property(AbstractTask.java:611)
-	at org.gradle.api.DefaultTask.property(DefaultTask.java:171)
-	at Build_gradle.__result$lambda$0$0(build.gradle.kts:57)
-	at org.gradle.kotlin.dsl.NamedDomainObjectProviderExtensionsKt$sam$org_gradle_api_Action$0.execute(NamedDomainObjectProviderExtensions.kt)
-	at org.gradle.api.internal.DefaultMutationGuard$1.execute(DefaultMutationGuard.java:66)
-	at org.gradle.api.internal.DefaultMutationGuard$1.execute(DefaultMutationGuard.java:66)
-	at org.gradle.internal.code.DefaultUserCodeApplicationContext$CurrentApplication$1.execute(DefaultUserCodeApplicationContext.java:124)
-	at org.gradle.api.internal.DefaultCollectionCallbackActionDecorator$BuildOperationEmittingAction$1.run(DefaultCollectionCallbackActionDecorator.java:109)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:30)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:27)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeAction(TaskExecution.java:253)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeActions(TaskExecution.java:236)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeWithPreviousOutputFiles(TaskExecution.java:219)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.execute(TaskExecution.java:185)
+	at org.gradle.internal.execution.steps.ExecuteStep.executeInternal(ExecuteStep.java:167)
+	at org.gradle.internal.execution.steps.ExecuteStep.access$000(ExecuteStep.java:47)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:137)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:134)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
 	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
-	at org.gradle.internal.operations.DefaultBuildOperationRunner.run(DefaultBuildOperationRunner.java:48)
-	at org.gradle.api.internal.DefaultCollectionCallbackActionDecorator$BuildOperationEmittingAction.execute(DefaultCollectionCallbackActionDecorator.java:106)
-	at org.gradle.internal.ImmutableActionSet$SetWithManyActions.execute(ImmutableActionSet.java:332)
-	at org.gradle.api.internal.DefaultDomainObjectCollection.doAdd(DefaultDomainObjectCollection.java:288)
-	at org.gradle.api.internal.DefaultNamedDomainObjectCollection.doAdd(DefaultNamedDomainObjectCollection.java:127)
-	at org.gradle.api.internal.DefaultNamedDomainObjectCollection$AbstractDomainObjectCreatingProvider.tryCreate(DefaultNamedDomainObjectCollection.java:1012)
-	... 181 more
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:134)
+	at org.gradle.internal.execution.steps.ExecuteStep$Mutable.execute(ExecuteStep.java:80)
+	at org.gradle.internal.execution.steps.CancelExecutionStep.execute(CancelExecutionStep.java:42)
+	at org.gradle.internal.execution.steps.TimeoutStep.executeWithoutTimeout(TimeoutStep.java:75)
+	at org.gradle.internal.execution.steps.TimeoutStep.execute(TimeoutStep.java:55)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:51)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:29)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.executeMutable(RemovePreviousOutputsStep.java:67)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.executeMutable(RemovePreviousOutputsStep.java:39)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:42)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:24)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:69)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:46)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.executeMutable(ResolveInputChangesStep.java:39)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.executeMutable(ResolveInputChangesStep.java:28)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.BuildCacheStep.executeWithoutCache(BuildCacheStep.java:189)
+	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$execute$1(BuildCacheStep.java:76)
+	at org.gradle.internal.Either$Right.fold(Either.java:176)
+	at org.gradle.internal.execution.caching.CachingState.fold(CachingState.java:62)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:74)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:49)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.executeMutable(StoreExecutionStateStep.java:46)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.executeMutable(StoreExecutionStateStep.java:35)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.executeBecause(SkipUpToDateStep.java:75)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.lambda$execute$2(SkipUpToDateStep.java:53)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:53)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:35)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:37)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:27)
+	at org.gradle.internal.execution.steps.ResolveMutableCachingStateStep.executeDelegate(ResolveMutableCachingStateStep.java:70)
+	at org.gradle.internal.execution.steps.ResolveMutableCachingStateStep.executeDelegate(ResolveMutableCachingStateStep.java:32)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:69)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:37)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.executeMutable(ResolveChangesStep.java:63)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.executeMutable(ResolveChangesStep.java:34)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.ValidateStep$Mutable.executeDelegate(ValidateStep.java:79)
+	at org.gradle.internal.execution.steps.ValidateStep$Mutable.executeDelegate(ValidateStep.java:65)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:105)
+	at org.gradle.internal.execution.steps.ValidateStep$Mutable.execute(ValidateStep.java:65)
+	at org.gradle.internal.execution.steps.CaptureMutableStateBeforeExecutionStep.executeMutable(CaptureMutableStateBeforeExecutionStep.java:86)
+	at org.gradle.internal.execution.steps.CaptureMutableStateBeforeExecutionStep.execute(CaptureMutableStateBeforeExecutionStep.java:65)
+	at org.gradle.internal.execution.steps.CaptureMutableStateBeforeExecutionStep.execute(CaptureMutableStateBeforeExecutionStep.java:45)
+	at org.gradle.internal.execution.steps.SkipEmptyMutableWorkStep.executeWithNonEmptySources(SkipEmptyMutableWorkStep.java:210)
+	at org.gradle.internal.execution.steps.SkipEmptyMutableWorkStep.executeMutable(SkipEmptyMutableWorkStep.java:90)
+	at org.gradle.internal.execution.steps.SkipEmptyMutableWorkStep.executeMutable(SkipEmptyMutableWorkStep.java:53)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.executeMutable(LoadPreviousExecutionStateStep.java:36)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.executeMutable(LoadPreviousExecutionStateStep.java:23)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.executeMutable(HandleStaleOutputsStep.java:77)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.executeMutable(HandleStaleOutputsStep.java:43)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$executeMutable$0(AssignMutableWorkspaceStep.java:34)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:314)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.executeMutable(AssignMutableWorkspaceStep.java:30)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.executeMutable(AssignMutableWorkspaceStep.java:21)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:56)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:38)
+	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:68)
+	at org.gradle.api.internal.tasks.execution.DefaultTaskNodeExecutor.doExecute(DefaultTaskNodeExecutor.java:364)
+	... 25 more
 
 
 Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
@@ -276,4 +1634,5 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/9.8.0/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD FAILED in 1m 20s
+BUILD FAILED in 1m 44s
+19 actionable tasks: 19 executed
