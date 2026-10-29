@@ -1898,17 +1898,23 @@ public class BuilderController {
 
         // 5. Perform click action
         InteractionHand hand = InteractionHand.MAIN_HAND;
-        // Anti-fall keeps SNEAK held at edges; a sneaking right-click would not toggle/adjust a block
-        boolean unsneakForClick = candidate.type == PlacementCandidate.Type.ADJUST && player.isShiftKeyDown();
+        // Anti-fall keeps SNEAK held at edges. Stand up for the click when sneaking would change the result:
+        //  - ADJUST: a sneaking right-click does not toggle / adjust a block
+        //  - WATERLOG: since 1.21.2 a SNEAKING water bucket on a waterloggable block pours the water NEXT to it
+        //    instead of into it (the water then spills out over the build)
+        boolean unsneakForClick = (candidate.type == PlacementCandidate.Type.ADJUST
+                || candidate.type == PlacementCandidate.Type.WATERLOG) && player.isShiftKeyDown();
         if (unsneakForClick) {
+            player.setShiftKeyDown(false);
             player.connection.send(com.xlrw.compat.MC.sneakPacket(player, false));
         }
         InteractionResult useResult = mc.gameMode.useItemOn(player, hand, hitResult);
-        if (unsneakForClick) {
-            player.connection.send(com.xlrw.compat.MC.sneakPacket(player, true));
-        }
         if (!useResult.consumesAction()) {
             mc.gameMode.useItem(player, hand);
+        }
+        if (unsneakForClick) {
+            player.setShiftKeyDown(true);
+            player.connection.send(com.xlrw.compat.MC.sneakPacket(player, true));
         }
         player.swing(hand);
         XlrwDebug.logBuildAttempt(candidate.targetPos, candidate.requiredState.getBlock().getName().getString(),
