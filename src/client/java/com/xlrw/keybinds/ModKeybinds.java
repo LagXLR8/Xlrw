@@ -21,6 +21,7 @@ public class ModKeybinds {
     public static KeyMapping PLACE_STEP;
     public static KeyMapping LAYER_UP;
     public static KeyMapping LAYER_DOWN;
+    public static KeyMapping DRY_RUN;
 
     public static void init() {
         TOGGLE_BUILD = KeyBindingHelper.registerKeyBinding(new KeyMapping(
@@ -58,6 +59,13 @@ public class ModKeybinds {
                 CATEGORY
         ));
 
+        DRY_RUN = KeyBindingHelper.registerKeyBinding(new KeyMapping(
+                "key.xlrw.dryrun",
+                InputConstants.Type.KEYSYM,
+                GLFW.GLFW_KEY_N,
+                CATEGORY
+        ));
+
         ClientTickEvents.END_CLIENT_TICK.register(ModKeybinds::handleTick);
     }
 
@@ -75,6 +83,10 @@ public class ModKeybinds {
 
         while (OPEN_GUI.consumeClick()) {
             mc.setScreen(new XlrwScreen());
+        }
+
+        while (DRY_RUN.consumeClick()) {
+            com.xlrw.builder.DryRun.toggle(mc);
         }
 
         while (PLACE_STEP.consumeClick()) {

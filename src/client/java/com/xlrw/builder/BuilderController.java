@@ -1680,7 +1680,8 @@ public class BuilderController {
     private boolean isFastEligible(LocalPlayer player, PlacementCandidate c) {
         BuilderConfig config = BuilderConfig.getInstance();
         if (!config.fastSimpleBlocks || c == null) return false;
-        if (c.type != PlacementCandidate.Type.PLACE || c.item == null || c.requiresSneak || c.throughWall) return false;
+        if (c.type != PlacementCandidate.Type.PLACE || c.item == null || c.requiresSneak) return false;
+        if (c.throughWall && !PlacementFinder.throughWallAnywhere()) return false;
         BlockState st = c.requiredState;
         if (!st.getProperties().isEmpty()) return false;
         if (st.getBlock() instanceof net.minecraft.world.level.block.FallingBlock) return false;
@@ -1694,7 +1695,7 @@ public class BuilderController {
         BuilderConfig config = BuilderConfig.getInstance();
         Vec3 eye = player.getEyePosition();
         if (c.hitVec.distanceToSqr(eye) > config.reachDistance * config.reachDistance) return false;
-        if (config.strictRaycast) {
+        if (config.strictRaycast && !c.throughWall) {
             BlockHitResult t = mc.level.clip(new net.minecraft.world.level.ClipContext(eye, c.hitVec,
                     net.minecraft.world.level.ClipContext.Block.COLLIDER, net.minecraft.world.level.ClipContext.Fluid.NONE, player));
             if (t.getType() == HitResult.Type.BLOCK && !t.getBlockPos().equals(c.neighborPos) && !t.getBlockPos().equals(c.targetPos)
@@ -1749,14 +1750,17 @@ public class BuilderController {
         // 0. Through-wall placements: at most one every 1.5 s, so it never looks like a burst of impossible clicks
         Vec3 eyePos = player.getEyePosition();
         if (candidate.throughWall) {
-            long nowTw = System.currentTimeMillis();
-            if (nowTw - lastThroughWallAt < 1_500) {
-                nextActionTime = lastThroughWallAt + 1_500;
-                return;
+            // Pockets-only mode keeps the old 1.5 s spacing; anywhere mode places at the normal speed
+            if (!PlacementFinder.throughWallAnywhere()) {
+                long nowTw = System.currentTimeMillis();
+                if (nowTw - lastThroughWallAt < 1_500) {
+                    nextActionTime = lastThroughWallAt + 1_500;
+                    return;
+                }
+                lastThroughWallAt = nowTw;
             }
-            lastThroughWallAt = nowTw;
-            XlrwDebug.log("BUILD/THROUGH_WALL", "Đặt xuyên tường " + candidate.requiredState.getBlock().getName().getString()
-                    + " tại " + candidate.targetPos.toShortString() + " (ô bị bao kín)");
+            XlrwDebug.logRateLimited("THROUGH_WALL", 2000, "BUILD/THROUGH_WALL", "Đặt xuyên tường "
+                    + candidate.requiredState.getBlock().getName().getString() + " tại " + candidate.targetPos.toShortString());
         }
         // 1. Line of Sight Check: ensure there is no obstructing solid wall between eye and hitVec
         if (config.strictRaycast && !candidate.throughWall) {

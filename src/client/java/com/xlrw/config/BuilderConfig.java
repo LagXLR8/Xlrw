@@ -49,7 +49,12 @@ public class BuilderConfig {
     public java.util.List<BlockPos> materialChestPositions = new java.util.ArrayList<>(); // Multi-chest support
     public BlockPos scaffoldPillarPos = null; // Position of the scaffolding elevator pillar
     public boolean cleanupTempBlocks = true; // Remove throw-away bridge/pillar blocks when a layer is finished
-    public boolean throughWallPlace = true; // boxed-in cells only: place through the wall (server checks distance only)
+    public boolean throughWallPlace = true; // master switch: place through walls (server checks distance only)
+    /** On: through-wall placing is used ANYWHERE in reach (also lets the bot extend the layer it stands on).
+     *  Off: only for boxed-in cells (old behaviour). Turn off on servers with anti-cheat that checks line of sight. */
+    public boolean throughWallAnywhere = true;
+    /** Dry run: show the plan markers (stations, towers, problem blocks) in the world. */
+    public boolean renderDryRun = true;
     public boolean rotationSpoof = true; // place facing blocks (piston, observer...) without really looking that way
     public boolean chorusEscape = true; // stuck in a deep hole: eat a chorus fruit instead of pillaring out
     public boolean workWithInventoryOpen = true; // keep building while the player has the inventory open

@@ -347,15 +347,19 @@ public class PlacementFinder {
             if (status == BuildRules.BuildStatus.ADJUST) {
                 if (targetPos.distToCenterSqr(eyePos) <= maxReachSq) {
                     Vec3 targetCenter = findInteractPoint(level, player, eyePos, targetPos, maxReachSq);
+                    boolean unseen = false;
                     if (targetCenter == null) {
-                        if (config.strictRaycast) continue;
+                        if (config.strictRaycast && !throughWallAnywhere()) continue;
                         targetCenter = Vec3.atCenterOf(targetPos);
+                        unseen = true;
                     }
                     float[] rots = HumanAim.calculateRotations(eyePos, targetCenter);
                     if (BlockStateAdjuster.isAdjustYawAcceptable(currentInWorld, requiredState, rots[0])) {
-                        candidates.add(new PlacementCandidate(PlacementCandidate.Type.ADJUST, targetPos, requiredState,
+                        PlacementCandidate adj = new PlacementCandidate(PlacementCandidate.Type.ADJUST, targetPos, requiredState,
                                 targetPos, Direction.UP, targetCenter, rots[0], rots[1],
-                                targetPos.distToCenterSqr(eyePos), false, null, ClipContext.Fluid.NONE));
+                                targetPos.distToCenterSqr(eyePos), false, null, ClipContext.Fluid.NONE);
+                        adj.throughWall = unseen;
+                        candidates.add(adj);
                     }
                 }
                 continue;
@@ -365,15 +369,19 @@ public class PlacementFinder {
             if (status == BuildRules.BuildStatus.STACKABLE) {
                 if (targetPos.distToCenterSqr(eyePos) <= maxReachSq) {
                     Vec3 targetCenter = findInteractPoint(level, player, eyePos, targetPos, maxReachSq);
+                    boolean unseen = false;
                     if (targetCenter == null) {
-                        if (config.strictRaycast) continue;
+                        if (config.strictRaycast && !throughWallAnywhere()) continue;
                         targetCenter = Vec3.atCenterOf(targetPos);
+                        unseen = true;
                     }
                     float[] rots = HumanAim.calculateRotations(eyePos, targetCenter);
                     boolean sneak = BuildRules.isInteractable(currentInWorld);
-                    candidates.add(new PlacementCandidate(PlacementCandidate.Type.STACK, targetPos, requiredState,
+                    PlacementCandidate stk = new PlacementCandidate(PlacementCandidate.Type.STACK, targetPos, requiredState,
                             targetPos, Direction.UP, targetCenter, rots[0], rots[1],
-                            targetPos.distToCenterSqr(eyePos), sneak, requiredItem, ClipContext.Fluid.NONE));
+                            targetPos.distToCenterSqr(eyePos), sneak, requiredItem, ClipContext.Fluid.NONE);
+                    stk.throughWall = unseen;
+                    candidates.add(stk);
                 }
                 continue;
             }
@@ -426,6 +434,9 @@ public class PlacementFinder {
      */
     public static boolean throughWallAllowed(ClientLevel level, BlockPos target, Vec3 eye) {
         if (!BuilderConfig.getInstance().throughWallPlace) return false;
+        // Anywhere mode: the vanilla server only checks the distance and that the hit point lies on the clicked
+        // block, never the line of sight or which way the face points -> allowed for every cell in reach
+        if (throughWallAnywhere()) return true;
         if (eye.distanceToSqr(Vec3.atCenterOf(target)) > 4.0 * 4.0) return false;
         int solid = 0;
         for (Direction d : DIRECTIONS) {
@@ -679,6 +690,22 @@ public class PlacementFinder {
         return null;
     }
 
+    public static boolean throughWallAnywhere() {
+        BuilderConfig c = BuilderConfig.getInstance();
+        return c.throughWallPlace && c.throughWallAnywhere;
+    }
+
+    /**
+     * May this face be clicked from the eye? Strict (line-of-sight) searches need it to point at the eye. The
+     * non-strict (through-wall) search in anywhere mode accepts every face: that is what lets the bot stand on top
+     * of the layer and extend it sideways by clicking the side of the block under its feet, instead of building a
+     * new tower for every block next to it.
+     */
+    private static boolean faceUsable(Vec3 eye, BlockPos neighborPos, Direction face, BlockState neighborState, boolean strict) {
+        if (!strict && throughWallAnywhere()) return true;
+        return isFaceVisible(eye, neighborPos, face) || neighborState.is(net.minecraft.world.level.block.Blocks.SCAFFOLDING);
+    }
+
     public static boolean isFaceVisible(Vec3 eyePos, BlockPos neighborPos, Direction face) {
         double nx = face.getStepX();
         double ny = face.getStepY();
@@ -731,7 +758,7 @@ public class PlacementFinder {
             if (neighborState.isAir() || neighborState.canBeReplaced() || BuildRules.isLiquid(neighborState)) continue;
 
             Direction clickFace = dir.getOpposite();
-            if (!isFaceVisible(eye, neighborPos, clickFace) && !neighborState.is(net.minecraft.world.level.block.Blocks.SCAFFOLDING)) continue;
+            if (!faceUsable(eye, neighborPos, clickFace, neighborState, strict)) continue;
 
             Vec3 hit = findVisibleFacePoint(level, player, eye, neighborPos, clickFace, requiredState, reachSq, strict);
             if (hit != null && hit.distanceToSqr(eye) <= reachSq) {
@@ -771,7 +798,7 @@ public class PlacementFinder {
         PlacementCandidate best = null;
         double bestScore = Double.MAX_VALUE;
         for (Direction face : DIRECTIONS) {
-            if (!isFaceVisible(eyePos, targetPos, face)) continue;
+            if (!(!strictRaycast && throughWallAnywhere()) && !isFaceVisible(eyePos, targetPos, face)) continue;
             double[] heights = face.getAxis() == Direction.Axis.Y ? new double[]{0.5} : new double[]{0.5, 0.25, 0.75};
             for (double hy : heights) {
                 Vec3 hit = new Vec3(
@@ -886,8 +913,9 @@ public class PlacementFinder {
 
             Direction clickFace = dir.getOpposite();
 
-            // Geometric face visibility: Face must physically point towards the player's eyes (scaffolding allows open side placement)
-            if (!isFaceVisible(eyePos, neighborPos, clickFace) && !neighborState.is(net.minecraft.world.level.block.Blocks.SCAFFOLDING)) {
+            // Geometric face visibility: Face must physically point towards the player's eyes (scaffolding allows open
+            // side placement). Through-wall anywhere mode (non-strict pass) accepts every face.
+            if (!faceUsable(eyePos, neighborPos, clickFace, neighborState, strictRaycast)) {
                 continue;
             }
 

@@ -86,3 +86,23 @@ Copy vào `.minecraft/mods` và chạy với **Fabric Loader 1.21.1** + **Fabric
 - "Gỡ kẹt" không còn đặt block bừa dưới chân hay phá tường của công trình; chỉ kê chân khi kẹt trong hố thật sự.
 - Mọi block tạm (cầu, kê chân) được ghi lại và **tự dọn khi xong một tầng** (`cleanupTempBlocks` trong `config/xlrw.json`).
 - Block tạm/giàn giáo nằm ngoài công trình không còn bị coi là "đặt sai" (trước đây có thể phá cả đất).
+
+
+---
+
+## 🧱 v1.2: Gom việc theo chỗ đứng, đặt xuyên tường, chạy thử
+
+**Hết cảnh "leo trụ đặt 1 block rồi xuống dựng trụ khác"**
+- Khi chọn chỗ đứng (dưới đất hoặc trên đỉnh trụ), bot đếm xem từ đó **với tới thêm bao nhiêu block khác**. Chỗ làm được cả một mảng sẽ thắng chỗ gần hơn một chút mà chỉ làm được đúng 1 block.
+- Đứng trên mặt tầng vừa xây, bot giờ **nối dài tầng sang ngang** được (click vào mặt bên của block dưới chân), thay vì leo xuống dựng trụ mới.
+
+**Đặt xuyên tường ở mọi nơi trong tầm với** (`throughWallAnywhere`, nút **WALL** trong tab Engine)
+- Server vanilla chỉ kiểm tra khoảng cách và điểm click nằm trên block, không kiểm tra tầm nhìn hay hướng của mặt block.
+- Bot vẫn ưu tiên cách đặt có tầm nhìn; chỉ dùng xuyên tường khi không còn cách nào khác.
+- **Tắt WALL trên server có anti-cheat kiểm tra tầm nhìn.** Khi tắt, bot quay về chế độ cũ (chỉ xuyên tường ở ô bị bao kín, cách nhau 1,5 giây).
+
+**Chạy thử / Dry run** (phím **`N`** hoặc nút **◎** trong tab Engine)
+- Mô phỏng toàn bộ phần còn lại của công trình trên bản sao thế giới, **không gửi gói tin nào** lên server, không làm game bị khựng (chia nhỏ qua từng tick).
+- In ra chat: thời gian ước tính, số lần đặt, số chỗ đứng, quãng đường đi bộ, số trụ và số khối giàn giáo (so với số đang có), vật liệu còn thiếu trong túi.
+- Đánh dấu trong thế giới: 🟥 block bot không với tới được, 🟧 block lơ lửng cần cột đỡ, 🟨 vị trí trụ giàn giáo, 🟦 các chỗ đứng.
+- Bấm `N` lần nữa để tắt khung đánh dấu. Chi tiết từng block bị kẹt được ghi vào `logs/xlrw_debug.log` (mục `DRYRUN/STUCK`).

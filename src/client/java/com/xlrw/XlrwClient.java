@@ -50,6 +50,7 @@ public class XlrwClient implements ClientModInitializer {
         // Register client tick listener for auto-building loop and periodic auto-save
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             BuilderController.getInstance().onClientTick(client);
+            com.xlrw.builder.DryRun.tick(client);
             WorldStateManager.tickAutoSave(client);
         });
 
