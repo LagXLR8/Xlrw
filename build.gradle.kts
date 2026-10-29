@@ -54,7 +54,7 @@ tasks {
     processResources {
         val props = mapOf(
             "version" to project.version.toString(),
-            "minecraft" to property("mod.mc_compat").toString(),
+            "minecraft" to project.property("mod.mc_compat").toString(),
         )
         inputs.properties(props)
         filesMatching("fabric.mod.json") { expand(props) }
