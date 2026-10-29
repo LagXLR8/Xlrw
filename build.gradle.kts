@@ -23,8 +23,8 @@ loom {
     }
 
     runConfigs.all {
-        generateRunConfig = true
-        runDirectory = rootProject.file("run") // one run folder shared by all versions
+        ideConfigGenerated(true)
+        runDir = "../../run" // one run folder shared by all versions
     }
 }
 
