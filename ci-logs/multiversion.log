@@ -1,5 +1,5 @@
 status: success
-commit: 8447de728c25b457c8e2f7f374bebc1db655b812
+commit: 82d228bd727b56c35341f123cd45cfcd3c4600b5
 
 Fetching distribution.
 Downloading https://services.gradle.org/distributions/gradle-9.8.0-bin.zip
@@ -69,15 +69,16 @@ Cannot remap modifiers because it does not exists in any of the targets [] or th
 > Task :1.21.11:stonecutterPrepareClient
 > Task :1.21.11:stonecutterGenerateClient
 
-> Task :1.21.1:compileClientJava
-Note: /home/runner/work/Xlrw/Xlrw/src/client/java/com/xlrw/builder/DryRun.java uses or overrides a deprecated API.
-Note: Recompile with -Xlint:deprecation for details.
-
 > Task :1.21.11:compileClientJava
 Note: Some input files use or override a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
 
 > Task :1.21.11:processClientResources
+
+> Task :1.21.1:compileClientJava
+Note: /home/runner/work/Xlrw/Xlrw/src/client/java/com/xlrw/builder/DryRun.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
 > Task :1.21.11:jar
 > Task :1.21.11:processIncludeJars
 > Task :1.21.11:sourcesJar
@@ -118,5 +119,5 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/9.8.0/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 1m 42s
+BUILD SUCCESSFUL in 1m 43s
 21 actionable tasks: 21 executed
