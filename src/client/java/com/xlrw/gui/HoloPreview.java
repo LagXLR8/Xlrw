@@ -140,6 +140,80 @@ final class HoloPreview {
         }
     }
 
+    //? if >=1.21.11 {
+    /*/^* Draws the turntable into a PiP texture. {@code ps}: origin at the box centre, 1 unit = 1 GUI pixel, y up. ^/
+    void draw3D(com.mojang.blaze3d.vertex.PoseStack ps, net.minecraft.client.renderer.MultiBufferSource.BufferSource bs,
+                int w, int h, int layerY, long now) {
+        if (cells.isEmpty() || diag <= 0) return;
+        Minecraft mc = Minecraft.getInstance();
+        ps.pushPose();
+        ps.translate(0f, -h * 0.03f, 0f);
+        float sc = Math.min(w, h) * 0.8f / diag * zoom;
+        ps.scale(sc, sc, -sc);
+        ps.mulPose(com.mojang.math.Axis.XP.rotationDegrees(pitch));
+        ps.mulPose(com.mojang.math.Axis.YP.rotationDegrees(yaw));
+        ps.translate(-sx / 2f, -sy / 2f, -sz / 2f);
+        com.mojang.blaze3d.vertex.VertexConsumer vc = bs.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.cutoutMovingBlock());
+        var br = mc.getBlockRenderer();
+        float pulse = 0.75f + 0.25f * (float) Math.sin(now / 220.0);
+        for (Cell c : cells) {
+            float tr, tg, tb;
+            if (c.built) { tr = 1f; tg = 1f; tb = 1f; }
+            else if (c.worldY == layerY) { tr = 1f * pulse + 0.25f; tg = 0.55f * pulse; tb = 0.25f * pulse; }
+            else { tr = 0.36f; tg = 0.44f; tb = 0.58f; }
+            ps.pushPose();
+            ps.translate(c.x, c.y, c.z);
+            com.mojang.blaze3d.vertex.PoseStack.Pose pose = ps.last();
+            rand.setSeed(42L);
+            List<net.minecraft.client.renderer.block.model.BlockModelPart> parts;
+            try {
+                parts = br.getBlockModel(c.state).collectParts(rand);
+            } catch (Throwable t) {
+                ps.popPose();
+                continue;
+            }
+            for (net.minecraft.client.renderer.block.model.BlockModelPart part : parts) {
+                for (Direction d : FACES_AND_NULL) {
+                    if (d != null && (c.faces & (1 << d.ordinal())) == 0) continue;
+                    for (net.minecraft.client.renderer.block.model.BakedQuad q : part.getQuads(d)) {
+                        float shade = q.shade() ? faceShade(q.direction()) : 1f;
+                        float r = tr * shade, gg = tg * shade, b = tb * shade;
+                        if (q.isTinted()) {
+                            int col = tint(mc, c.state, q.tintIndex());
+                            r *= ((col >> 16) & 255) / 255f;
+                            gg *= ((col >> 8) & 255) / 255f;
+                            b *= (col & 255) / 255f;
+                        }
+                        vc.putBulkData(pose, q, Math.min(1f, r), Math.min(1f, gg), Math.min(1f, b), 1f,
+                                net.minecraft.client.renderer.LightTexture.FULL_BRIGHT, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY);
+                    }
+                }
+            }
+            ps.popPose();
+        }
+        bs.endBatch(net.minecraft.client.renderer.rendertype.RenderTypes.cutoutMovingBlock());
+
+        // current layer plane
+        if (layerY >= minWorldY && layerY < minWorldY + sy) {
+            float py = layerY - minWorldY + 0.02f;
+            com.mojang.blaze3d.vertex.VertexConsumer q = bs.getBuffer(net.minecraft.client.renderer.rendertype.RenderTypes.debugQuads());
+            org.joml.Matrix4f m = ps.last().pose();
+            float a0 = -0.4f, ax = sx + 0.4f, az = sz + 0.4f;
+            int col = 0x40F3701E;
+            q.addVertex(m, a0, py, a0).setColor(col);
+            q.addVertex(m, a0, py, az).setColor(col);
+            q.addVertex(m, ax, py, az).setColor(col);
+            q.addVertex(m, ax, py, a0).setColor(col);
+            q.addVertex(m, ax, py, a0).setColor(col);
+            q.addVertex(m, ax, py, az).setColor(col);
+            q.addVertex(m, a0, py, az).setColor(col);
+            q.addVertex(m, a0, py, a0).setColor(col);
+            bs.endBatch(net.minecraft.client.renderer.rendertype.RenderTypes.debugQuads());
+        }
+        ps.popPose();
+    }
+    *///?}
+
     private static float faceShade(Direction d) {
         if (d == null) return 0.9f;
         return switch (d) {
@@ -161,7 +235,14 @@ final class HoloPreview {
         if (cells.isEmpty() || diag <= 0) return;
 
         //? if >=1.21.11 {
-        /*renderFlat(g, x, y, w, h, layerY, now);
+        /*// Real 3D through a picture-in-picture renderer (custom 3D is not allowed directly in 1.21.11 GUIs).
+        // The PiP box is given in screen coordinates, so map the panel-local box through the current GUI transform.
+        org.joml.Vector2f a0 = g.pose().transformPosition(x, y, new org.joml.Vector2f());
+        org.joml.Vector2f a1 = g.pose().transformPosition(x + w, y + h, new org.joml.Vector2f());
+        int sx0 = Math.round(Math.min(a0.x, a1.x)), sy0 = Math.round(Math.min(a0.y, a1.y));
+        int sx1 = Math.round(Math.max(a0.x, a1.x)), sy1 = Math.round(Math.max(a0.y, a1.y));
+        if (sx1 - sx0 < 4 || sy1 - sy0 < 4) return;
+        g.guiRenderState.submitPicturesInPictureState(new HoloPip.State(this, layerY, now, sx0, sy0, sx1, sy1));
         *///?} else {
         g.flush();
         FogRenderer.setupNoFog();

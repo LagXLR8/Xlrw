@@ -30,6 +30,9 @@ public class XlrwClient implements ClientModInitializer {
 
         // Initialize world rendering (hologram & highlights)
         SchematicRenderer.init();
+        //? if >=1.21.11 {
+        /*com.xlrw.gui.HoloPip.register(); // 3D preview in the deck (picture-in-picture)
+        *///?}
 
         // Initialize in-game HUD overlay (top-left next block status)
         com.xlrw.gui.BuilderHud.init();
