@@ -512,7 +512,7 @@ public final class DryRun {
             need.sort((a, b) -> b.getValue() - a.getValue());
             for (Map.Entry<Item, Integer> e : need) {
                 int have = count(player, e.getKey());
-                if (have < e.getValue()) missing.add((e.getValue() - have) + "× " + e.getKey().getDescription().getString());
+                if (have < e.getValue()) missing.add((e.getValue() - have) + "× " + com.xlrw.compat.MC.itemName(e.getKey()).getString());
             }
         }
 

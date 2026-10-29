@@ -72,11 +72,11 @@ public final class HubWidgets {
         LocalDateTime t = LocalDateTime.now();
         // real time, big
         String hhmm = t.format(DateTimeFormatter.ofPattern("HH:mm"));
-        g.pose().pushPose();
-        g.pose().translate(x + 8, y + 17, 0);
-        g.pose().scale(2f, 2f, 1f);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, x + 8, y + 17, 0);
+        com.xlrw.compat.GuiCompat.scale(g, 2f, 2f, 1f);
         g.drawString(font, hhmm, 0, 0, ORANGE, false);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
         String ss = t.format(DateTimeFormatter.ofPattern("ss"));
         g.drawString(font, ss, x + 10 + font.width(hhmm) * 2, y + 25, CREAM, false);
         g.drawString(font, t.format(DateTimeFormatter.ofPattern("EEE dd/MM")).toUpperCase(), x + w - 6 - font.width(t.format(DateTimeFormatter.ofPattern("EEE dd/MM")).toUpperCase()), y + 5, DIM, false);

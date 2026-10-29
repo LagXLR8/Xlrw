@@ -213,16 +213,16 @@ public class XlrwScreen extends Screen {
 
         // Tab content: slide in from the right
         float tIn = ease(Mth.clamp((now - tabChangedAt) / 200f, 0f, 1f));
-        g.pose().pushPose();
-        g.pose().translate((1f - tIn) * 14f, 0, 0);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, (1f - tIn) * 14f, 0, 0);
         scissorLocal(g, tl, cx - 2, cy - 2, cx + cw + 2, cy + ch + 2);
         // huge slanted tab name as a watermark (Persona menu vibe)
-        g.pose().pushPose();
-        g.pose().translate(cx + cw - font.width(tab.label) * 4.2f - 4, cy + ch - 36, 0);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, cx + cw - font.width(tab.label) * 4.2f - 4, cy + ch - 36, 0);
         shear(g, -0.3f);
-        g.pose().scale(4.2f, 4.2f, 1f);
+        com.xlrw.compat.GuiCompat.scale(g, 4.2f, 4.2f, 1f);
         g.drawString(font, tab.label, 0, 0, 0x10E8D8C9, false);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
         UiImages.draw(g, tab.name(), true, cx, cy, smx, smy);   // pictures sent behind the widgets
         switch (tab) {
             case DECK -> drawDeck(g, smx, smy, now);
@@ -237,7 +237,7 @@ public class XlrwScreen extends Screen {
         if (UiImages.editing) drawImageToolbar(g, smx, smy);
         UiImages.drawPicker(g, font, cx, cy, cw, ch, smx, smy, this::hit, tab.name(), cx, cy);
         g.disableScissor();
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
         drawScanline(g, now);
 
         // ---- right: hologram preview ----
@@ -432,20 +432,20 @@ public class XlrwScreen extends Screen {
             int w = 18;
             x -= w + 3;
             float hv = hover("imgtb" + i, mx, my, x, y, w, 14);
-            g.pose().pushPose();
-            g.pose().translate(0, 0, 150);
+            com.xlrw.compat.GuiCompat.push(g);
+            com.xlrw.compat.GuiCompat.translate(g, 0, 0, 150);
             chamfer(g, x, y, w, 14, 3, i == 2 ? lerpColor(RED, 0xFFFF8F45, hv) : lerpColor(TEAL, TEAL_HI, hv));
             g.drawCenteredString(font, labels[i], x + w / 2, y + 3, i == 2 ? INK : CREAM);
-            g.pose().popPose();
+            com.xlrw.compat.GuiCompat.pop(g);
             hit(x, y, w, 14, acts[i]);
         }
         String hint = "kéo: dời · góc cam: co giãn · cuộn: scale · chuột phải: xoá · F: trước/sau";
-        g.pose().pushPose();
-        g.pose().translate(cx + 4, cy + ch - 9, 150);
-        g.pose().scale(0.6f, 0.6f, 1f);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, cx + 4, cy + ch - 9, 150);
+        com.xlrw.compat.GuiCompat.scale(g, 0.6f, 0.6f, 1f);
         g.fill(-2, -2, font.width(hint) + 2, 9, 0xCC141416);
         g.drawString(font, hint, 0, 0, CREAM, false);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
     }
 
     private void openEditor() {
@@ -494,12 +494,12 @@ public class XlrwScreen extends Screen {
         int tw = (int) (font.width(title) * 1.6f) + 14;
         skewRect(g, wx + 44 + 3, wy + 9 + 2, tw, 14, 5, RED);
         skewRect(g, wx + 44, wy + 9, tw, 14, 5, CREAM);
-        g.pose().pushPose();
-        g.pose().translate(wx + 52 + gx, wy + 11, 0);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, wx + 52 + gx, wy + 11, 0);
         shear(g, -0.25f);
-        g.pose().scale(1.6f, 1.25f, 1f);
+        com.xlrw.compat.GuiCompat.scale(g, 1.6f, 1.25f, 1f);
         g.drawString(font, title, 0, 0, INK, false);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
         g.drawString(font, "PRINTER", wx + 44 + tw + 8, wy + 13, RED, false);
         // diagonal halftone stripes (P5 flavour) behind the status dots
         for (int i = 0; i < 14; i++) {
@@ -553,12 +553,12 @@ public class XlrwScreen extends Screen {
             skewRect(g, x + pop, y, w, h - 4, 5, bg);
             int col = active ? INK : lerpColor(TEXT_DIM, CREAM, hv);
             g.drawCenteredString(font, t.icon, x + pop + w / 2, y + 6, active ? RED : col);
-            g.pose().pushPose();
-            g.pose().translate(x + pop + w / 2f, y + 19, 0);
+            com.xlrw.compat.GuiCompat.push(g);
+            com.xlrw.compat.GuiCompat.translate(g, x + pop + w / 2f, y + 19, 0);
             shear(g, -0.2f);
-            g.pose().scale(0.8f, 0.8f, 1f);
+            com.xlrw.compat.GuiCompat.scale(g, 0.8f, 0.8f, 1f);
             g.drawString(font, t.label, -font.width(t.label) / 2, 0, col, false);
-            g.pose().popPose();
+            com.xlrw.compat.GuiCompat.pop(g);
             final Tab tt = t;
             hit(x, y, w + 8, h - 4, () -> switchTab(tt));
             y += h;
@@ -587,11 +587,11 @@ public class XlrwScreen extends Screen {
         float target = s != null ? s.getProgressPercentage() : 0f;
         shownProgress += (target - shownProgress) * 0.12f;
         String pct = String.format("%.0f", shownProgress);
-        g.pose().pushPose();
-        g.pose().translate(x + 12, y + 14, 0);
-        g.pose().scale(3.5f, 3.5f, 1f);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, x + 12, y + 14, 0);
+        com.xlrw.compat.GuiCompat.scale(g, 3.5f, 3.5f, 1f);
         g.drawString(font, pct, 0, 0, RED, false);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
         g.drawString(font, "%", x + 15 + (int) (font.width(pct) * 3.5f), y + 34, RED_DIM, false);
         // segmented bar
         int bx = x + 12, by = y + 64, bw = w - 24, segs = 40;
@@ -773,19 +773,19 @@ public class XlrwScreen extends Screen {
             int ex = x + half - 104, ey = y + 20, ew = 96, eh = 58;
             float eh0 = hover("edit3dP", mx, my, ex, ey, ew, eh);
             skewRect(g, ex + 3, ey + 3, ew, eh, 6, alpha(RED, 0.55f + 0.45f * eh0));
-            g.pose().pushPose();
+            com.xlrw.compat.GuiCompat.push(g);
             float es = 1f + 0.05f * eh0;
-            g.pose().translate(ex + ew / 2f - 2f * eh0, ey + eh / 2f - 2.5f * eh0, 0);
-            g.pose().scale(es, es, 1f);
-            g.pose().translate(-(ex + ew / 2f), -(ey + eh / 2f), 0);
+            com.xlrw.compat.GuiCompat.translate(g, ex + ew / 2f - 2f * eh0, ey + eh / 2f - 2.5f * eh0, 0);
+            com.xlrw.compat.GuiCompat.scale(g, es, es, 1f);
+            com.xlrw.compat.GuiCompat.translate(g, -(ex + ew / 2f), -(ey + eh / 2f), 0);
             skewRect(g, ex, ey, ew, eh, 6, lerpColor(CREAM, 0xFFFFF1E4, eh0));
-            g.pose().pushPose();
-            g.pose().translate(ex + ew / 2f + 3, ey + 12, 0);
-            g.pose().scale(2f, 2f, 1f);
+            com.xlrw.compat.GuiCompat.push(g);
+            com.xlrw.compat.GuiCompat.translate(g, ex + ew / 2f + 3, ey + 12, 0);
+            com.xlrw.compat.GuiCompat.scale(g, 2f, 2f, 1f);
             g.drawCenteredString(font, "✥", 0, 0, RED);
-            g.pose().popPose();
+            com.xlrw.compat.GuiCompat.pop(g);
             g.drawCenteredString(font, "EDIT 3D", ex + ew / 2 + 2, ey + eh - 16, INK);
-            g.pose().popPose();
+            com.xlrw.compat.GuiCompat.pop(g);
             hit(ex, ey, ew + 6, eh, this::openEditor);
             tip("edit3dP", "Free cam: kéo mũi tên dời, kéo vòng xoay", mx, my, ex, ey, ew, eh);
 
@@ -802,11 +802,11 @@ public class XlrwScreen extends Screen {
         if (s != null) {
             int max = s.getMaxY() - s.getMinY();
             String big = String.valueOf(cfg.currentLayer);
-            g.pose().pushPose();
-            g.pose().translate(lx + 8, y + 22, 0);
-            g.pose().scale(2.5f, 2.5f, 1f);
+            com.xlrw.compat.GuiCompat.push(g);
+            com.xlrw.compat.GuiCompat.translate(g, lx + 8, y + 22, 0);
+            com.xlrw.compat.GuiCompat.scale(g, 2.5f, 2.5f, 1f);
             g.drawString(font, big, 0, 0, RED, false);
-            g.pose().popPose();
+            com.xlrw.compat.GuiCompat.pop(g);
             g.drawString(font, "/" + max + "   Y " + (s.getMinY() + cfg.currentLayer), lx + 12 + (int) (font.width(big) * 2.5f), y + 34, TEXT_DIM, false);
             // vertical layer meter
             int mxx = lx + half - 14, mtop = y + 20, mh = ch - 90;
@@ -991,15 +991,15 @@ public class XlrwScreen extends Screen {
             g.fill(x + cut, y + h - 1, x + w + 1, y + h + 1, alpha(0xFF000000, 0.45f * hv));
             g.fill(x + cut + 2, y + h + 1, x + w - 1, y + h + 2, alpha(0xFF000000, 0.22f * hv));
         }
-        g.pose().pushPose();
+        com.xlrw.compat.GuiCompat.push(g);
         float s = 1f + 0.05f * hv, px = x + w / 2f, py = y + h / 2f;
-        g.pose().translate(px - 1.5f * hv, py - 2f * hv, 0);
-        g.pose().scale(s, s, 1f);
-        g.pose().translate(-px, -py, 0);
+        com.xlrw.compat.GuiCompat.translate(g, px - 1.5f * hv, py - 2f * hv, 0);
+        com.xlrw.compat.GuiCompat.scale(g, s, s, 1f);
+        com.xlrw.compat.GuiCompat.translate(g, -px, -py, 0);
     }
 
     private void liftEnd(GuiGraphics g) {
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
     }
 
     private void padButton(GuiGraphics g, int mx, int my, String id, int x, int y, String glyph, Runnable r, String tipText) {
@@ -1025,12 +1025,12 @@ public class XlrwScreen extends Screen {
     private void drawTooltip(GuiGraphics g, int mx, int my, String text) {
         int w = font.width(text) + 10, h = 14;
         int x = Math.min(mx + 8, width - w - 2), y = Math.max(2, my - 16);
-        g.pose().pushPose();
-        g.pose().translate(0, 0, 400);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, 0, 0, 400);
         chamfer(g, x, y, w, h, 3, 0xF0201418);
         g.fill(x, y + h - 1, x + w, y + h, RED);
         g.drawString(font, text, x + 5, y + 3, 0xFFFFC9C4, false);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -1188,11 +1188,11 @@ public class XlrwScreen extends Screen {
         float target = s != null ? s.getProgressPercentage() : 0f;
         shownProgress += (target - shownProgress) * 0.12f;
         String pct = String.format("%.0f%%", shownProgress);
-        g.pose().pushPose();
-        g.pose().translate(x + 9, y + 6, 0);
-        g.pose().scale(1.5f, 1.5f, 1f);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, x + 9, y + 6, 0);
+        com.xlrw.compat.GuiCompat.scale(g, 1.5f, 1.5f, 1f);
         g.drawString(font, pct, 0, 0, RED, false);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
         String blocks = s != null ? compact(s.getPlacedBlocks()) + "/" + compact(s.getTotalBlocks()) : "-";
         String layer = s != null ? "L" + cfg.currentLayer + "/" + (s.getMaxY() - s.getMinY()) : "";
         int right = x + w - 10;
@@ -1254,7 +1254,7 @@ public class XlrwScreen extends Screen {
 
     /** Shear the current pose so text / shapes lean forward like Persona menus. */
     private static void shear(GuiGraphics g, float k) {
-        g.pose().last().pose().mul(new org.joml.Matrix4f().m10(k));
+        com.xlrw.compat.GuiCompat.shearX(g, (k));
     }
 
     /** Parallelogram leaning right: the top edge is shifted {@code slant} px to the right of the bottom edge. */
@@ -1295,11 +1295,11 @@ public class XlrwScreen extends Screen {
     }
 
     private void drawCentered(GuiGraphics g, String s, int cxp, int y, int color, float scale) {
-        g.pose().pushPose();
-        g.pose().translate(cxp, y, 0);
-        g.pose().scale(scale, scale, 1f);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, cxp, y, 0);
+        com.xlrw.compat.GuiCompat.scale(g, scale, scale, 1f);
         g.drawString(font, s, -font.width(s) / 2, 0, color, false);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
     }
 
     private String trimToWidth(String s, int w) {

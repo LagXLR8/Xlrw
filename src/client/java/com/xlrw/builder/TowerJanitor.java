@@ -43,8 +43,8 @@ public final class TowerJanitor {
     private static List<BlockPos> findTowerBases(ClientLevel level, Schematic schematic, BlockPos center) {
         List<BlockPos> bases = new ArrayList<>();
         BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
-        int minY = Math.max(level.getMinBuildHeight(), center.getY() - 40);
-        int maxY = Math.min(level.getMaxBuildHeight() - 1, center.getY() + 30);
+        int minY = Math.max(com.xlrw.compat.MC.minY(level), center.getY() - 40);
+        int maxY = Math.min(com.xlrw.compat.MC.maxYExclusive(level) - 1, center.getY() + 30);
         for (int dx = -SCAN_RADIUS; dx <= SCAN_RADIUS; dx++) {
             for (int dz = -SCAN_RADIUS; dz <= SCAN_RADIUS; dz++) {
                 int x = center.getX() + dx, z = center.getZ() + dz;

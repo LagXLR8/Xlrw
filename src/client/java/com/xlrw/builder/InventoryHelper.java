@@ -43,7 +43,7 @@ public class InventoryHelper {
         Item requiredItem = getItemForBlockState(state);
         if (requiredItem == Items.AIR) return false;
 
-        for (ItemStack stack : player.getInventory().items) {
+        for (ItemStack stack : com.xlrw.compat.MC.mainItems(player.getInventory())) {
             if (!stack.isEmpty() && stack.is(requiredItem)) {
                 return true;
             }
@@ -86,8 +86,8 @@ public class InventoryHelper {
         // 2. Creative mode auto-pick with server synchronization
         if (player.isCreative() && BuilderConfig.getInstance().creativeAutoPick) {
             ItemStack creativeStack = new ItemStack(requiredItem);
-            inv.setItem(inv.selected, creativeStack);
-            player.connection.send(new ServerboundSetCreativeModeSlotPacket(36 + inv.selected, creativeStack));
+            inv.setItem(com.xlrw.compat.MC.selected(inv), creativeStack);
+            player.connection.send(new ServerboundSetCreativeModeSlotPacket(36 + com.xlrw.compat.MC.selected(inv), creativeStack));
             return true;
         }
 
@@ -97,7 +97,7 @@ public class InventoryHelper {
             if (stack.is(requiredItem)) {
                 Minecraft mc = Minecraft.getInstance();
                 if (mc.gameMode != null) {
-                    mc.gameMode.handleInventoryMouseClick(player.inventoryMenu.containerId, slot, inv.selected, ClickType.SWAP, player);
+                    mc.gameMode.handleInventoryMouseClick(player.inventoryMenu.containerId, slot, com.xlrw.compat.MC.selected(inv), ClickType.SWAP, player);
                     return true;
                 }
             }
@@ -107,8 +107,8 @@ public class InventoryHelper {
     }
 
     public static void selectHotbarSlot(LocalPlayer player, int slot) {
-        if (player.getInventory().selected != slot) {
-            player.getInventory().selected = slot;
+        if (com.xlrw.compat.MC.selected(player.getInventory()) != slot) {
+            com.xlrw.compat.MC.setSelected(player.getInventory(), slot);
             player.connection.send(new ServerboundSetCarriedItemPacket(slot));
         }
     }
@@ -116,7 +116,7 @@ public class InventoryHelper {
     public static boolean hasItem(LocalPlayer player, Item item) {
         if (item == null || item == Items.AIR) return false;
         if (player.isCreative()) return true;
-        for (ItemStack stack : player.getInventory().items) {
+        for (ItemStack stack : com.xlrw.compat.MC.mainItems(player.getInventory())) {
             if (!stack.isEmpty() && stack.is(item)) return true;
         }
         return player.getOffhandItem().is(item);
@@ -142,8 +142,8 @@ public class InventoryHelper {
 
         if (player.isCreative() && BuilderConfig.getInstance().creativeAutoPick) {
             ItemStack creativeStack = new ItemStack(item);
-            inv.setItem(inv.selected, creativeStack);
-            player.connection.send(new ServerboundSetCreativeModeSlotPacket(36 + inv.selected, creativeStack));
+            inv.setItem(com.xlrw.compat.MC.selected(inv), creativeStack);
+            player.connection.send(new ServerboundSetCreativeModeSlotPacket(36 + com.xlrw.compat.MC.selected(inv), creativeStack));
             return EquipResult.SWITCHED;
         }
 
@@ -151,7 +151,7 @@ public class InventoryHelper {
             if (inv.getItem(slot).is(item)) {
                 Minecraft mc = Minecraft.getInstance();
                 if (mc.gameMode != null) {
-                    mc.gameMode.handleInventoryMouseClick(player.inventoryMenu.containerId, slot, inv.selected, ClickType.SWAP, player);
+                    mc.gameMode.handleInventoryMouseClick(player.inventoryMenu.containerId, slot, com.xlrw.compat.MC.selected(inv), ClickType.SWAP, player);
                     return EquipResult.SWITCHED;
                 }
             }

@@ -366,13 +366,13 @@ final class ArcadeMore {
             for (int x = 0; x < fw; x += 6) g.fill(x - (int) (scroll % 6), fh - 10, x - (int) (scroll % 6) + 3, fh - 9, 0xFF6B513C);
             float bx = fw * 0.28f;
             if (state != State.OVER) {
-                g.pose().pushPose();
-                g.pose().translate(bx, y, 0);
-                g.pose().mulPose(com.mojang.math.Axis.ZP.rotationDegrees(Math.max(-25, Math.min(60, vy * 0.25f))));
+                com.xlrw.compat.GuiCompat.push(g);
+                com.xlrw.compat.GuiCompat.translate(g, bx, y, 0);
+                com.xlrw.compat.GuiCompat.rotateZ(g, Math.max(-25, Math.min(60, vy * 0.25f)));
                 tinyBitAt(g, -5, -5, now, 1f);
                 int rot = (int) ((now / 50) % 3); // propeller
                 g.fill(-4 + rot, -7, 4 - rot, -6, CREAM);
-                g.pose().popPose();
+                com.xlrw.compat.GuiCompat.pop(g);
             }
             drawParticles(g, fxs);
             g.drawCenteredString(font, String.valueOf(score), fw / 2, 4, CREAM);
@@ -384,11 +384,11 @@ final class ArcadeMore {
     }
 
     static void tinyBitAt(GuiGraphics g, float x, float y, long now, float scale, boolean mirror) {
-        g.pose().pushPose();
-        g.pose().translate(x, y, 0);
-        g.pose().scale(scale, scale, 1f);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, x, y, 0);
+        com.xlrw.compat.GuiCompat.scale(g, scale, scale, 1f);
         tinyBit(g, 0, 0, now, false, mirror);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
     }
 
     // ================================================================================================
@@ -787,12 +787,12 @@ final class ArcadeMore {
                     px = fw * 0.25f + (float) (Math.sin(th) * (loopR - 5));
                     py = loopCy + (float) (Math.cos(th) * (loopR - 5));
                 }
-                g.pose().pushPose();
-                g.pose().translate(px, py, 0);
-                if (loopT >= 0) g.pose().mulPose(com.mojang.math.Axis.ZP.rotationDegrees((float) -Math.toDegrees(th)));
-                else if (!onGround) g.pose().mulPose(com.mojang.math.Axis.ZP.rotationDegrees((now * 1.2f) % 360));
+                com.xlrw.compat.GuiCompat.push(g);
+                com.xlrw.compat.GuiCompat.translate(g, px, py, 0);
+                if (loopT >= 0) com.xlrw.compat.GuiCompat.rotateZ(g, (float) -Math.toDegrees(th));
+                else if (!onGround) com.xlrw.compat.GuiCompat.rotateZ(g, (now * 1.2f) % 360);
                 tinyBitAt(g, -5, -5, now, 1f);
-                g.pose().popPose();
+                com.xlrw.compat.GuiCompat.pop(g);
                 if (shield) circle(g, px, py, 9, 0x447FE3F0);
                 if (now < magnetUntil && (now / 100) % 2 == 0) g.fill((int) px - 1, (int) py - 12, (int) px + 1, (int) py - 10, PINK);
                 if (onGround && speed > 120) for (int i = 0; i < 3; i++) g.fill((int) px - 10 - i * 5, (int) y - 4 - i * 2, (int) px - 6 - i * 5, (int) y - 3 - i * 2, 0x88E8D8C9);
@@ -1150,12 +1150,12 @@ final class ArcadeMore {
                     if (id == LEAVES) g.blit(bx + 1, hy + 1, 0, 8, 8, sp, 0.42f, 0.72f, 0.3f, 1f);
                     else g.blit(bx + 1, hy + 1, 0, 8, 8, sp);
                 }
-                g.pose().pushPose();
-                g.pose().translate(bx + 10, hy + 6, 0);
-                g.pose().scale(0.5f, 0.5f, 1f);
+                com.xlrw.compat.GuiCompat.push(g);
+                com.xlrw.compat.GuiCompat.translate(g, bx + 10, hy + 6, 0);
+                com.xlrw.compat.GuiCompat.scale(g, 0.5f, 0.5f, 1f);
                 String c = String.valueOf(inv.get(id));
                 g.drawString(font, c, -font.width(c), 0, CREAM, true);
-                g.pose().popPose();
+                com.xlrw.compat.GuiCompat.pop(g);
             }
         }
     }

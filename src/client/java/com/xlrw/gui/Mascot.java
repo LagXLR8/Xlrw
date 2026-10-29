@@ -443,29 +443,29 @@ final class Mascot {
             g.fill(Math.round(x - shw / 2f), Math.round(gy) - 1, Math.round(x + shw / 2f), Math.round(gy), 0x55000000);
         }
 
-        g.pose().pushPose();
-        g.pose().translate(0, 0, 300);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, 0, 0, 300);
         if (mood == Mood.HELD || Math.abs(swing) > 0.5f) {
-            g.pose().translate(x, sy, 0);
-            g.pose().mulPose(com.mojang.math.Axis.ZP.rotationDegrees(Math.max(-35, Math.min(35, swing))));
-            g.pose().translate(-x, -sy, 0);
+            com.xlrw.compat.GuiCompat.translate(g, x, sy, 0);
+            com.xlrw.compat.GuiCompat.rotateZ(g, Math.max(-35, Math.min(35, swing)));
+            com.xlrw.compat.GuiCompat.translate(g, -x, -sy, 0);
         }
         loadSkin();
         if (skin != null) drawSkin(g, sx, sy);
         else drawRobot(g, font, sx, sy, mx, my, now);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
 
         if (bubble != null && now < bubbleUntil) {
             int tw = font.width(bubble);
             int bx = Math.round(x) - tw / 2 - 3, by = sy - 14;
-            g.pose().pushPose();
-            g.pose().translate(0, 0, 310);
+            com.xlrw.compat.GuiCompat.push(g);
+            com.xlrw.compat.GuiCompat.translate(g, 0, 0, 310);
             g.fill(bx, by, bx + tw + 6, by + 11, CREAM);
             g.fill(bx - 1, by + 1, bx, by + 10, CREAM);
             g.fill(bx + tw + 6, by + 1, bx + tw + 7, by + 10, CREAM);
             g.fill(Math.round(x) - 1, by + 11, Math.round(x) + 2, by + 13, CREAM);
             g.drawString(font, bubble, bx + 3, by + 2, INK, false);
-            g.pose().popPose();
+            com.xlrw.compat.GuiCompat.pop(g);
         }
     }
 

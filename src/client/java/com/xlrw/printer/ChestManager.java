@@ -261,7 +261,7 @@ public class ChestManager {
      */
     public int getPlayerItemCount(LocalPlayer player, Item item) {
         int count = 0;
-        for (ItemStack stack : player.getInventory().items) {
+        for (ItemStack stack : com.xlrw.compat.MC.mainItems(player.getInventory())) {
             if (!stack.isEmpty() && stack.is(item)) {
                 count += stack.getCount();
             }
@@ -338,7 +338,7 @@ public class ChestManager {
         lastChestInteract = now;
 
         Vec3 hitVec = new Vec3(chestPos.getX() + 0.5, chestPos.getY() + 0.8, chestPos.getZ() + 0.5);
-        player.connection.send(new ServerboundMovePlayerPacket.Rot(player.getYRot(), player.getXRot(), player.onGround()));
+        player.connection.send(com.xlrw.compat.MC.rot(player.getYRot(), player.getXRot(), player.onGround()));
 
         BlockHitResult hitResult = new BlockHitResult(hitVec, Direction.UP, chestPos, false);
         mc.gameMode.useItemOn(player, InteractionHand.MAIN_HAND, hitResult);

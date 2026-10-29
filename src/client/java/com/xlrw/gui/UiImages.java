@@ -188,8 +188,8 @@ final class UiImages {
             pickList = l == null ? new ArrayList<>() : new ArrayList<>(Arrays.asList(l));
             pickList.sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
         }
-        g.pose().pushPose();
-        g.pose().translate(0, 0, 200);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, 0, 0, 200);
         g.fill(x, y, x + w, y + h, 0xF0141416);
         g.fill(x, y, x + 3, y + h, 0xFFF3701E);
         g.drawString(font, "ẢNH  ·  " + tab, x + 8, y + 5, 0xFFE8D8C9, false);
@@ -215,15 +215,15 @@ final class UiImages {
                 int iw = Math.max(1, Math.round(t.w * s)), ih = Math.max(1, Math.round(t.h * s));
                 g.blit(t.loc, tx + (cell - iw) / 2, ty + (cell - ih) / 2, iw, ih, 0, 0, t.w, t.h, t.w, t.h);
             } else g.drawCenteredString(font, "?", tx + cell / 2, ty + cell / 2 - 4, 0xFFE0403A);
-            g.pose().pushPose();
-            g.pose().translate(tx, ty + cell + 1, 0);
-            g.pose().scale(0.5f, 0.5f, 1f);
+            com.xlrw.compat.GuiCompat.push(g);
+            com.xlrw.compat.GuiCompat.translate(g, tx, ty + cell + 1, 0);
+            com.xlrw.compat.GuiCompat.scale(g, 0.5f, 0.5f, 1f);
             g.drawString(font, font.plainSubstrByWidth(f.getName(), cell * 2), 0, 0, 0xFF8D97AB, false);
-            g.pose().popPose();
+            com.xlrw.compat.GuiCompat.pop(g);
             final String name = f.getName();
             hit.hit(tx, ty, cell, cell, () -> add(name, tab, w, h));
         }
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
     }
 
     private static void add(String file, String tab, int areaW, int areaH) {

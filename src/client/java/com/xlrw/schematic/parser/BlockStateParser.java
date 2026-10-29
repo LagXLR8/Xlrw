@@ -1,5 +1,7 @@
 package com.xlrw.schematic.parser;
 
+import com.xlrw.compat.NbtCompat;
+
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -18,15 +20,15 @@ public class BlockStateParser {
             return Blocks.AIR.defaultBlockState();
         }
 
-        Block block = BuiltInRegistries.BLOCK.get(id);
+        Block block = NbtCompat.block(id);
         if (block == null || block == Blocks.AIR && !blockName.contains("air")) {
             return Blocks.AIR.defaultBlockState();
         }
 
         BlockState state = block.defaultBlockState();
         if (properties != null && !properties.isEmpty()) {
-            for (String key : properties.getAllKeys()) {
-                String valStr = properties.getString(key);
+            for (String key : NbtCompat.keys(properties)) {
+                String valStr = NbtCompat.getString(properties, key);
                 state = applyProperty(state, key, valStr);
             }
         }
@@ -43,7 +45,7 @@ public class BlockStateParser {
         if (bracketStart == -1) {
             ResourceLocation id = ResourceLocation.tryParse(stateString);
             if (id == null) return Blocks.AIR.defaultBlockState();
-            Block block = BuiltInRegistries.BLOCK.get(id);
+            Block block = NbtCompat.block(id);
             return block != null ? block.defaultBlockState() : Blocks.AIR.defaultBlockState();
         }
 
@@ -52,7 +54,7 @@ public class BlockStateParser {
 
         ResourceLocation id = ResourceLocation.tryParse(blockName);
         if (id == null) return Blocks.AIR.defaultBlockState();
-        Block block = BuiltInRegistries.BLOCK.get(id);
+        Block block = NbtCompat.block(id);
         if (block == null) return Blocks.AIR.defaultBlockState();
 
         BlockState state = block.defaultBlockState();

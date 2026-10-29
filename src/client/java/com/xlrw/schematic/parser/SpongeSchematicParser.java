@@ -1,5 +1,7 @@
 package com.xlrw.schematic.parser;
 
+import com.xlrw.compat.NbtCompat;
+
 import com.xlrw.schematic.Schematic;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -22,22 +24,22 @@ public class SpongeSchematicParser {
             root = NbtIo.readCompressed(is, NbtAccounter.unlimitedHeap());
         }
 
-        CompoundTag dataTag = root.contains("Schematic") ? root.getCompound("Schematic") : root;
+        CompoundTag dataTag = root.contains("Schematic") ? NbtCompat.getCompound(root, "Schematic") : root;
 
-        int width = dataTag.getShort("Width");
-        int height = dataTag.getShort("Height");
-        int length = dataTag.getShort("Length");
+        int width = NbtCompat.getShort(dataTag, "Width");
+        int height = NbtCompat.getShort(dataTag, "Height");
+        int length = NbtCompat.getShort(dataTag, "Length");
 
-        CompoundTag paletteTag = dataTag.getCompound("Palette");
+        CompoundTag paletteTag = NbtCompat.getCompound(dataTag, "Palette");
         Map<Integer, BlockState> paletteMap = new HashMap<>();
 
-        for (String key : paletteTag.getAllKeys()) {
-            int id = paletteTag.getInt(key);
+        for (String key : NbtCompat.keys(paletteTag)) {
+            int id = NbtCompat.getInt(paletteTag, key);
             BlockState state = BlockStateParser.fromString(key);
             paletteMap.put(id, state);
         }
 
-        byte[] blockData = dataTag.getByteArray("BlockData");
+        byte[] blockData = NbtCompat.getByteArray(dataTag, "BlockData");
         Map<BlockPos, BlockState> blocks = new HashMap<>();
 
         int dataIndex = 0;

@@ -194,7 +194,7 @@ public class PlacementFinder {
                         net.minecraft.world.item.Item reqItem = InventoryHelper.getItemForBlockState(req);
                         if (!player.isCreative() && !InventoryHelper.hasItem(player, reqItem) && s != BuildRules.BuildStatus.ADJUST) {
                             missingItem++;
-                            if (sampleReject == null) sampleReject = String.format("Thiếu vật phẩm [%s] cho block tại %s", reqItem.getDescription().getString(), pos.toShortString());
+                            if (sampleReject == null) sampleReject = String.format("Thiếu vật phẩm [%s] cho block tại %s", com.xlrw.compat.MC.itemName(reqItem).getString(), pos.toShortString());
                         } else {
                             // Within reach and has item, but rejected: check support / raycast
                             boolean hasSolidNeighbor = false;

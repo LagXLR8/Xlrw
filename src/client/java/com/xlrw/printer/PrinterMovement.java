@@ -383,7 +383,7 @@ public class PrinterMovement {
         if (foot.distSqr(goal) > 12 * 12) return false;              // only short hops
         double dx = goal.getX() + 0.5 - player.getX();
         double dz = goal.getZ() + 0.5 - player.getZ();
-        Direction dir = Direction.getNearest(dx, 0, dz);
+        Direction dir = com.xlrw.compat.MC.nearestDir(dx, 0, dz);
         if (dir.getAxis() == Direction.Axis.Y) return false;
 
         BlockPos gapFloor = foot.below().relative(dir);
@@ -478,20 +478,20 @@ public class PrinterMovement {
         if (mc != null && mc.player != null) {
             mc.player.setSprinting(false);
             if (mc.player.input != null) {
-                mc.player.input.up = false;
-                mc.player.input.down = false;
-                mc.player.input.left = false;
-                mc.player.input.right = false;
-                mc.player.input.forwardImpulse = 0.0f;
-                mc.player.input.leftImpulse = 0.0f;
-                mc.player.input.jumping = false;
-                mc.player.input.shiftKeyDown = false;
+                com.xlrw.compat.InputCompat.up(mc.player, false);
+                com.xlrw.compat.InputCompat.down(mc.player, false);
+                com.xlrw.compat.InputCompat.left(mc.player, false);
+                com.xlrw.compat.InputCompat.right(mc.player, false);
+                com.xlrw.compat.InputCompat.forwardImpulse(mc.player, 0.0f);
+                com.xlrw.compat.InputCompat.leftImpulse(mc.player, 0.0f);
+                com.xlrw.compat.InputCompat.jumping(mc.player, false);
+                com.xlrw.compat.InputCompat.shiftKeyDown(mc.player, false);
             }
             // Anti-fall: when stopping next to a drop, keep SNEAK held so leftover momentum (or a later nudge)
             // can never carry the bot over the edge while it stands there building
             if (mc.level != null && isNearDangerousEdge(mc.level, mc.player)) {
                 mc.options.keyShift.setDown(true);
-                if (mc.player.input != null) mc.player.input.shiftKeyDown = true;
+                if (mc.player.input != null) com.xlrw.compat.InputCompat.shiftKeyDown(mc.player, true);
             }
         }
     }
@@ -550,18 +550,18 @@ public class PrinterMovement {
         mc.options.keyLeft.setDown(left);
         mc.options.keyRight.setDown(right);
         if (p.input != null) {
-            p.input.up = up;
-            p.input.down = down;
-            p.input.left = left;
-            p.input.right = right;
-            p.input.forwardImpulse = forwardImpulse;
-            p.input.leftImpulse = leftImpulse;
+            com.xlrw.compat.InputCompat.up(p, up);
+            com.xlrw.compat.InputCompat.down(p, down);
+            com.xlrw.compat.InputCompat.left(p, left);
+            com.xlrw.compat.InputCompat.right(p, right);
+            com.xlrw.compat.InputCompat.forwardImpulse(p, forwardImpulse);
+            com.xlrw.compat.InputCompat.leftImpulse(p, leftImpulse);
         }
     }
 
     private static void setJump(Minecraft mc, LocalPlayer p, boolean jump) {
         mc.options.keyJump.setDown(jump);
-        if (p.input != null) p.input.jumping = jump;
+        if (p.input != null) com.xlrw.compat.InputCompat.jumping(p, jump);
     }
 
     private static double descendLastY = Double.NaN;
@@ -599,7 +599,7 @@ public class PrinterMovement {
 
     private static void setSneak(Minecraft mc, LocalPlayer p, boolean sneak) {
         mc.options.keyShift.setDown(sneak);
-        if (p.input != null) p.input.shiftKeyDown = sneak;
+        if (p.input != null) com.xlrw.compat.InputCompat.shiftKeyDown(p, sneak);
     }
 
     private static BlockPos findNearestDryLand(ClientLevel level, BlockPos start, int radius) {

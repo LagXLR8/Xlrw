@@ -80,7 +80,7 @@ public class SneakBridgeHelper {
         // 1. ENGAGE SNEAK LOCK IMMEDIATELY: prevents player from ever falling off the ledge!
         mc.options.keyShift.setDown(true);
         if (player.input != null) {
-            player.input.shiftKeyDown = true;
+            com.xlrw.compat.InputCompat.shiftKeyDown(player, true);
         }
 
         // 2. Select bridging material from inventory
@@ -136,7 +136,7 @@ public class SneakBridgeHelper {
         // Sync view angles to client and send server rotation packet
         player.setYRot(targetYaw);
         player.setXRot(targetPitch);
-        player.connection.send(new ServerboundMovePlayerPacket.Rot(targetYaw, targetPitch, player.onGround()));
+        player.connection.send(com.xlrw.compat.MC.rot(targetYaw, targetPitch, player.onGround()));
 
         // 5. Gently steer toward the block edge while sneak is locked
         double edgeTargetX = currentSupport.getX() + 0.5 + bridgeDir.getStepX() * 0.42;
@@ -154,7 +154,7 @@ public class SneakBridgeHelper {
 
         XlrwDebug.logRateLimited("BRIDGE_PLACE_" + targetPos.asLong(), 500, "SNEAK_BRIDGE",
                 String.format("Sneak-bridge block placed at %s via side face %s | Item=%s, Pitch=%.1f",
-                        targetPos.toShortString(), clickFace.getName(), bridgeItem.getDescription().getString(), targetPitch));
+                        targetPos.toShortString(), clickFace.getName(), com.xlrw.compat.MC.itemName(bridgeItem).getString(), targetPitch));
 
         return true;
     }
@@ -178,13 +178,13 @@ public class SneakBridgeHelper {
         mc.options.keySprint.setDown(false);
         mc.options.keyShift.setDown(true); // Maintain sneak lock!
         if (p.input != null) {
-            p.input.up = up;
-            p.input.down = down;
-            p.input.left = l;
-            p.input.right = r;
-            p.input.shiftKeyDown = true;
-            p.input.forwardImpulse = up ? 1.0f : (down ? -1.0f : 0.0f);
-            p.input.leftImpulse = l ? 1.0f : (r ? -1.0f : 0.0f);
+            com.xlrw.compat.InputCompat.up(p, up);
+            com.xlrw.compat.InputCompat.down(p, down);
+            com.xlrw.compat.InputCompat.left(p, l);
+            com.xlrw.compat.InputCompat.right(p, r);
+            com.xlrw.compat.InputCompat.shiftKeyDown(p, true);
+            com.xlrw.compat.InputCompat.forwardImpulse(p, up ? 1.0f : (down ? -1.0f : 0.0f));
+            com.xlrw.compat.InputCompat.leftImpulse(p, l ? 1.0f : (r ? -1.0f : 0.0f));
         }
         p.setSprinting(false);
     }

@@ -122,12 +122,12 @@ public class ScaffoldManager {
         mc.options.keyRight.setDown(false);
         mc.options.keySprint.setDown(false);
         if (player.input != null) {
-            player.input.up = false;
-            player.input.down = false;
-            player.input.left = false;
-            player.input.right = false;
-            player.input.forwardImpulse = 0.0f;
-            player.input.leftImpulse = 0.0f;
+            com.xlrw.compat.InputCompat.up(player, false);
+            com.xlrw.compat.InputCompat.down(player, false);
+            com.xlrw.compat.InputCompat.left(player, false);
+            com.xlrw.compat.InputCompat.right(player, false);
+            com.xlrw.compat.InputCompat.forwardImpulse(player, 0.0f);
+            com.xlrw.compat.InputCompat.leftImpulse(player, 0.0f);
         }
 
         startY = player.getY();
@@ -162,12 +162,12 @@ public class ScaffoldManager {
         mc.options.keyRight.setDown(false);
         mc.options.keySprint.setDown(false);
         if (player.input != null) {
-            player.input.up = false;
-            player.input.down = false;
-            player.input.left = false;
-            player.input.right = false;
-            player.input.forwardImpulse = 0.0f;
-            player.input.leftImpulse = 0.0f;
+            com.xlrw.compat.InputCompat.up(player, false);
+            com.xlrw.compat.InputCompat.down(player, false);
+            com.xlrw.compat.InputCompat.left(player, false);
+            com.xlrw.compat.InputCompat.right(player, false);
+            com.xlrw.compat.InputCompat.forwardImpulse(player, 0.0f);
+            com.xlrw.compat.InputCompat.leftImpulse(player, 0.0f);
         }
 
         switch (jumpState) {
@@ -183,17 +183,17 @@ public class ScaffoldManager {
                 }
 
                 // Send look packet to server without snapping client camera
-                player.connection.send(new ServerboundMovePlayerPacket.Rot(player.getYRot(), 90.0f, player.onGround()));
+                player.connection.send(com.xlrw.compat.MC.rot(player.getYRot(), 90.0f, player.onGround()));
 
                 // Jump straight up!
                 mc.options.keyJump.setDown(true);
-                if (player.input != null) player.input.jumping = true;
+                if (player.input != null) com.xlrw.compat.InputCompat.jumping(player, true);
 
                 jumpState = JumpState.ASCENDING;
             }
             case ASCENDING -> {
                 mc.options.keyJump.setDown(true);
-                if (player.input != null) player.input.jumping = true;
+                if (player.input != null) com.xlrw.compat.InputCompat.jumping(player, true);
 
                 // Player bounding box must strictly clear the 1.0m block space
                 double heightAboveStart = player.getY() - startY;
@@ -240,9 +240,9 @@ public class ScaffoldManager {
                 }
 
                 mc.options.keyShift.setDown(false);
-                if (player.input != null) player.input.shiftKeyDown = false;
+                if (player.input != null) com.xlrw.compat.InputCompat.shiftKeyDown(player, false);
 
-                player.connection.send(new ServerboundMovePlayerPacket.Rot(player.getYRot(), 90.0f, false));
+                player.connection.send(com.xlrw.compat.MC.rot(player.getYRot(), 90.0f, false));
                 BlockHitResult hitResult = new BlockHitResult(hitVec, clickFace, clickPos, false);
 
                 net.minecraft.world.InteractionResult res = mc.gameMode.useItemOn(player, InteractionHand.MAIN_HAND, hitResult);
@@ -254,7 +254,7 @@ public class ScaffoldManager {
                 }
 
                 mc.options.keyJump.setDown(false);
-                if (player.input != null) player.input.jumping = false;
+                if (player.input != null) com.xlrw.compat.InputCompat.jumping(player, false);
 
                 jumpState = JumpState.LANDED;
             }
@@ -353,7 +353,7 @@ public class ScaffoldManager {
         if (!isColumnFreeOfSchematic(schematic, cx, cz)) return null;
 
         int top = Math.max(refY + 3, targetY);
-        int bottom = Math.max(level.getMinBuildHeight() + 1, refY - 10);
+        int bottom = Math.max(com.xlrw.compat.MC.minY(level) + 1, refY - 10);
 
         // First scan downward from refY + 2 (most common for natural ground / basement)
         for (int y = Math.min(refY + 2, top); y >= bottom; y--) {
@@ -725,10 +725,10 @@ public class ScaffoldManager {
             BlockPos groundPos = basePos.below();
             Vec3 hitVec = new Vec3(basePos.getX() + 0.5, groundPos.getY() + 1.0, basePos.getZ() + 0.5);
             float[] rots = HumanAim.calculateRotations(player.getEyePosition(), hitVec);
-            player.connection.send(new ServerboundMovePlayerPacket.Rot(rots[0], rots[1], player.onGround()));
+            player.connection.send(com.xlrw.compat.MC.rot(rots[0], rots[1], player.onGround()));
 
             mc.options.keyShift.setDown(false);
-            if (player.input != null) player.input.shiftKeyDown = false;
+            if (player.input != null) com.xlrw.compat.InputCompat.shiftKeyDown(player, false);
 
             BlockHitResult hitResult = new BlockHitResult(hitVec, Direction.UP, groundPos, false);
             mc.gameMode.useItemOn(player, InteractionHand.MAIN_HAND, hitResult);
@@ -748,7 +748,7 @@ public class ScaffoldManager {
                 return false;
             }
 
-            Direction sideFace = Direction.getNearest(dx, 0, dz);
+            Direction sideFace = com.xlrw.compat.MC.nearestDir(dx, 0, dz);
             if (sideFace.getAxis() == Direction.Axis.Y) sideFace = Direction.NORTH;
 
             // Hit point on that side face of the bottom-most scaffolding block
@@ -759,11 +759,11 @@ public class ScaffoldManager {
             );
 
             float[] rots = HumanAim.calculateRotations(player.getEyePosition(), hitVec);
-            player.connection.send(new ServerboundMovePlayerPacket.Rot(rots[0], rots[1], player.onGround()));
+            player.connection.send(com.xlrw.compat.MC.rot(rots[0], rots[1], player.onGround()));
 
             // Sneaking MUST be disabled so vanilla does not place normally against the face!
             mc.options.keyShift.setDown(false);
-            if (player.input != null) player.input.shiftKeyDown = false;
+            if (player.input != null) com.xlrw.compat.InputCompat.shiftKeyDown(player, false);
 
             BlockHitResult hitResult = new BlockHitResult(hitVec, sideFace, basePos, false);
             mc.gameMode.useItemOn(player, InteractionHand.MAIN_HAND, hitResult);
@@ -815,11 +815,11 @@ public class ScaffoldManager {
         float targetPitch = 60.0f;
         player.setYRot(targetYaw);
         player.setXRot(targetPitch);
-        player.connection.send(new ServerboundMovePlayerPacket.Rot(targetYaw, targetPitch, player.onGround()));
+        player.connection.send(com.xlrw.compat.MC.rot(targetYaw, targetPitch, player.onGround()));
 
         // Ensure sneak is OFF
         mc.options.keyShift.setDown(false);
-        if (player.input != null) player.input.shiftKeyDown = false;
+        if (player.input != null) com.xlrw.compat.InputCompat.shiftKeyDown(player, false);
 
         // TOP face + facing direction => vanilla extends the row horizontally
         Direction clickFace = Direction.UP;

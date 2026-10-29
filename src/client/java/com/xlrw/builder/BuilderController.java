@@ -523,7 +523,7 @@ public class BuilderController {
                 nextActionTime = System.currentTimeMillis() + 60;
                 return;
             } else if (eq == InventoryHelper.EquipResult.MISSING && !player.isCreative()) {
-                XlrwDebug.logBuildReject(currentCandidate.targetPos, currentCandidate.requiredState.getBlock().getName().getString(), "Missing fluid item: " + (currentCandidate.item != null ? currentCandidate.item.getDescription().getString() : "null"));
+                XlrwDebug.logBuildReject(currentCandidate.targetPos, currentCandidate.requiredState.getBlock().getName().getString(), "Missing fluid item: " + (currentCandidate.item != null ? com.xlrw.compat.MC.itemName(currentCandidate.item).getString() : "null"));
                 currentCandidate = null;
                 return;
             }
@@ -536,8 +536,8 @@ public class BuilderController {
                     nextActionTime = System.currentTimeMillis() + 60;
                     return;
                 } else if (eq == InventoryHelper.EquipResult.MISSING && !player.isCreative()) {
-                    statusMessage = "Missing item: " + currentCandidate.item.getDescription().getString();
-                    XlrwDebug.logBuildReject(currentCandidate.targetPos, currentCandidate.requiredState.getBlock().getName().getString(), "Missing item in inventory: " + currentCandidate.item.getDescription().getString());
+                    statusMessage = "Missing item: " + com.xlrw.compat.MC.itemName(currentCandidate.item).getString();
+                    XlrwDebug.logBuildReject(currentCandidate.targetPos, currentCandidate.requiredState.getBlock().getName().getString(), "Missing item in inventory: " + com.xlrw.compat.MC.itemName(currentCandidate.item).getString());
                     currentCandidate = null;
                     return;
                 }
@@ -1213,7 +1213,7 @@ public class BuilderController {
         climbOutStartY = player.getY();
         climbOutStartedAt = System.currentTimeMillis();
         XlrwDebug.log("MOVE/CLIMB_OUT", "Bị nhốt trong vùng kín tại " + player.blockPosition().toShortString()
-                + " -> kê " + climbOutItem(player).getDescription().getString() + " dưới chân để leo ra");
+                + " -> kê " + com.xlrw.compat.MC.itemName(climbOutItem(player)).getString() + " dưới chân để leo ra");
         return true;
     }
 
@@ -1298,7 +1298,7 @@ public class BuilderController {
         }
 
         // Cooldown between fruits
-        if (player.getCooldowns().isOnCooldown(Items.CHORUS_FRUIT)) {
+        if (com.xlrw.compat.MC.onCooldown(player, Items.CHORUS_FRUIT)) {
             mc.options.keyUse.setDown(false);
             return true;
         }
@@ -1365,7 +1365,7 @@ public class BuilderController {
             return false;
         }
         PrinterMovement.stop(mc);
-        statusMessage = "3D Printer: Kê " + item.getDescription().getString() + " dưới chân để leo ra";
+        statusMessage = "3D Printer: Kê " + com.xlrw.compat.MC.itemName(item).getString() + " dưới chân để leo ra";
         sm.triggerPillarStepUp(mc, player, item);
         return true;
     }
@@ -1531,7 +1531,7 @@ public class BuilderController {
         }
 
         if (pillarItem != null && canJumpUp) {
-            XlrwDebug.logMoveObstacle("PIT_ESCAPE_PILLAR", foot, "Kẹt trong hố thật sự: nhảy đặt " + pillarItem.getDescription().getString() + " dưới chân");
+            XlrwDebug.logMoveObstacle("PIT_ESCAPE_PILLAR", foot, "Kẹt trong hố thật sự: nhảy đặt " + com.xlrw.compat.MC.itemName(pillarItem).getString() + " dưới chân");
             statusMessage = "3D Printer: Thoát hố - nhảy đặt block dưới chân";
             PrinterMovement.stop(mc);
             return ScaffoldManager.getInstance().triggerPillarStepUp(mc, player, pillarItem);
@@ -1707,7 +1707,7 @@ public class BuilderController {
         PrinterMovement.stop(mc);
         player.setYRot(c.targetYaw);
         player.setXRot(c.targetPitch);
-        player.connection.send(new ServerboundMovePlayerPacket.Rot(c.targetYaw, c.targetPitch, player.onGround()));
+        player.connection.send(com.xlrw.compat.MC.rot(c.targetYaw, c.targetPitch, player.onGround()));
         BlockHitResult hit = new BlockHitResult(c.hitVec, c.clickFace, c.neighborPos, false);
         InteractionResult r = mc.gameMode.useItemOn(player, InteractionHand.MAIN_HAND, hit);
         player.swing(InteractionHand.MAIN_HAND);
@@ -1792,7 +1792,7 @@ public class BuilderController {
             player.yHeadRotO = candidate.targetYaw;
             player.yBodyRot = candidate.targetYaw;
         }
-        player.connection.send(new ServerboundMovePlayerPacket.Rot(player.getYRot(), player.getXRot(), player.onGround()));
+        player.connection.send(com.xlrw.compat.MC.rot(player.getYRot(), player.getXRot(), player.onGround()));
 
         // 2b. The server only copies the body yaw into the HEAD yaw during its next player tick, and pistons /
         //     observers / dispensers / droppers / hoppers take their facing from the head yaw. Clicking in the same
@@ -1853,8 +1853,8 @@ public class BuilderController {
         // 3. Sneak if neighbour is interactable (e.g. chest, door, trapdoor, furnace) to prevent opening GUI / toggling
         if (candidate.requiresSneak) {
             mc.options.keyShift.setDown(true);
-            if (player.input != null) player.input.shiftKeyDown = true;
-            player.connection.send(new ServerboundPlayerCommandPacket(player, ServerboundPlayerCommandPacket.Action.PRESS_SHIFT_KEY));
+            if (player.input != null) com.xlrw.compat.InputCompat.shiftKeyDown(player, true);
+            player.connection.send(com.xlrw.compat.MC.sneakPacket(player, true));
         }
 
         // 4. Construct authentic BlockHitResult (Meteor & Baritone style) targeting candidate.hitVec on candidate.clickFace
@@ -1878,8 +1878,8 @@ public class BuilderController {
                         "Kiểm tra trước khi click: sẽ ra sai hướng (" + (sim != null ? sim.state() : "null") + "), bỏ qua lần này");
                 if (candidate.requiresSneak) {
                     mc.options.keyShift.setDown(false);
-                    if (player.input != null) player.input.shiftKeyDown = false;
-                    player.connection.send(new ServerboundPlayerCommandPacket(player, ServerboundPlayerCommandPacket.Action.RELEASE_SHIFT_KEY));
+                    if (player.input != null) com.xlrw.compat.InputCompat.shiftKeyDown(player, false);
+                    player.connection.send(com.xlrw.compat.MC.sneakPacket(player, false));
                 }
                 TaskTracker.getInstance().onAction(candidate.targetPos, 0);
                 currentCandidate = null;
@@ -1901,11 +1901,11 @@ public class BuilderController {
         // Anti-fall keeps SNEAK held at edges; a sneaking right-click would not toggle/adjust a block
         boolean unsneakForClick = candidate.type == PlacementCandidate.Type.ADJUST && player.isShiftKeyDown();
         if (unsneakForClick) {
-            player.connection.send(new ServerboundPlayerCommandPacket(player, ServerboundPlayerCommandPacket.Action.RELEASE_SHIFT_KEY));
+            player.connection.send(com.xlrw.compat.MC.sneakPacket(player, false));
         }
         InteractionResult useResult = mc.gameMode.useItemOn(player, hand, hitResult);
         if (unsneakForClick) {
-            player.connection.send(new ServerboundPlayerCommandPacket(player, ServerboundPlayerCommandPacket.Action.PRESS_SHIFT_KEY));
+            player.connection.send(com.xlrw.compat.MC.sneakPacket(player, true));
         }
         if (!useResult.consumesAction()) {
             mc.gameMode.useItem(player, hand);
@@ -1917,8 +1917,8 @@ public class BuilderController {
         // 6. Release sneak (unless we stand at an edge: then anti-fall keeps it held)
         if (candidate.requiresSneak && !PrinterMovement.isNearDangerousEdge(mc.level, player)) {
             mc.options.keyShift.setDown(false);
-            if (player.input != null) player.input.shiftKeyDown = false;
-            player.connection.send(new ServerboundPlayerCommandPacket(player, ServerboundPlayerCommandPacket.Action.RELEASE_SHIFT_KEY));
+            if (player.input != null) com.xlrw.compat.InputCompat.shiftKeyDown(player, false);
+            player.connection.send(com.xlrw.compat.MC.sneakPacket(player, false));
         }
 
         // 7. Track with TaskTracker to prevent repeated click spam
@@ -2055,7 +2055,7 @@ public class BuilderController {
         statusMessage = "3D Printer: Thoát khỏi " + (inLava ? "lava" : "dòng nước");
         mc.options.keySprint.setDown(false);
         mc.options.keyShift.setDown(false);
-        if (player.input != null) player.input.shiftKeyDown = false;
+        if (player.input != null) com.xlrw.compat.InputCompat.shiftKeyDown(player, false);
         mc.options.keyJump.setDown(true); // swim up / hop onto the ledge
         if (best != null) {
             double tx = best.getX() + 0.5 - player.getX(), tz = best.getZ() + 0.5 - player.getZ();
@@ -2154,12 +2154,12 @@ public class BuilderController {
             PrinterMovement.stop(mc);
             player.setYRot(c.targetYaw);
             player.setXRot(c.targetPitch);
-            player.connection.send(new ServerboundMovePlayerPacket.Rot(c.targetYaw, c.targetPitch, player.onGround()));
+            player.connection.send(com.xlrw.compat.MC.rot(c.targetYaw, c.targetPitch, player.onGround()));
             BlockHitResult hit = new BlockHitResult(c.hitVec, c.clickFace, c.neighborPos, false);
             mc.gameMode.useItemOn(player, InteractionHand.MAIN_HAND, hit);
             player.swing(InteractionHand.MAIN_HAND);
             TempBlockTracker.record(p, plug);
-            XlrwDebug.log("FLUID/PLUG", "Lấp " + p.toShortString() + " bằng " + plug.getDescription().getString());
+            XlrwDebug.log("FLUID/PLUG", "Lấp " + p.toShortString() + " bằng " + com.xlrw.compat.MC.itemName(plug).getString());
             statusMessage = "3D Printer: Lấp chất lỏng đổ nhầm tại " + p.toShortString();
             spills.remove(p);
             nextActionTime = now + 150;
