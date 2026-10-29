@@ -1,0 +1,242 @@
+{
+  "ui.click": {
+    "sounds": [
+      {
+        "name": "xlrw:ui/click",
+        "stream": false
+      }
+    ]
+  },
+  "ui.close": {
+    "sounds": [
+      {
+        "name": "xlrw:ui/close",
+        "stream": false
+      }
+    ]
+  },
+  "ui.edit": {
+    "sounds": [
+      {
+        "name": "xlrw:ui/edit",
+        "stream": false
+      }
+    ]
+  },
+  "ui.hover": {
+    "sounds": [
+      {
+        "name": "xlrw:ui/hover",
+        "stream": false
+      }
+    ]
+  },
+  "ui.open": {
+    "sounds": [
+      {
+        "name": "xlrw:ui/open",
+        "stream": false
+      }
+    ]
+  },
+  "ui.power_off": {
+    "sounds": [
+      {
+        "name": "xlrw:ui/power_off",
+        "stream": false
+      }
+    ]
+  },
+  "ui.power_on": {
+    "sounds": [
+      {
+        "name": "xlrw:ui/power_on",
+        "stream": false
+      }
+    ]
+  },
+  "ui.tab": {
+    "sounds": [
+      {
+        "name": "xlrw:ui/tab",
+        "stream": false
+      }
+    ]
+  },
+  "ui.toggle_off": {
+    "sounds": [
+      {
+        "name": "xlrw:ui/toggle_off",
+        "stream": false
+      }
+    ]
+  },
+  "ui.toggle_on": {
+    "sounds": [
+      {
+        "name": "xlrw:ui/toggle_on",
+        "stream": false
+      }
+    ]
+  },
+  "ui.victory": {
+    "sounds": [
+      {
+        "name": "xlrw:ui/victory",
+        "stream": false
+      }
+    ]
+  },
+  "bit.break": {
+    "sounds": [
+      {
+        "name": "xlrw:bit/break",
+        "stream": false
+      }
+    ]
+  },
+  "bit.chirp": {
+    "sounds": [
+      {
+        "name": "xlrw:bit/chirp",
+        "stream": false
+      }
+    ]
+  },
+  "bit.drop": {
+    "sounds": [
+      {
+        "name": "xlrw:bit/drop",
+        "stream": false
+      }
+    ]
+  },
+  "bit.grab": {
+    "sounds": [
+      {
+        "name": "xlrw:bit/grab",
+        "stream": false
+      }
+    ]
+  },
+  "bit.happy": {
+    "sounds": [
+      {
+        "name": "xlrw:bit/happy",
+        "stream": false
+      }
+    ]
+  },
+  "bit.land": {
+    "sounds": [
+      {
+        "name": "xlrw:bit/land",
+        "stream": false
+      }
+    ]
+  },
+  "bit.place": {
+    "sounds": [
+      {
+        "name": "xlrw:bit/place",
+        "stream": false
+      }
+    ]
+  },
+  "bit.sleep": {
+    "sounds": [
+      {
+        "name": "xlrw:bit/sleep",
+        "stream": false
+      }
+    ]
+  },
+  "bit.step": {
+    "sounds": [
+      {
+        "name": "xlrw:bit/step",
+        "stream": false
+      }
+    ]
+  },
+  "bit.surprise": {
+    "sounds": [
+      {
+        "name": "xlrw:bit/surprise",
+        "stream": false
+      }
+    ]
+  },
+  "game.clear": {
+    "sounds": [
+      {
+        "name": "xlrw:game/clear",
+        "stream": false
+      }
+    ]
+  },
+  "game.coin": {
+    "sounds": [
+      {
+        "name": "xlrw:game/coin",
+        "stream": false
+      }
+    ]
+  },
+  "game.eat": {
+    "sounds": [
+      {
+        "name": "xlrw:game/eat",
+        "stream": false
+      }
+    ]
+  },
+  "game.hurt": {
+    "sounds": [
+      {
+        "name": "xlrw:game/hurt",
+        "stream": false
+      }
+    ]
+  },
+  "game.over": {
+    "sounds": [
+      {
+        "name": "xlrw:game/over",
+        "stream": false
+      }
+    ]
+  },
+  "game.pop": {
+    "sounds": [
+      {
+        "name": "xlrw:game/pop",
+        "stream": false
+      }
+    ]
+  },
+  "game.quack": {
+    "sounds": [
+      {
+        "name": "xlrw:game/quack",
+        "stream": false
+      }
+    ]
+  },
+  "game.shoot": {
+    "sounds": [
+      {
+        "name": "xlrw:game/shoot",
+        "stream": false
+      }
+    ]
+  },
+  "game.wave": {
+    "sounds": [
+      {
+        "name": "xlrw:game/wave",
+        "stream": false
+      }
+    ]
+  }
+}

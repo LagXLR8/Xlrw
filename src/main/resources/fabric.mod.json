@@ -1,0 +1,28 @@
+{
+	"schemaVersion": 1,
+	"id": "xlrw",
+	"version": "${version}",
+	"name": "Xlrw",
+	"description": "Xlrw - Premium Legit Schematic & Litematica Auto-Builder Client for Fabric 1.21.1.",
+	"authors": [
+		"Xlrw Team"
+	],
+	"contact": {},
+	"license": "MIT",
+	"icon": "assets/xlrw/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"com.xlrw.XlrwClient"
+		]
+	},
+	"mixins": [
+		"xlrw.client.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~1.21.1",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
