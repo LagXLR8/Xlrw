@@ -49,6 +49,7 @@ tasks {
     withType<JavaCompile>().configureEach {
         options.release = 21
         options.encoding = "UTF-8"
+        options.compilerArgs.addAll(listOf("-Xmaxerrs", "10000"))
     }
 
     processResources {

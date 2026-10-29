@@ -27,6 +27,10 @@ jobs:
           set -o pipefail
           # gradle.properties points org.gradle.java.home at a Windows JDK; use the runner's JDK instead
           ./gradlew -Dorg.gradle.java.home="$JAVA_HOME" build --continue --stacktrace --no-daemon 2>&1 | tee build.log
+      - name: dump 1.21.11 API (porting aid)
+        if: always() && github.ref == 'refs/heads/multiversion'
+        run: |
+          .github/scripts/api-dump.sh 1.21.11 api.txt $(cat .github/scripts/api-classes.txt) || true
       - name: publish build log
         if: always() && github.event_name == 'push'
         run: |
@@ -35,6 +39,7 @@ jobs:
           git config user.name "ci-bot"
           git config user.email "ci-bot@users.noreply.github.com"
           cp build.log /tmp/build.log || echo "no log" > /tmp/build.log
+          [ -f api.txt ] && cp api.txt /tmp/api.txt || true
           git fetch origin ci-logs || true
           if git rev-parse --verify origin/ci-logs >/dev/null 2>&1; then
             git checkout -B ci-logs origin/ci-logs
@@ -44,6 +49,7 @@ jobs:
           fi
           mkdir -p ci-logs
           { echo "status: $STATUS"; echo "commit: $GITHUB_SHA"; echo; cat /tmp/build.log; } > "ci-logs/$BR.log"
+          [ -f /tmp/api.txt ] && cp /tmp/api.txt "ci-logs/api-$BR.txt" && git add "ci-logs/api-$BR.txt"
           git add "ci-logs/$BR.log"
           git commit -m "log $BR $GITHUB_SHA ($STATUS)" || true
           git push origin ci-logs
