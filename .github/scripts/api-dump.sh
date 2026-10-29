@@ -15,6 +15,6 @@ ALL=$(find "$HOME/.gradle" "$GITHUB_WORKSPACE" -path "*remapped*" -path "*1_21_1
   echo "remapped fabric: $ALL" | tr ':' '\n' | head -5; unzip -l "$FAPI" | awk '{print $4}' | grep "\.class$" | grep -v '\$[0-9]\|impl/' | head -200
   for c in "$@"; do
     echo; echo "=== $c ==="
-    javap -public -cp "$JAR$ALL$FAPI" "$c" 2>&1 | head -400
+    javap -p -cp "$JAR$ALL$FAPI" "$c" 2>&1 | head -400
   done
 } > "$OUT"
