@@ -1,6 +1,5 @@
 package com.xlrw.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.xlrw.builder.BuilderController;
@@ -10,18 +9,9 @@ import com.xlrw.config.BuilderConfig;
 import com.xlrw.gui.SchematicEditorScreen;
 import com.xlrw.schematic.Schematic;
 import com.xlrw.schematic.SchematicManager;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
-import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -48,10 +38,10 @@ public class SchematicRenderer {
     private static final int MODEL_CAP = 6000;      // safety cap per frame (nearest first)
 
     public static void init() {
-        WorldRenderEvents.AFTER_TRANSLUCENT.register(SchematicRenderer::render);
+        com.xlrw.compat.RenderCompat.registerWorldRender(SchematicRenderer::render);
     }
 
-    private static void render(WorldRenderContext context) {
+    private static void render(PoseStack ps, MultiBufferSource consumers) {
         BuilderConfig config = BuilderConfig.getInstance();
         Schematic schematic = SchematicManager.getInstance().getActiveSchematic();
         Minecraft mc = Minecraft.getInstance();
@@ -60,10 +50,7 @@ public class SchematicRenderer {
         SchematicEditorScreen editor = SchematicEditorScreen.ACTIVE;
         if (!config.renderHologram && editor == null) return;
 
-        PoseStack ps = context.matrixStack();
-        Camera camera = context.camera();
-        Vec3 cam = camera.getPosition();
-        MultiBufferSource consumers = context.consumers();
+        Vec3 cam = com.xlrw.compat.RenderCompat.cameraPos();
         long now = System.currentTimeMillis();
 
         ps.pushPose();
@@ -71,10 +58,10 @@ public class SchematicRenderer {
 
         // 1. Holographic ghost blocks (+ wrong-block cages)
         renderGhosts(ps, consumers, level, schematic, config, cam, now, editor != null);
-        flush(consumers, net.minecraft.client.renderer.Sheets.translucentCullBlockSheet());
-        flush(consumers, RenderType.debugQuads());
+        com.xlrw.compat.RenderCompat.endTranslucent(consumers);
+        com.xlrw.compat.RenderCompat.endQuads(consumers);
 
-        VertexConsumer lines = consumers.getBuffer(RenderType.lines());
+        VertexConsumer lines = com.xlrw.compat.RenderCompat.lines(consumers);
         // 2. Bounds with animated corner brackets, and the active layer frame
         Bounds b = Bounds.of(schematic);
         if (b != null && (config.renderBoundingBox || editor != null)) {
@@ -86,11 +73,11 @@ public class SchematicRenderer {
         if (candidate != null && config.renderTargetBox && editor == null) {
             float p = 0.55f + 0.45f * (float) Math.sin(now * 0.012);
             BlockPos t = candidate.targetPos;
-            LevelRenderer.renderLineBox(ps, lines, new AABB(t).inflate(0.02 + 0.03 * p), 0.95f, 0.44f, 0.12f, 0.6f + 0.4f * p);
+            com.xlrw.compat.RenderCompat.lineBox(ps, lines, new AABB(t).inflate(0.02 + 0.03 * p), 0.95f, 0.44f, 0.12f, 0.6f + 0.4f * p);
         }
         // 4. Supply chests
         for (BlockPos chestPos : config.getChestPositions()) {
-            LevelRenderer.renderLineBox(ps, lines, new AABB(chestPos).inflate(0.01), 0.91f, 0.85f, 0.79f, 0.8f);
+            com.xlrw.compat.RenderCompat.lineBox(ps, lines, new AABB(chestPos).inflate(0.01), 0.91f, 0.85f, 0.79f, 0.8f);
         }
         // 4b. Dry run markers: stuck blocks (red), scaffolding towers (yellow), standing spots (cyan)
         com.xlrw.builder.DryRun.Report dry = com.xlrw.builder.DryRun.get();
@@ -98,37 +85,33 @@ public class SchematicRenderer {
             float pulse = 0.6f + 0.4f * (float) Math.sin(now * 0.008);
             for (BlockPos p : dry.problems.keySet()) {
                 if (p.distToCenterSqr(cam) > 96 * 96) continue;
-                LevelRenderer.renderLineBox(ps, lines, new AABB(p).inflate(0.04), 1.0f, 0.15f, 0.15f, pulse);
+                com.xlrw.compat.RenderCompat.lineBox(ps, lines, new AABB(p).inflate(0.04), 1.0f, 0.15f, 0.15f, pulse);
             }
             for (BlockPos p : dry.floatingWarnings) {
                 if (p.distToCenterSqr(cam) > 96 * 96) continue;
-                LevelRenderer.renderLineBox(ps, lines, new AABB(p).inflate(0.02), 1.0f, 0.6f, 0.1f, 0.8f);
+                com.xlrw.compat.RenderCompat.lineBox(ps, lines, new AABB(p).inflate(0.02), 1.0f, 0.6f, 0.1f, 0.8f);
             }
             for (com.xlrw.builder.DryRun.Tower t : dry.towers) {
                 if (t.base.distToCenterSqr(cam) > 128 * 128) continue;
-                LevelRenderer.renderLineBox(ps, lines, new AABB(t.base.getX() + 0.15, t.base.getY(), t.base.getZ() + 0.15,
+                com.xlrw.compat.RenderCompat.lineBox(ps, lines, new AABB(t.base.getX() + 0.15, t.base.getY(), t.base.getZ() + 0.15,
                         t.base.getX() + 0.85, t.topY, t.base.getZ() + 0.85), 1.0f, 0.85f, 0.1f, 0.9f);
             }
             for (BlockPos p : dry.stations) {
                 if (p.distToCenterSqr(cam) > 64 * 64) continue;
-                LevelRenderer.renderLineBox(ps, lines, new AABB(p.getX() + 0.35, p.getY(), p.getZ() + 0.35,
+                com.xlrw.compat.RenderCompat.lineBox(ps, lines, new AABB(p.getX() + 0.35, p.getY(), p.getZ() + 0.35,
                         p.getX() + 0.65, p.getY() + 0.1, p.getZ() + 0.65), 0.2f, 0.85f, 1.0f, 0.7f);
             }
         }
-        flush(consumers, RenderType.lines());
+        com.xlrw.compat.RenderCompat.endLines(consumers);
 
         // 5. Editor gizmo, always on top
         if (editor != null && b != null) {
-            RenderSystem.clear(256, Minecraft.ON_OSX); // GL_DEPTH_BUFFER_BIT: the gizmo must never hide inside blocks
+            com.xlrw.compat.RenderCompat.clearDepth(); // the gizmo must never hide inside blocks
             editor.renderGizmo(ps, consumers, b, now);
-            flush(consumers, RenderType.debugQuads());
-            flush(consumers, RenderType.lines());
+            com.xlrw.compat.RenderCompat.endQuads(consumers);
+            com.xlrw.compat.RenderCompat.endLines(consumers);
         }
         ps.popPose();
-    }
-
-    private static void flush(MultiBufferSource consumers, RenderType type) {
-        if (consumers instanceof MultiBufferSource.BufferSource bs) bs.endBatch(type);
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -140,7 +123,7 @@ public class SchematicRenderer {
         Minecraft mc = Minecraft.getInstance();
         // Never hold two buffers at once: asking a BufferSource for another (non-fixed) type ends the previous batch.
         // Pass 1 draws the cubes, pass 2 the translucent models, pass 3 cubes for models without quads.
-        VertexConsumer quads = consumers.getBuffer(RenderType.debugQuads());
+        VertexConsumer quads = com.xlrw.compat.RenderCompat.quads(consumers);
         List<Object[]> modelJobs = new ArrayList<>();
         int minY = schematic.getMinY();
         int models = 0;
@@ -179,47 +162,38 @@ public class SchematicRenderer {
             modelJobs.add(new Object[]{expected, pos, new float[]{0.55f + 0.45f * glow, 0.85f + 0.15f * glow, 1.0f, a}, d2});
             models++;
         }
-        flush(consumers, RenderType.debugQuads());
+        com.xlrw.compat.RenderCompat.endQuads(consumers);
         if (modelJobs.isEmpty()) return;
         // nearest MODEL_CAP blocks only, then far -> near so the translucent layers blend correctly
         modelJobs.sort((x, y) -> Double.compare((double) x[3], (double) y[3]));
         if (modelJobs.size() > MODEL_CAP) modelJobs = new ArrayList<>(modelJobs.subList(0, MODEL_CAP));
         java.util.Collections.reverse(modelJobs);
-        VertexConsumer holo = consumers.getBuffer(net.minecraft.client.renderer.Sheets.translucentCullBlockSheet());
+        VertexConsumer holo = com.xlrw.compat.RenderCompat.translucentBlocks(consumers);
         List<Object[]> noModel = new ArrayList<>();
         for (Object[] j : modelJobs) {
             float[] c = (float[]) j[2];
             if (!ghostModel(ps, holo, mc, (BlockState) j[0], (BlockPos) j[1], c[0], c[1], c[2], c[3])) noModel.add(j);
         }
-        flush(consumers, net.minecraft.client.renderer.Sheets.translucentCullBlockSheet());
+        com.xlrw.compat.RenderCompat.endTranslucent(consumers);
         if (noModel.isEmpty()) return;
         // block entities / special renderers (chests, beds...): a hologram cube instead
-        quads = consumers.getBuffer(RenderType.debugQuads());
+        quads = com.xlrw.compat.RenderCompat.quads(consumers);
         for (Object[] j : noModel) {
             BlockPos pos = (BlockPos) j[1];
             float[] c = (float[]) j[2];
             cube(ps, quads, pos.getX() + 0.1, pos.getY() + 0.1, pos.getZ() + 0.1, 0.8, c[0], c[1], c[2], c[3] * 0.8f);
         }
-        flush(consumers, RenderType.debugQuads());
+        com.xlrw.compat.RenderCompat.endQuads(consumers);
     }
 
     /** The real block model, slightly shrunk so it never z-fights with neighbours, tinted and translucent. */
     private static boolean ghostModel(PoseStack ps, VertexConsumer vc, Minecraft mc, BlockState state, BlockPos pos,
                                    float r, float g, float b, float a) {
-        BakedModel model = mc.getBlockRenderer().getBlockModel(state);
         ps.pushPose();
         ps.translate(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
         ps.scale(0.985f, 0.985f, 0.985f);
         ps.translate(-0.5, -0.5, -0.5);
-        PoseStack.Pose pose = ps.last();
-        boolean any = false;
-        for (Direction d : FACES_AND_NULL) {
-            RAND.setSeed(42L);
-            for (BakedQuad q : model.getQuads(state, d, RAND)) {
-                vc.putBulkData(pose, q, r, g, b, a, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
-                any = true;
-            }
-        }
+        boolean any = com.xlrw.compat.RenderCompat.blockModel(ps.last(), vc, state, r, g, b, a);
         ps.popPose();
         return any;
     }
@@ -257,7 +231,7 @@ public class SchematicRenderer {
 
     private static void renderBounds(PoseStack ps, VertexConsumer lines, Bounds b, long now, boolean editing) {
         float a = editing ? 0.9f : 0.45f;
-        LevelRenderer.renderLineBox(ps, lines, b.minX, b.minY, b.minZ, b.maxX, b.maxY, b.maxZ, 0.29f, 0.38f, 0.5f, a);
+        com.xlrw.compat.RenderCompat.lineBox(ps, lines, b.minX, b.minY, b.minZ, b.maxX, b.maxY, b.maxZ, 0.29f, 0.38f, 0.5f, a);
         // orange corner brackets breathing in and out
         double len = 1.2 + 0.4 * Math.sin(now / 300.0);
         double[] xs = {b.minX, b.maxX}, ys = {b.minY, b.maxY}, zs = {b.minZ, b.maxZ};
@@ -271,7 +245,7 @@ public class SchematicRenderer {
 
     private static void renderLayerFrame(PoseStack ps, VertexConsumer lines, Bounds b, int y, long now) {
         double yy = y + 0.01;
-        LevelRenderer.renderLineBox(ps, lines, b.minX - 0.05, yy, b.minZ - 0.05, b.maxX + 0.05, yy + 1, b.maxZ + 0.05, 0.95f, 0.44f, 0.12f, 0.55f);
+        com.xlrw.compat.RenderCompat.lineBox(ps, lines, b.minX - 0.05, yy, b.minZ - 0.05, b.maxX + 0.05, yy + 1, b.maxZ + 0.05, 0.95f, 0.44f, 0.12f, 0.55f);
         // a dash running around the layer
         double per = 2 * ((b.maxX - b.minX) + (b.maxZ - b.minZ));
         double t = (now / 40.0) % per;
@@ -292,13 +266,7 @@ public class SchematicRenderer {
 
     public static void line(PoseStack ps, VertexConsumer vc, double x0, double y0, double z0, double x1, double y1, double z1,
                             float r, float g, float b, float a) {
-        PoseStack.Pose p = ps.last();
-        float nx = (float) (x1 - x0), ny = (float) (y1 - y0), nz = (float) (z1 - z0);
-        float len = (float) Math.sqrt(nx * nx + ny * ny + nz * nz);
-        if (len < 1e-6) return;
-        nx /= len; ny /= len; nz /= len;
-        vc.addVertex(p, (float) x0, (float) y0, (float) z0).setColor(r, g, b, a).setNormal(p, nx, ny, nz);
-        vc.addVertex(p, (float) x1, (float) y1, (float) z1).setColor(r, g, b, a).setNormal(p, nx, ny, nz);
+        com.xlrw.compat.RenderCompat.line(ps, vc, x0, y0, z0, x1, y1, z1, r, g, b, a);
     }
 
     /** World-space bounding box of the schematic (cached per anchor / rotation). */

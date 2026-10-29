@@ -1,12 +1,10 @@
 package com.xlrw.gui;
 
+//? if <1.21.11 {
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import com.xlrw.schematic.Schematic;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -14,6 +12,11 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
+import org.joml.Matrix4f;
+//?}
+import com.xlrw.schematic.Schematic;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -21,7 +24,6 @@ import net.minecraft.world.level.EmptyBlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
-import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,9 +79,9 @@ final class HoloPreview {
                 for (Direction d : Direction.values()) {
                     m.setWithOffset(p, d);
                     BlockState n = wb.get(m);
-                    if (n == null || !n.isSolidRender(EmptyBlockGetter.INSTANCE, BlockPos.ZERO)) mask |= 1 << d.ordinal();
+                    if (n == null || !solidRender(n)) mask |= 1 << d.ordinal();
                 }
-                boolean solid = st.isSolidRender(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+                boolean solid = solidRender(st);
                 if (mask == 0 && solid) continue; // buried
                 boolean built = level != null && level.getBlockState(p).getBlock() == st.getBlock();
                 out.add(new Cell(p.getX() - x0, p.getY() - y0, p.getZ() - z0, st, solid ? mask : 0x3F, built, p.getY()));
@@ -92,6 +94,50 @@ final class HoloPreview {
         cells = out;
         key = k;
         builtAt = now;
+    }
+
+    private static boolean solidRender(BlockState st) {
+        //? if >=1.21.11 {
+        /*return st.isSolidRender();
+        *///?} else {
+        return st.isSolidRender(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+        //?}
+    }
+
+    /**
+     * Flat fallback (1.21.11, no custom 3D in GUIs): the same turntable, each visible block drawn as a small square
+     * in its map colour, painted back to front.
+     */
+    private void renderFlat(GuiGraphics g, int x, int y, int w, int h, int layerY, long now) {
+        float sc = Math.min(w, h) * 0.8f / diag * zoom;
+        double cyw = Math.cos(Math.toRadians(yaw)), syw = Math.sin(Math.toRadians(yaw));
+        double cp = Math.cos(Math.toRadians(pitch)), sp = Math.sin(Math.toRadians(pitch));
+        int n = Math.min(cells.size(), 12000);
+        float[] px = new float[n], py = new float[n], depth = new float[n];
+        Integer[] order = new Integer[n];
+        for (int i = 0; i < n; i++) {
+            Cell c = cells.get(i);
+            double X = c.x() - sx / 2 + 0.5, Y = c.y() - sy / 2 + 0.5, Z = c.z() - sz / 2 + 0.5;
+            double rx = X * cyw - Z * syw, rz = X * syw + Z * cyw;
+            double ry = Y * cp - rz * sp, rz2 = Y * sp + rz * cp;
+            px[i] = (float) (x + w / 2f + rx * sc);
+            py[i] = (float) (y + h / 2f + h * 0.03f - ry * sc);
+            depth[i] = (float) rz2;
+            order[i] = i;
+        }
+        java.util.Arrays.sort(order, (a, b) -> Float.compare(depth[a], depth[b]));
+        int half = Math.max(1, Math.round(sc * 0.55f));
+        float pulse = 0.75f + 0.25f * (float) Math.sin(now / 220.0);
+        for (int k = 0; k < n; k++) {
+            int i = order[k];
+            Cell c = cells.get(i);
+            int col;
+            if (c.built()) col = 0xFF000000 | c.state().getMapColor(EmptyBlockGetter.INSTANCE, BlockPos.ZERO).col;
+            else if (c.worldY() == layerY) col = 0xFF000000 | ((int) (255 * Math.min(1f, pulse + 0.25f)) << 16) | ((int) (140 * pulse) << 8) | (int) (64 * pulse);
+            else col = 0xFF5C708F;
+            int ix = Math.round(px[i]), iy = Math.round(py[i]);
+            g.fill(ix - half, iy - half, ix + half, iy + half, col);
+        }
     }
 
     private static float faceShade(Direction d) {
@@ -114,6 +160,9 @@ final class HoloPreview {
         if (!dragging && now - lastTouch > 2500) yaw = (yaw + dt * 14f) % 360f;
         if (cells.isEmpty() || diag <= 0) return;
 
+        //? if >=1.21.11 {
+        /*renderFlat(g, x, y, w, h, layerY, now);
+        *///?} else {
         g.flush();
         FogRenderer.setupNoFog();
         RenderSystem.clear(256, Minecraft.ON_OSX); // depth only: the HUD below may have written depth here
@@ -183,6 +232,7 @@ final class HoloPreview {
             bs.endBatch(RenderType.gui());
         }
         ps.popPose();
+        //?}
     }
 
     private static int tint(Minecraft mc, BlockState st, int idx) {

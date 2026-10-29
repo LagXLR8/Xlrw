@@ -575,7 +575,7 @@ final class Mascot {
                 skinW = img.getWidth();
                 skinH = img.getHeight();
                 ResourceLocation loc = ResourceLocation.fromNamespaceAndPath("xlrw", "dynamic/mascot");
-                Minecraft.getInstance().getTextureManager().register(loc, new DynamicTexture(img));
+                Minecraft.getInstance().getTextureManager().register(loc, com.xlrw.compat.GuiCompat.texture(img));
                 skin = loc;
             }
         } catch (Throwable t) {
@@ -588,8 +588,8 @@ final class Mascot {
         float bob = (mood == Mood.WALK || mood == Mood.CROSS) ? ((System.currentTimeMillis() / 140) % 2) : 0;
         int dx = Math.round(x - w / 2f), dy = Math.round(y - h - bob);
         // face left by flipping the texture coordinates (a negative pose scale would get the quad culled)
-        if (dir < 0) g.blit(skin, dx, dy, w, h, skinW, 0, -skinW, skinH, skinW, skinH);
-        else g.blit(skin, dx, dy, w, h, 0, 0, skinW, skinH, skinW, skinH);
+        if (dir < 0) com.xlrw.compat.GuiCompat.blitTex(g, skin, dx, dy, w, h, skinW, 0, -skinW, skinH, skinW, skinH);
+        else com.xlrw.compat.GuiCompat.blitTex(g, skin, dx, dy, w, h, 0, 0, skinW, skinH, skinW, skinH);
     }
 
     private static void px(GuiGraphics g, int sx, int sy, int c, int r, int w, int h, int color) {

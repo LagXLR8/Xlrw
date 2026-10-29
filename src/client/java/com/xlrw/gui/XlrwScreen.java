@@ -1,5 +1,6 @@
 package com.xlrw.gui;
 
+//? if <1.21.11 {
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -7,8 +8,9 @@ import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
+//?}
+import net.minecraft.client.Minecraft;
 import com.xlrw.builder.BuilderController;
 import com.xlrw.config.BuilderConfig;
 import com.xlrw.printer.ChestManager;
@@ -166,9 +168,11 @@ public class XlrwScreen extends Screen {
         g.fill(0, 0, width, height, 0x66000000);
     }
 
+    //? if <1.21.11 {
     @Override
     protected void renderBlurredBackground(float partialTick) {
     }
+    //?}
 
     @Override
     protected void renderMenuBackground(GuiGraphics g) {
@@ -182,7 +186,7 @@ public class XlrwScreen extends Screen {
         lastMy = my;
         long now = System.currentTimeMillis();
         float open = ease(Mth.clamp((now - openedAt) / 420f, 0f, 1f));
-        boolean d3 = BuilderConfig.getInstance().ui3d;
+        boolean d3 = com.xlrw.compat.GuiCompat.SUPPORTS_3D_PANELS && BuilderConfig.getInstance().ui3d;
 
         renderBackground(g, mx, my, pt);
 
@@ -259,7 +263,7 @@ public class XlrwScreen extends Screen {
             re = new Mascot.Edge(r0[0], r0[1], r1[0], r1[1]);
         }
         if (open > 0.85f) MASCOT.render(g, font, le, re, mx, my, now);
-        g.flush();
+        com.xlrw.compat.GuiCompat.flush(g);
 
         if (tooltip != null) drawTooltip(g, mx, my, tooltip);
     }
@@ -269,6 +273,7 @@ public class XlrwScreen extends Screen {
      * perspective applied. Drawing the widgets themselves through the perspective matrix made overlapping layers
      * (same depth, different w) fight in the depth buffer and flicker.
      */
+    //? if <1.21.11 {
     private TextureTarget panelTarget;
 
     private void beginPanels(GuiGraphics g) {
@@ -318,6 +323,16 @@ public class XlrwScreen extends Screen {
         mv.popMatrix();
         RenderSystem.applyModelViewMatrix();
     }
+    //?} else {
+    /*private void beginPanels(GuiGraphics g) {
+    }
+
+    private void endPanels(GuiGraphics g) {
+    }
+
+    private void composite(Tilt t, int x0, int y0, int x1, int y1) {
+    }
+    *///?}
 
     // ---- walk while the deck is open (bot off: WASD / jump / sneak / sprint pass through) ----
     private boolean passedKeys;
@@ -336,11 +351,10 @@ public class XlrwScreen extends Screen {
             if (passedKeys) for (var k : moveKeys()) k.setDown(false);
             return;
         }
-        long w = minecraft.getWindow().getWindow();
         for (var k : moveKeys()) {
             com.mojang.blaze3d.platform.InputConstants.Key key = com.mojang.blaze3d.platform.InputConstants.getKey(k.saveString());
             if (key.getType() == com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM) {
-                k.setDown(com.mojang.blaze3d.platform.InputConstants.isKeyDown(w, key.getValue()));
+                k.setDown(com.xlrw.compat.GuiCompat.keyDown(key.getValue()));
                 passedKeys = true;
             }
         }
@@ -352,10 +366,12 @@ public class XlrwScreen extends Screen {
             for (var k : moveKeys()) k.setDown(false);
             passedKeys = false;
         }
+        //? if <1.21.11 {
         if (panelTarget != null) {
             panelTarget.destroyBuffers();
             panelTarget = null;
         }
+        //?}
         super.removed();
     }
 
@@ -1037,8 +1053,7 @@ public class XlrwScreen extends Screen {
     // Input
     // ------------------------------------------------------------------------------------------------
 
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    boolean xMouseClicked(double mouseX, double mouseY, int button) {
         if (UiImages.editing || UiImages.picker) {
             double[] el = tilts[0].toLocal(mouseX, mouseY);
             if (button == 0) {
@@ -1078,11 +1093,10 @@ public class XlrwScreen extends Screen {
                 }
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return superMouseClicked(mouseX, mouseY, button);
     }
 
-    @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+    boolean xMouseReleased(double mouseX, double mouseY, int button) {
         holo.dragging = false;
         if (UiImages.mouseUp()) return true;
         if (tab == Tab.HUB) {
@@ -1090,11 +1104,10 @@ public class XlrwScreen extends Screen {
             HubWidgets.mouseUp(hl[0], hl[1], button);
         }
         if (MASCOT.held()) MASCOT.release();
-        return super.mouseReleased(mouseX, mouseY, button);
+        return superMouseReleased(mouseX, mouseY, button);
     }
 
-    @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dx, double dy) {
+    boolean xMouseDragged(double mouseX, double mouseY, int button, double dx, double dy) {
         double[] dl = tilts[0].toLocal(mouseX, mouseY);
         if (UiImages.mouseDrag(dl[0], dl[1], cx, cy)) return true;
         if (MASCOT.held() && button == 0) {
@@ -1107,7 +1120,7 @@ public class XlrwScreen extends Screen {
             holo.touch();
             return true;
         }
-        return super.mouseDragged(mouseX, mouseY, button, dx, dy);
+        return superMouseDragged(mouseX, mouseY, button, dx, dy);
     }
 
     private boolean overPreview(double mouseX, double mouseY) {
@@ -1157,18 +1170,17 @@ public class XlrwScreen extends Screen {
         super.onClose();
     }
 
-    @Override
-    public boolean keyPressed(int key, int scan, int mods) {
+    boolean xKeyPressed(int key, int scan, int mods) {
         if (tab == Tab.HUB && HubWidgets.keyPressed(key)) return true;
         if (key == com.mojang.blaze3d.platform.InputConstants.KEY_F && UiImages.toggleLayer()) return true;
         // the same key that opens the deck (V by default) closes it again
         for (net.minecraft.client.KeyMapping km : minecraft.options.keyMappings) {
-            if ("key.xlrw.gui".equals(km.getName()) && km.matches(key, scan)) {
+            if ("key.xlrw.gui".equals(km.getName()) && com.xlrw.compat.GuiCompat.keyMatches(km, key, scan, mods)) {
                 onClose();
                 return true;
             }
         }
-        return super.keyPressed(key, scan, mods);
+        return superKeyPressed(key, scan, mods);
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -1338,4 +1350,27 @@ public class XlrwScreen extends Screen {
     private static int brighten(int c) {
         return lerpColor(c, 0xFFFFFFFF, 0.15f) | 0xFF000000;
     }
+
+    //? if >=1.21.11 {
+    /*private net.minecraft.client.input.MouseButtonEvent xLastMouse;
+    private boolean xLastDbl;
+    private net.minecraft.client.input.KeyEvent xLastKey;
+    @Override public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent e, boolean dbl) { xLastMouse = e; xLastDbl = dbl; return xMouseClicked(e.x(), e.y(), e.button()); }
+    private boolean superMouseClicked(double x, double y, int b) { return super.mouseClicked(xLastMouse, xLastDbl); }
+    @Override public boolean mouseReleased(net.minecraft.client.input.MouseButtonEvent e) { xLastMouse = e; return xMouseReleased(e.x(), e.y(), e.button()); }
+    private boolean superMouseReleased(double x, double y, int b) { return super.mouseReleased(xLastMouse); }
+    @Override public boolean mouseDragged(net.minecraft.client.input.MouseButtonEvent e, double dx, double dy) { xLastMouse = e; return xMouseDragged(e.x(), e.y(), e.button(), dx, dy); }
+    private boolean superMouseDragged(double x, double y, int b, double dx, double dy) { return super.mouseDragged(xLastMouse, dx, dy); }
+    @Override public boolean keyPressed(net.minecraft.client.input.KeyEvent e) { xLastKey = e; return xKeyPressed(e.key(), e.scancode(), e.modifiers()); }
+    private boolean superKeyPressed(int k, int s, int m) { return super.keyPressed(xLastKey); }
+    *///?} else {
+    @Override public boolean mouseClicked(double x, double y, int b) { return xMouseClicked(x, y, b); }
+    private boolean superMouseClicked(double x, double y, int b) { return super.mouseClicked(x, y, b); }
+    @Override public boolean mouseReleased(double x, double y, int b) { return xMouseReleased(x, y, b); }
+    private boolean superMouseReleased(double x, double y, int b) { return super.mouseReleased(x, y, b); }
+    @Override public boolean mouseDragged(double x, double y, int b, double dx, double dy) { return xMouseDragged(x, y, b, dx, dy); }
+    private boolean superMouseDragged(double x, double y, int b, double dx, double dy) { return super.mouseDragged(x, y, b, dx, dy); }
+    @Override public boolean keyPressed(int k, int s, int m) { return xKeyPressed(k, s, m); }
+    private boolean superKeyPressed(int k, int s, int m) { return super.keyPressed(k, s, m); }
+    //?}
 }

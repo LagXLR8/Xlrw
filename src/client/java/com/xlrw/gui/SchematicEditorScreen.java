@@ -13,7 +13,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -124,15 +123,14 @@ public class SchematicEditorScreen extends Screen {
         long n = System.nanoTime();
         double dt = Math.min(0.1, (n - lastNanos) / 1e9);
         lastNanos = n;
-        long w = Minecraft.getInstance().getWindow().getWindow();
         double f = 0, s = 0, u = 0;
-        if (InputConstants.isKeyDown(w, InputConstants.KEY_W)) f += 1;
-        if (InputConstants.isKeyDown(w, InputConstants.KEY_S)) f -= 1;
-        if (InputConstants.isKeyDown(w, InputConstants.KEY_A)) s += 1;
-        if (InputConstants.isKeyDown(w, InputConstants.KEY_D)) s -= 1;
-        if (InputConstants.isKeyDown(w, InputConstants.KEY_SPACE)) u += 1;
-        if (InputConstants.isKeyDown(w, InputConstants.KEY_LSHIFT)) u -= 1;
-        double boost = InputConstants.isKeyDown(w, InputConstants.KEY_LCONTROL) ? 2.5 : 1.0;
+        if (com.xlrw.compat.GuiCompat.keyDown(InputConstants.KEY_W)) f += 1;
+        if (com.xlrw.compat.GuiCompat.keyDown(InputConstants.KEY_S)) f -= 1;
+        if (com.xlrw.compat.GuiCompat.keyDown(InputConstants.KEY_A)) s += 1;
+        if (com.xlrw.compat.GuiCompat.keyDown(InputConstants.KEY_D)) s -= 1;
+        if (com.xlrw.compat.GuiCompat.keyDown(InputConstants.KEY_SPACE)) u += 1;
+        if (com.xlrw.compat.GuiCompat.keyDown(InputConstants.KEY_LSHIFT)) u -= 1;
+        double boost = com.xlrw.compat.GuiCompat.keyDown(InputConstants.KEY_LCONTROL) ? 2.5 : 1.0;
         if (f != 0 || s != 0 || u != 0) {
             double yr = Math.toRadians(yaw);
             Vec3 fwd = new Vec3(-Math.sin(yr), 0, Math.cos(yr));
@@ -245,9 +243,11 @@ public class SchematicEditorScreen extends Screen {
     public void renderBackground(GuiGraphics g, int mx, int my, float pt) {
     }
 
+    //? if <1.21.11 {
     @Override
     protected void renderBlurredBackground(float partialTick) {
     }
+    //?}
 
     @Override
     protected void renderMenuBackground(GuiGraphics g) {
@@ -315,7 +315,7 @@ public class SchematicEditorScreen extends Screen {
 
     /** Called from the world renderer (depth cleared) to draw the handles. */
     public void renderGizmo(PoseStack ps, MultiBufferSource consumers, Bounds b, long now) {
-        VertexConsumer q = consumers.getBuffer(RenderType.debugQuads());
+        VertexConsumer q = com.xlrw.compat.RenderCompat.quads(consumers);
         Vec3 o = origin(b);
         double len = axisLen(b);
         double th = 0.09;
@@ -349,8 +349,8 @@ public class SchematicEditorScreen extends Screen {
                     0.95f, 0.44f, 0.12f, al);
         }
         if (hover == Handle.BODY || drag == Handle.BODY) {
-            VertexConsumer lines = consumers.getBuffer(RenderType.lines());
-            net.minecraft.client.renderer.LevelRenderer.renderLineBox(ps, lines, b.minX - 0.05, b.minY - 0.05, b.minZ - 0.05,
+            VertexConsumer lines = com.xlrw.compat.RenderCompat.lines(consumers);
+            com.xlrw.compat.RenderCompat.lineBox(ps, lines, b.minX - 0.05, b.minY - 0.05, b.minZ - 0.05,
                     b.maxX + 0.05, b.maxY + 0.05, b.maxZ + 0.05, 0.91f, 0.85f, 0.79f, 1f);
         }
     }
@@ -427,8 +427,7 @@ public class SchematicEditorScreen extends Screen {
     // Input
     // ------------------------------------------------------------------------------------------------
 
-    @Override
-    public boolean mouseClicked(double mx, double my, int button) {
+    boolean xMouseClicked(double mx, double my, int button) {
         if (button == 0) {
             for (Object[] bt : buttons) {
                 int x = (int) bt[0], y = (int) bt[1], w = (int) bt[2], h = (int) bt[3];
@@ -469,18 +468,16 @@ public class SchematicEditorScreen extends Screen {
             looking = true;
             return true;
         }
-        return super.mouseClicked(mx, my, button);
+        return superMouseClicked(mx, my, button);
     }
 
-    @Override
-    public boolean mouseReleased(double mx, double my, int button) {
+    boolean xMouseReleased(double mx, double my, int button) {
         if (button == 0) drag = Handle.NONE;
         if (button == 1) looking = false;
         return true;
     }
 
-    @Override
-    public boolean mouseDragged(double mx, double my, int button, double dx, double dy) {
+    boolean xMouseDragged(double mx, double my, int button, double dx, double dy) {
         if (button == 1) {
             double sens = 0.6 * (0.2 + Minecraft.getInstance().options.sensitivity().get());
             yaw += (float) (dx * sens);
@@ -496,8 +493,7 @@ public class SchematicEditorScreen extends Screen {
         return true;
     }
 
-    @Override
-    public boolean keyPressed(int key, int scan, int mods) {
+    boolean xKeyPressed(int key, int scan, int mods) {
         SchematicManager sm = SchematicManager.getInstance();
         switch (key) {
             case InputConstants.KEY_RETURN, InputConstants.KEY_NUMPADENTER -> {
@@ -517,7 +513,7 @@ public class SchematicEditorScreen extends Screen {
             default -> {
             }
         }
-        return super.keyPressed(key, scan, mods); // ESC -> onClose (keeps changes)
+        return superKeyPressed(key, scan, mods); // ESC -> onClose (keeps changes)
     }
 
     private void cancel() {
@@ -558,4 +554,27 @@ public class SchematicEditorScreen extends Screen {
     public boolean isPauseScreen() {
         return false;
     }
+
+    //? if >=1.21.11 {
+    /*private net.minecraft.client.input.MouseButtonEvent xLastMouse;
+    private boolean xLastDbl;
+    private net.minecraft.client.input.KeyEvent xLastKey;
+    @Override public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent e, boolean dbl) { xLastMouse = e; xLastDbl = dbl; return xMouseClicked(e.x(), e.y(), e.button()); }
+    private boolean superMouseClicked(double x, double y, int b) { return super.mouseClicked(xLastMouse, xLastDbl); }
+    @Override public boolean mouseReleased(net.minecraft.client.input.MouseButtonEvent e) { xLastMouse = e; return xMouseReleased(e.x(), e.y(), e.button()); }
+    private boolean superMouseReleased(double x, double y, int b) { return super.mouseReleased(xLastMouse); }
+    @Override public boolean mouseDragged(net.minecraft.client.input.MouseButtonEvent e, double dx, double dy) { xLastMouse = e; return xMouseDragged(e.x(), e.y(), e.button(), dx, dy); }
+    private boolean superMouseDragged(double x, double y, int b, double dx, double dy) { return super.mouseDragged(xLastMouse, dx, dy); }
+    @Override public boolean keyPressed(net.minecraft.client.input.KeyEvent e) { xLastKey = e; return xKeyPressed(e.key(), e.scancode(), e.modifiers()); }
+    private boolean superKeyPressed(int k, int s, int m) { return super.keyPressed(xLastKey); }
+    *///?} else {
+    @Override public boolean mouseClicked(double x, double y, int b) { return xMouseClicked(x, y, b); }
+    private boolean superMouseClicked(double x, double y, int b) { return super.mouseClicked(x, y, b); }
+    @Override public boolean mouseReleased(double x, double y, int b) { return xMouseReleased(x, y, b); }
+    private boolean superMouseReleased(double x, double y, int b) { return super.mouseReleased(x, y, b); }
+    @Override public boolean mouseDragged(double x, double y, int b, double dx, double dy) { return xMouseDragged(x, y, b, dx, dy); }
+    private boolean superMouseDragged(double x, double y, int b, double dx, double dy) { return super.mouseDragged(x, y, b, dx, dy); }
+    @Override public boolean keyPressed(int k, int s, int m) { return xKeyPressed(k, s, m); }
+    private boolean superKeyPressed(int k, int s, int m) { return super.keyPressed(k, s, m); }
+    //?}
 }

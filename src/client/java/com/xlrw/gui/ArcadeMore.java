@@ -21,7 +21,7 @@ final class ArcadeMore {
     private ArcadeMore() {}
 
     static boolean held(int key) {
-        return InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), key);
+        return com.xlrw.compat.GuiCompat.keyDown(key);
     }
 
     static boolean jumpKey(int key) {
@@ -849,13 +849,13 @@ final class ArcadeMore {
 
         @Override void icon(GuiGraphics g, long now) {
             TextureAtlasSprite s = sprite(GRASS);
-            if (s != null) g.blit(0, 0, 0, 10, 10, sprite(DIRT));
+            if (s != null) com.xlrw.compat.GuiCompat.sprite(g, 0, 0, 10, 10, sprite(DIRT));
             g.fill(0, 0, 10, 3, 0xFF5E9D34);
         }
 
         private static TextureAtlasSprite sprite(int id) {
             try {
-                return Minecraft.getInstance().getBlockRenderer().getBlockModel(BLOCKS[id].defaultBlockState()).getParticleIcon();
+                return com.xlrw.compat.RenderCompat.particleIcon(BLOCKS[id].defaultBlockState());
             } catch (Throwable t) {
                 return null;
             }
@@ -1104,16 +1104,16 @@ final class ArcadeMore {
                     TextureAtlasSprite fs = sprite(id);
                     boolean surface = y == 0 || world[y - 1][x] == AIR;
                     if (fs != null) {
-                        if (id == WATER) g.blit(sx, sy + (surface ? 1 : 0), 0, T, T - (surface ? 1 : 0), fs, 0.25f, 0.45f, 0.95f, 0.72f);
-                        else g.blit(sx, sy, 0, T, T, fs);
+                        if (id == WATER) com.xlrw.compat.GuiCompat.sprite(g, sx, sy + (surface ? 1 : 0), T, T - (surface ? 1 : 0), fs, 0.25f, 0.45f, 0.95f, 0.72f);
+                        else com.xlrw.compat.GuiCompat.sprite(g, sx, sy, T, T, fs);
                     } else g.fill(sx, sy, sx + T, sy + T, id == WATER ? 0xB0305CC8 : 0xFFE0602A);
                     if (surface) g.fill(sx, sy + 1, sx + T, sy + 2, id == WATER ? 0x88B9D7F2 : 0xFFFFC266);
                     continue;
                 }
                 TextureAtlasSprite sp = sprite(id == GRASS ? DIRT : id);
                 if (sp == null) { g.fill(sx, sy, sx + T, sy + T, 0xFF888888); continue; }
-                if (id == LEAVES) g.blit(sx, sy, 0, T, T, sp, 0.42f, 0.72f, 0.3f, 1f);
-                else g.blit(sx, sy, 0, T, T, sp);
+                if (id == LEAVES) com.xlrw.compat.GuiCompat.sprite(g, sx, sy, T, T, sp, 0.42f, 0.72f, 0.3f, 1f);
+                else com.xlrw.compat.GuiCompat.sprite(g, sx, sy, T, T, sp);
                 if (id == GRASS) g.fill(sx, sy, sx + T, sy + 2, 0xFF5E9D34);
             }
             // target outline + cracks
@@ -1147,8 +1147,8 @@ final class ArcadeMore {
                 g.fill(bx - 1, hy - 1, bx + 11, hy + 11, i == Math.min(selected, n - 1) ? ORANGE : 0xAA141416);
                 TextureAtlasSprite sp = sprite(id == GRASS ? DIRT : id);
                 if (sp != null) {
-                    if (id == LEAVES) g.blit(bx + 1, hy + 1, 0, 8, 8, sp, 0.42f, 0.72f, 0.3f, 1f);
-                    else g.blit(bx + 1, hy + 1, 0, 8, 8, sp);
+                    if (id == LEAVES) com.xlrw.compat.GuiCompat.sprite(g, bx + 1, hy + 1, 8, 8, sp, 0.42f, 0.72f, 0.3f, 1f);
+                    else com.xlrw.compat.GuiCompat.sprite(g, bx + 1, hy + 1, 8, 8, sp);
                 }
                 com.xlrw.compat.GuiCompat.push(g);
                 com.xlrw.compat.GuiCompat.translate(g, bx + 10, hy + 6, 0);

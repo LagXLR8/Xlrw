@@ -56,7 +56,7 @@ final class ExternalMusic {
 
     static void openFolder() {
         try {
-            net.minecraft.Util.getPlatform().openFile(dir());
+            com.xlrw.compat.GuiCompat.openFile(dir());
         } catch (Throwable ignored) {
         }
     }
