@@ -17,7 +17,7 @@ public class XlrwClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        LOGGER.info("[XLRW] Initializing XLRW Client for Fabric 1.21.1...");
+        LOGGER.info("[XLRW] Initializing XLRW Client...");
 
         // Load configuration
         BuilderConfig.load();

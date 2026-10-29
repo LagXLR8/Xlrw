@@ -106,3 +106,24 @@ Copy vào `.minecraft/mods` và chạy với **Fabric Loader 1.21.1** + **Fabric
 - In ra chat: thời gian ước tính, số lần đặt, số chỗ đứng, quãng đường đi bộ, số trụ và số khối giàn giáo (so với số đang có), vật liệu còn thiếu trong túi.
 - Đánh dấu trong thế giới: 🟥 block bot không với tới được, 🟧 block lơ lửng cần cột đỡ, 🟨 vị trí trụ giàn giáo, 🟦 các chỗ đứng.
 - Bấm `N` lần nữa để tắt khung đánh dấu. Chi tiết từng block bị kẹt được ghi vào `logs/xlrw_debug.log` (mục `DRYRUN/STUCK`).
+
+
+---
+
+## 🧩 Hỗ trợ cả Minecraft 1.21.1 và 1.21.11 (Stonecutter)
+
+Một bộ code, mỗi lần build ra **hai file JAR**:
+
+| Phiên bản game | File JAR |
+| :--- | :--- |
+| 1.21.1 (Fabric API 0.116.17) | `versions/1.21.1/build/libs/xlrw-1.2.0+1.21.1.jar` |
+| 1.21.11 (Fabric API 0.141.6) | `versions/1.21.11/build/libs/xlrw-1.2.0+1.21.11.jar` |
+
+- Build cả hai: `gradlew build` (cần JDK 21). Hoặc `gradlew buildAndCollect` để gom hai file vào `build/libs/1.2.0/`.
+- Code trong `src/` viết cho 1.21.1. Chỗ nào API khác nhau thì dùng chú thích Stonecutter (`//? if >=1.21.11 { ... }`), phần lớn gom trong `com.xlrw.compat` (`MC`, `InputCompat`, `NbtCompat`, `GuiCompat`, `RenderCompat`).
+- Mỗi lần đẩy code lên GitHub, Actions tự build cả hai bản; log build nằm ở nhánh `ci-logs`.
+
+**Khác biệt trên 1.21.11** (do Mojang viết lại bộ vẽ):
+- Bảng điều khiển nghiêng 3D (nút 3D UI) tắt, menu hiện phẳng.
+- Bản xem trước 3D trong menu vẽ bằng các ô màu (vẫn xoay được), thay vì mô hình khối thật.
+- Mũi tên kéo/xoay của trình chỉnh vị trí có thể bị khối che khuất.
