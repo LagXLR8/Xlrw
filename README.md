@@ -124,6 +124,6 @@ Một bộ code, mỗi lần build ra **hai file JAR**:
 - Mỗi lần đẩy code lên GitHub, Actions tự build cả hai bản; log build nằm ở nhánh `ci-logs`.
 
 **Khác biệt trên 1.21.11** (do Mojang viết lại bộ vẽ):
-- Bảng điều khiển nghiêng 3D (nút 3D UI) tắt, menu hiện phẳng.
+- Bảng điều khiển 3D (nút 3D UI) nghiêng kiểu 2D (co + xiên theo chuột) vì GUI mới không còn phối cảnh thật.
 - Bản xem trước 3D trong menu vẽ bằng các ô màu (vẫn xoay được), thay vì mô hình khối thật.
 - Mũi tên kéo/xoay của trình chỉnh vị trí có thể bị khối che khuất.
