@@ -17,4 +17,8 @@ ALL=$(find "$HOME/.gradle" "$GITHUB_WORKSPACE" -path "*remapped*" -path "*1_21_1
     echo; echo "=== $c ==="
     javap -p -cp "$JAR$ALL$FAPI" "$c" 2>&1 | head -400
   done
+  for c in net.minecraft.client.gui.render.pip.PictureInPictureRenderer net.minecraft.client.gui.render.pip.GuiSkinRenderer; do
+    echo; echo "=== CODE $c ==="
+    javap -c -p -cp "$JAR$ALL$FAPI" "$c" 2>&1 | head -400
+  done
 } > "$OUT"

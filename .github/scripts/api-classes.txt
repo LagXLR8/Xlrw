@@ -1,7 +1,1 @@
-net.minecraft.client.gui.render.pip.PictureInPictureRenderer
-net.minecraft.client.gui.render.pip.GuiSkinRenderer
-net.minecraft.client.gui.render.state.pip.GuiSkinRenderState
-net.minecraft.client.gui.render.pip.GuiEntityRenderer
-net.minecraft.client.gui.render.state.GuiRenderState
-net.minecraft.client.gui.GuiGraphics
-net.minecraft.client.gui.navigation.ScreenRectangle
+net.minecraft.client.renderer.Lighting
