@@ -202,7 +202,9 @@ public class XlrwScreen extends Screen {
         float open = ease(Mth.clamp((now - openedAt) / 420f, 0f, 1f));
         boolean d3 = BuilderConfig.getInstance().ui3d;
 
-        renderBackground(g, mx, my, pt);
+        //? if <1.21.11 {
+        renderBackground(g, mx, my, pt); // 1.21.11 draws the background itself before render()
+        //?}
 
         // Panels swing in from a steep angle and then follow the mouse a little (parallax)
         float nx = Mth.clamp((mx - width / 2f) / (width / 2f), -1f, 1f);
@@ -400,7 +402,7 @@ public class XlrwScreen extends Screen {
         com.xlrw.compat.GuiCompat.push(g);
         float sq = t.squeeze(), sl = t.slant();
         // T(p + o) * [sq 0; sl 1] * T(-p)
-        com.xlrw.compat.GuiCompat.mulAffine(g, sq, sl, 0f, 1f, t.px + t.ox - sq * t.px, t.py + t.oy - sl * t.px - t.py + t.py);
+        com.xlrw.compat.GuiCompat.mulAffine(g, sq, sl, 0f, 1f, t.px + t.ox - sq * t.px, t.oy - sl * t.px);
     }
 
     private void popTilt(GuiGraphics g) {

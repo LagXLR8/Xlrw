@@ -1,0 +1,10 @@
+{
+  "category.xlrw": "XLRW 3D-Printer",
+  "key.category.xlrw.main": "XLRW 3D-Printer",
+  "key.xlrw.toggle": "Bật/tắt bot xây",
+  "key.xlrw.gui": "Mở bảng điều khiển",
+  "key.xlrw.step": "Đặt 1 block (thủ công)",
+  "key.xlrw.layer_up": "Lên 1 tầng",
+  "key.xlrw.layer_down": "Xuống 1 tầng",
+  "key.xlrw.dryrun": "Chạy thử (dry run)"
+}
