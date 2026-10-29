@@ -1,5 +1,5 @@
 status: success
-commit: 6dcf8a5f0ffc025e43003173846b8169968cd116
+commit: 3fb11158003a14d87260eb154558a78d8383b7a1
 
 Fetching distribution.
 Downloading https://services.gradle.org/distributions/gradle-9.8.0-bin.zip
@@ -17,6 +17,24 @@ For more details see https://docs.gradle.org/9.8.0/release-notes.html
 To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.8.0/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
 Daemon will be stopped at the end of the build 
 Running Stonecutter 0.9.8
+Warning: Stonecutter is used with Groovy buildscripts
+------------------------------------------------------------------------------------
+Stonecutter requires a more complex Gradle setup than typical Java projects.
+While Groovy DSL works, Kotlin DSL offers significant advantages:
+- The type-safe model prevents silent failures and Groovy's dynamic typing
+  shenanigans that are hell to debug.
+- Full IDE support with code completion, documentation and source navigation.
+- Kotlin-exclusive operator functions for simpler configurations.
+------------------------------------------------------------------------------------
+For more information see:
+- https://stonecutter.kikugie.dev/wiki/v2/faq#groovy-support
+- https://docs.gradle.org/current/userguide/migrating_from_groovy_to_kotlin_dsl.html
+
+To acknowledge and disable this warning add to the `gradle.properties`:
+```
+dev.kikugie.stonecutter.hard_mode=true
+```
+------------------------------------------------------------------------------------
 
 > Configure project :1.21.1
 Fabric Loom: 1.14.10
@@ -45,9 +63,9 @@ Cannot remap modifiers because it does not exists in any of the targets [] or th
 > Task :1.21.11:stonecutterGenerate
 > Task :1.21.11:compileJava NO-SOURCE
 > Task :1.21.1:processResources
-> Task :1.21.1:classes
 > Task :1.21.11:processResources
 > Task :1.21.11:classes
+> Task :1.21.1:classes
 > Task :1.21.11:stonecutterPrepareClient
 > Task :1.21.11:stonecutterGenerateClient
 
@@ -73,11 +91,11 @@ Note: Recompile with -Xlint:deprecation for details.
 > Task :1.21.11:test NO-SOURCE
 > Task :1.21.11:validateAccessWidener NO-SOURCE
 > Task :1.21.11:check UP-TO-DATE
+> Task :1.21.11:remapJar
 > Task :1.21.1:processClientResources
 > Task :1.21.1:jar
 > Task :1.21.1:processIncludeJars
 > Task :1.21.1:sourcesJar
-> Task :1.21.11:remapJar
 > Task :1.21.1:clientClasses
 > Task :1.21.1:compileTestJava NO-SOURCE
 > Task :1.21.1:processTestResources NO-SOURCE
@@ -86,12 +104,12 @@ Note: Recompile with -Xlint:deprecation for details.
 > Task :1.21.1:validateAccessWidener NO-SOURCE
 > Task :1.21.1:check UP-TO-DATE
 > Task :1.21.1:remapJar
-> Task :1.21.1:remapSourcesJar
-> Task :1.21.1:assemble
-> Task :1.21.1:build
 > Task :1.21.11:remapSourcesJar
 > Task :1.21.11:assemble
 > Task :1.21.11:build
+> Task :1.21.1:remapSourcesJar
+> Task :1.21.1:assemble
+> Task :1.21.1:build
 
 [Incubating] Problems report is available at: file:///home/runner/work/Xlrw/Xlrw/build/reports/problems/problems-report.html
 
@@ -101,5 +119,5 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/9.8.0/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 1m 56s
+BUILD SUCCESSFUL in 1m 26s
 21 actionable tasks: 21 executed
