@@ -103,17 +103,20 @@ public class XlrwScreen extends Screen {
 
     /** Perspective of one panel: local (x, y) -> screen, w = 1 + a * (x - px). */
     private static final class Tilt {
-        /** 1.21.11: GUI transforms are 2D affine only, so the tilt is a squeeze + slant instead of a true perspective. */
+        /**
+         * 1.21.11: GUI transforms are 2D affine only. A slant made the panel a parallelogram (one edge tilted the wrong
+         * way), so there the "3D" is just depth: the panel shrinks a little and drifts against the mouse (parallax).
+         */
         static final boolean AFFINE = !com.xlrw.compat.GuiCompat.SUPPORTS_3D_PANELS;
         float px, py, a, ox, oy;
 
-        float squeeze() { return Math.max(0.6f, 1f - Math.abs(a) * 80f); }
-        float slant() { return a * 90f; }
+        float squeeze() { return Math.max(0.75f, 1f - Math.abs(a) * 60f); }
+        float slant() { return 0f; }
 
         float[] toScreen(float x, float y) {
             if (AFFINE) {
                 float X = x - px, Y = y - py;
-                return new float[]{px + ox + squeeze() * X, py + oy + slant() * X + Y};
+                return new float[]{px + ox + squeeze() * X, py + oy + slant() * X + squeeze() * Y};
             }
             float X = x - px, Y = y - py, w = 1 + a * X;
             return new float[]{px + ox + X / w, py + oy + Y / w};
@@ -122,7 +125,7 @@ public class XlrwScreen extends Screen {
         double[] toLocal(double sx, double sy) {
             if (AFFINE) {
                 double X = (sx - px - ox) / squeeze();
-                double Y = (sy - py - oy) - slant() * X;
+                double Y = ((sy - py - oy) - slant() * X) / squeeze();
                 return new double[]{px + X, py + Y};
             }
             double U = sx - px - ox, V = sy - py - oy, d = 1 - a * U;
@@ -402,7 +405,7 @@ public class XlrwScreen extends Screen {
         com.xlrw.compat.GuiCompat.push(g);
         float sq = t.squeeze(), sl = t.slant();
         // T(p + o) * [sq 0; sl 1] * T(-p)
-        com.xlrw.compat.GuiCompat.mulAffine(g, sq, sl, 0f, 1f, t.px + t.ox - sq * t.px, t.oy - sl * t.px);
+        com.xlrw.compat.GuiCompat.mulAffine(g, sq, sl, 0f, sq, t.px + t.ox - sq * t.px, t.py + t.oy - sq * t.py - sl * t.px);
     }
 
     private void popTilt(GuiGraphics g) {
