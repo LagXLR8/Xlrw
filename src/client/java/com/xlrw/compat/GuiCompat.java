@@ -27,7 +27,9 @@ public final class GuiCompat {
 
     public static void translate(GuiGraphics g, double x, double y, double z) {
         //? if >=1.21.11 {
-        /*g.pose().translate((float) x, (float) y);
+        /*// a big z meant "draw this on top" (tooltips, popups): 1.21.11 uses strata for that
+        if (z >= 100) g.nextStratum();
+        g.pose().translate((float) x, (float) y);
         *///?} else {
         g.pose().translate(x, y, z);
         //?}
@@ -140,5 +142,12 @@ public final class GuiCompat {
         *///?} else {
         net.minecraft.Util.getPlatform().openFile(f);
         //?}
+    }
+
+    /** Multiplies the GUI transform by an affine matrix (x' = m00*x + m10*y + m20, y' = m01*x + m11*y + m21). 1.21.11 only. */
+    public static void mulAffine(GuiGraphics g, float m00, float m01, float m10, float m11, float m20, float m21) {
+        //? if >=1.21.11 {
+        /*g.pose().mul(new org.joml.Matrix3x2f(m00, m01, m10, m11, m20, m21));
+        *///?}
     }
 }

@@ -26,7 +26,9 @@ public final class RenderCompat {
     /** Calls {@code r} once per frame after the world (translucent pass) with the view pose and buffers. */
     public static void registerWorldRender(BiConsumer<PoseStack, MultiBufferSource> r) {
         //? if >=1.21.11 {
-        /*net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents.END_MAIN.register(ctx -> r.accept(ctx.matrices(), ctx.consumers()));
+        /*net.fabricmc.fabric.api.client.rendering.v1.world.WorldRenderEvents.END_MAIN.register(ctx -> {
+            if (ctx.matrices() != null && ctx.consumers() != null) r.accept(ctx.matrices(), ctx.consumers());
+        });
         *///?} else {
         net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.AFTER_TRANSLUCENT.register(ctx -> r.accept(ctx.matrixStack(), ctx.consumers()));
         //?}

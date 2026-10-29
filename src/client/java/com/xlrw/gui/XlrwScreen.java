@@ -103,14 +103,28 @@ public class XlrwScreen extends Screen {
 
     /** Perspective of one panel: local (x, y) -> screen, w = 1 + a * (x - px). */
     private static final class Tilt {
+        /** 1.21.11: GUI transforms are 2D affine only, so the tilt is a squeeze + slant instead of a true perspective. */
+        static final boolean AFFINE = !com.xlrw.compat.GuiCompat.SUPPORTS_3D_PANELS;
         float px, py, a, ox, oy;
 
+        float squeeze() { return Math.max(0.6f, 1f - Math.abs(a) * 80f); }
+        float slant() { return a * 90f; }
+
         float[] toScreen(float x, float y) {
+            if (AFFINE) {
+                float X = x - px, Y = y - py;
+                return new float[]{px + ox + squeeze() * X, py + oy + slant() * X + Y};
+            }
             float X = x - px, Y = y - py, w = 1 + a * X;
             return new float[]{px + ox + X / w, py + oy + Y / w};
         }
 
         double[] toLocal(double sx, double sy) {
+            if (AFFINE) {
+                double X = (sx - px - ox) / squeeze();
+                double Y = (sy - py - oy) - slant() * X;
+                return new double[]{px + X, py + Y};
+            }
             double U = sx - px - ox, V = sy - py - oy, d = 1 - a * U;
             if (d < 0.05) d = 0.05;
             return new double[]{px + U / d, py + V / d};
@@ -186,7 +200,7 @@ public class XlrwScreen extends Screen {
         lastMy = my;
         long now = System.currentTimeMillis();
         float open = ease(Mth.clamp((now - openedAt) / 420f, 0f, 1f));
-        boolean d3 = com.xlrw.compat.GuiCompat.SUPPORTS_3D_PANELS && BuilderConfig.getInstance().ui3d;
+        boolean d3 = BuilderConfig.getInstance().ui3d;
 
         renderBackground(g, mx, my, pt);
 
@@ -210,6 +224,7 @@ public class XlrwScreen extends Screen {
         double[] l = tl.toLocal(mx, my);
         int smx = (int) Math.floor(l[0]), smy = (int) Math.floor(l[1]);
         beginPanels(g);
+        pushTilt(g, tl);
         drawStatusStrip(g, smx, smy, now);   // drawn first: it slides out from under the panel
         drawFrame(g, now, open);
         drawHeader(g, smx, smy, now, open);
@@ -244,11 +259,15 @@ public class XlrwScreen extends Screen {
         com.xlrw.compat.GuiCompat.pop(g);
         drawScanline(g, now);
 
+        popTilt(g);
+
         // ---- right: hologram preview ----
         if (showPreview) {
             panel = 1;
             double[] r = tr.toLocal(mx, my);
+            pushTilt(g, tr);
             drawPreviewPanel(g, (int) Math.floor(r[0]), (int) Math.floor(r[1]), now, open);
+            popTilt(g);
         }
         panel = 0;
         endPanels(g);
@@ -373,6 +392,19 @@ public class XlrwScreen extends Screen {
         }
         //?}
         super.removed();
+    }
+
+    /** 1.21.11: draw the following panel content through its (affine) tilt. 1.21.1 tilts in {@link #composite}. */
+    private void pushTilt(GuiGraphics g, Tilt t) {
+        if (!Tilt.AFFINE) return;
+        com.xlrw.compat.GuiCompat.push(g);
+        float sq = t.squeeze(), sl = t.slant();
+        // T(p + o) * [sq 0; sl 1] * T(-p)
+        com.xlrw.compat.GuiCompat.mulAffine(g, sq, sl, 0f, 1f, t.px + t.ox - sq * t.px, t.py + t.oy - sl * t.px - t.py + t.py);
+    }
+
+    private void popTilt(GuiGraphics g) {
+        if (Tilt.AFFINE) com.xlrw.compat.GuiCompat.pop(g);
     }
 
     /** Scissor around a panel-local rectangle. */
