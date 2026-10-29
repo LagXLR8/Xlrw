@@ -40,6 +40,8 @@ jobs:
           git config user.email "ci-bot@users.noreply.github.com"
           cp build.log /tmp/build.log || echo "no log" > /tmp/build.log
           [ -f api.txt ] && cp api.txt /tmp/api.txt || true
+          mkdir -p /tmp/jars && cp versions/*/build/libs/*.jar /tmp/jars/ 2>/dev/null || true
+          rm -f /tmp/jars/*-sources.jar
           git fetch origin ci-logs || true
           if git rev-parse --verify origin/ci-logs >/dev/null 2>&1; then
             git checkout -B ci-logs origin/ci-logs
@@ -51,6 +53,10 @@ jobs:
           { echo "status: $STATUS"; echo "commit: $GITHUB_SHA"; echo; cat /tmp/build.log; } > "ci-logs/$BR.log"
           [ -f /tmp/api.txt ] && cp /tmp/api.txt "ci-logs/api-$BR.txt" && git add "ci-logs/api-$BR.txt"
           git add "ci-logs/$BR.log"
+          if [ "${{ steps.build.outcome }}" = "success" ] && ls /tmp/jars/*.jar >/dev/null 2>&1; then
+            rm -rf "ci-logs/jars-$BR" && mkdir -p "ci-logs/jars-$BR" && cp /tmp/jars/*.jar "ci-logs/jars-$BR/"
+            git add -A "ci-logs/jars-$BR"
+          fi
           git commit -m "log $BR $GITHUB_SHA ($STATUS)" || true
           git push origin ci-logs
       - name: capture build artifacts
