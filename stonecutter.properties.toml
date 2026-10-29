@@ -1,0 +1,16 @@
+# Per-version properties (https://stonecutter.kikugie.dev/wiki/config/properties#centralized-properties)
+mod.id = "xlrw"
+mod.name = "Xlrw"
+mod.group = "com.xlrw"
+mod.version = "1.2.0"
+
+deps.fabric_loader = "0.19.5"
+loomx.loom_version = "1.18-SNAPSHOT"
+
+["1.21.1"]
+mod.mc_compat = ">=1.21 <=1.21.1"
+deps.fabric_api = "0.116.17+1.21.1"
+
+["1.21.11"]
+mod.mc_compat = "1.21.11"
+deps.fabric_api = "0.141.6+1.21.11"

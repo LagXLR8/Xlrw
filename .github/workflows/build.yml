@@ -26,7 +26,7 @@ jobs:
         run: |
           set -o pipefail
           # gradle.properties points org.gradle.java.home at a Windows JDK; use the runner's JDK instead
-          ./gradlew -Dorg.gradle.java.home="$JAVA_HOME" build --stacktrace --no-daemon 2>&1 | tee build.log
+          ./gradlew -Dorg.gradle.java.home="$JAVA_HOME" build --continue --stacktrace --no-daemon 2>&1 | tee build.log
       - name: publish build log
         if: always() && github.event_name == 'push'
         run: |
