@@ -1,5 +1,5 @@
 status: success
-commit: e7f116eb3f7f40a62e6e2bf70ef1725e9818c5c5
+commit: aae8c108430b1b66c3564516c2aa8a016a40ce9c
 
 Fetching distribution.
 Downloading https://services.gradle.org/distributions/gradle-9.8.0-bin.zip
@@ -63,8 +63,8 @@ Cannot remap modifiers because it does not exists in any of the targets [] or th
 > Task :1.21.11:stonecutterGenerate
 > Task :1.21.11:compileJava NO-SOURCE
 > Task :1.21.1:processResources
-> Task :1.21.1:classes
 > Task :1.21.11:processResources
+> Task :1.21.1:classes
 > Task :1.21.11:classes
 > Task :1.21.11:stonecutterPrepareClient
 > Task :1.21.11:stonecutterGenerateClient
@@ -94,8 +94,8 @@ Note: Recompile with -Xlint:deprecation for details.
 > Task :1.21.1:processClientResources
 > Task :1.21.1:jar
 > Task :1.21.1:processIncludeJars
-> Task :1.21.1:sourcesJar
 > Task :1.21.11:remapJar
+> Task :1.21.1:sourcesJar
 > Task :1.21.1:clientClasses
 > Task :1.21.1:compileTestJava NO-SOURCE
 > Task :1.21.1:processTestResources NO-SOURCE
@@ -104,12 +104,12 @@ Note: Recompile with -Xlint:deprecation for details.
 > Task :1.21.1:validateAccessWidener NO-SOURCE
 > Task :1.21.1:check UP-TO-DATE
 > Task :1.21.1:remapJar
-> Task :1.21.1:remapSourcesJar
-> Task :1.21.1:assemble
-> Task :1.21.1:build
 > Task :1.21.11:remapSourcesJar
 > Task :1.21.11:assemble
 > Task :1.21.11:build
+> Task :1.21.1:remapSourcesJar
+> Task :1.21.1:assemble
+> Task :1.21.1:build
 
 [Incubating] Problems report is available at: file:///home/runner/work/Xlrw/Xlrw/build/reports/problems/problems-report.html
 
@@ -119,5 +119,5 @@ You can use '--warning-mode all' to show the individual deprecation warnings and
 
 For more on this, please refer to https://docs.gradle.org/9.8.0/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
 
-BUILD SUCCESSFUL in 1m 50s
+BUILD SUCCESSFUL in 1m 40s
 21 actionable tasks: 21 executed
