@@ -549,12 +549,12 @@ public class BuilderController {
         boolean aimed = HumanAim.stepRotation(player, currentCandidate.targetYaw, currentCandidate.targetPitch);
         BlockPos clickPos = currentCandidate.getClickTargetPos();
         Direction requiredFace = (currentCandidate.type == PlacementCandidate.Type.WATERLOG || currentCandidate.type == PlacementCandidate.Type.BUCKET_FILL) ? null : currentCandidate.clickFace;
-        boolean lookingAtFace = currentCandidate.type == PlacementCandidate.Type.BUCKET_FILL ? aimed : HumanAim.isLookingAtFace(mc, player, clickPos, requiredFace, config.reachDistance);
+        boolean lookingAtFace = currentCandidate.type == PlacementCandidate.Type.BUCKET_FILL ? aimed : HumanAim.isLookingAtFace(mc, player, clickPos, requiredFace, com.xlrw.account.Plus.reach());
 
         // FAST MODE: plain blocks (obsidian, stone, planks...) - the look direction does not change the result, so
         // snap the aim and place several per tick without waiting for each server confirmation.
         if (isFastEligible(player, currentCandidate)) {
-            int budget = Math.max(1, config.fastBlocksPerTick);
+            int budget = com.xlrw.account.Plus.fastBlocksPerTick();
             PlacementCandidate c = currentCandidate;
             Item held = player.getMainHandItem().getItem();
             for (int i = 0; i < budget && c != null; i++) {
@@ -1694,7 +1694,7 @@ public class BuilderController {
     private boolean placeFast(Minecraft mc, LocalPlayer player, PlacementCandidate c) {
         BuilderConfig config = BuilderConfig.getInstance();
         Vec3 eye = player.getEyePosition();
-        if (c.hitVec.distanceToSqr(eye) > config.reachDistance * config.reachDistance) return false;
+        if (c.hitVec.distanceToSqr(eye) > com.xlrw.account.Plus.reach() * com.xlrw.account.Plus.reach()) return false;
         if (config.strictRaycast && !c.throughWall) {
             BlockHitResult t = mc.level.clip(new net.minecraft.world.level.ClipContext(eye, c.hitVec,
                     net.minecraft.world.level.ClipContext.Block.COLLIDER, net.minecraft.world.level.ClipContext.Fluid.NONE, player));
@@ -1833,7 +1833,7 @@ public class BuilderController {
         if (candidate.isBucketAction()) {
             boolean fill = candidate.type == PlacementCandidate.Type.BUCKET_FILL || candidate.type == PlacementCandidate.Type.DRAIN;
             BlockHitResult ray = PlacementFinder.viewRay(mc.level, player, player.getEyePosition(), player.getYRot(), player.getXRot(),
-                    config.reachDistance + 0.5, fill ? net.minecraft.world.level.ClipContext.Fluid.SOURCE_ONLY : net.minecraft.world.level.ClipContext.Fluid.NONE);
+                    com.xlrw.account.Plus.reach() + 0.5, fill ? net.minecraft.world.level.ClipContext.Fluid.SOURCE_ONLY : net.minecraft.world.level.ClipContext.Fluid.NONE);
             boolean ok;
             if (candidate.type == PlacementCandidate.Type.FLUID_SOURCE) {
                 ok = ray.getType() == HitResult.Type.BLOCK && ray.getBlockPos().equals(candidate.neighborPos) && ray.getDirection() == candidate.clickFace;
@@ -1928,7 +1928,7 @@ public class BuilderController {
         }
 
         // 7. Track with TaskTracker to prevent repeated click spam
-        int actionDelay = Math.max(120, config.placeDelayMs);
+        int actionDelay = Math.max(com.xlrw.account.Plus.minActionDelay(), config.placeDelayMs);
         if (candidate.type == PlacementCandidate.Type.FLUID_SOURCE || candidate.type == PlacementCandidate.Type.BUCKET_FILL) actionDelay = Math.max(300, actionDelay);
         TaskTracker.getInstance().onAction(candidate.targetPos, actionDelay);
 
@@ -2140,7 +2140,7 @@ public class BuilderController {
             spills.clear();
             return false;
         }
-        double reach = BuilderConfig.getInstance().reachDistance;
+        double reach = com.xlrw.account.Plus.reach();
         Vec3 eye = player.getEyePosition();
         for (BlockPos p : spills) {
             if (eye.distanceToSqr(Vec3.atCenterOf(p)) > reach * reach) continue;

@@ -122,7 +122,7 @@ public class PlacementFinder {
 
         BuilderConfig config = BuilderConfig.getInstance();
         Vec3 eyePos = player.getEyePosition();
-        double maxReach = config.reachDistance;
+        double maxReach = com.xlrw.account.Plus.reach();
         double maxReachSq = maxReach * maxReach;
 
         int minY = schematic.getMinY();

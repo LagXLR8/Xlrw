@@ -111,7 +111,7 @@ public class DemolishManager {
         if (!config.autoDemolish) return null;
 
         Vec3 eyePos = player.getEyePosition();
-        double maxReach = config.reachDistance;
+        double maxReach = com.xlrw.account.Plus.reach();
         double maxReachSq = maxReach * maxReach;
 
         List<Map.Entry<BlockPos, BlockState>> entries = config.layerMode ?
@@ -233,7 +233,7 @@ public class DemolishManager {
         // 2. Range safety: if moved out of reach, abort
         Vec3 eyePos = player.getEyePosition();
         double distSq = activeBreakPos.distToCenterSqr(eyePos);
-        double maxReach = BuilderConfig.getInstance().reachDistance + 0.6;
+        double maxReach = com.xlrw.account.Plus.reach() + 0.6;
         if (distSq > maxReach * maxReach) {
             stopBreaking(mc);
             return false;

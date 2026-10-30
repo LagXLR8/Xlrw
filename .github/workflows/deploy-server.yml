@@ -1,0 +1,62 @@
+# Deploys the account server (server/) to Cloudflare Workers.
+# Needs repository secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID, XLRW_ADMIN_PASSWORD.
+# The output (worker URL, errors) is written to ci-logs/deploy-server.log on the ci-logs branch.
+
+name: deploy-server
+on:
+  workflow_dispatch:
+  push:
+    paths: ['server/**', '.github/workflows/deploy-server.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      XLRW_ADMIN_PASSWORD: ${{ secrets.XLRW_ADMIN_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: deploy
+        id: deploy
+        working-directory: server
+        run: |
+          set -o pipefail
+          {
+            echo "== secrets present: token=$([ -n "$CLOUDFLARE_API_TOKEN" ] && echo yes || echo NO) account=$([ -n "$CLOUDFLARE_ACCOUNT_ID" ] && echo yes || echo NO) admin=$([ -n "$XLRW_ADMIN_PASSWORD" ] && echo yes || echo NO)"
+            npm i -g wrangler@4 >/dev/null 2>&1
+            wrangler --version
+            # KV namespace: reuse "xlrw-accounts" or create it
+            ID=$(wrangler kv namespace list 2>/dev/null | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const a=JSON.parse(s);const n=a.find(x=>x.title==="xlrw-accounts");console.log(n?n.id:"")}catch{console.log("")}})')
+            if [ -z "$ID" ]; then
+              echo "== creating KV namespace xlrw-accounts"
+              OUT=$(wrangler kv namespace create xlrw-accounts 2>&1); echo "$OUT"
+              ID=$(echo "$OUT" | grep -oE '[0-9a-f]{32}' | head -1)
+            fi
+            echo "== KV id: $ID"
+            [ -n "$ID" ] || { echo "no KV id"; exit 1; }
+            sed -i "s/__KV_ID__/$ID/" wrangler.toml
+            wrangler deploy 2>&1
+            if [ -n "$XLRW_ADMIN_PASSWORD" ]; then
+              printf '%s' "$XLRW_ADMIN_PASSWORD" | wrangler secret put ADMIN_PASSWORD 2>&1
+            fi
+          } 2>&1 | tee ../deploy.log
+      - name: publish log
+        if: always()
+        run: |
+          git config user.name "ci-bot"
+          git config user.email "ci-bot@users.noreply.github.com"
+          cp deploy.log /tmp/deploy.log 2>/dev/null || echo "no log" > /tmp/deploy.log
+          git fetch origin ci-logs || true
+          git checkout -B ci-logs origin/ci-logs
+          mkdir -p ci-logs
+          { echo "status: ${{ steps.deploy.outcome }}"; echo "commit: $GITHUB_SHA"; echo; cat /tmp/deploy.log; } > ci-logs/deploy-server.log
+          git add ci-logs/deploy-server.log
+          git commit -m "deploy log $GITHUB_SHA (${{ steps.deploy.outcome }})" || true
+          git push origin ci-logs

@@ -161,7 +161,7 @@ public final class DryRun {
             this.player = player;
             this.schematic = schematic;
             this.out = out;
-            this.reach = Math.max(2.5, cfg.reachDistance - 0.3); // same margin as the StationPlanner
+            this.reach = Math.max(2.5, com.xlrw.account.Plus.reach() - 0.3); // same margin as the StationPlanner
             int x0 = Integer.MAX_VALUE, x1 = Integer.MIN_VALUE, z0 = Integer.MAX_VALUE, z1 = Integer.MIN_VALUE;
             for (BlockPos p : schematic.getWorldBlocks().keySet()) {
                 x0 = Math.min(x0, p.getX()); x1 = Math.max(x1, p.getX());

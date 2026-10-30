@@ -25,6 +25,9 @@ public class XlrwClient implements ClientModInitializer {
         // Initialize diagnostic logging system
         com.xlrw.debug.XlrwDebug.init();
 
+        // Xlrw account (optional login, Plus)
+        com.xlrw.account.AccountManager.get().init();
+
         // Initialize keybindings
         ModKeybinds.init();
 
@@ -54,6 +57,7 @@ public class XlrwClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             BuilderController.getInstance().onClientTick(client);
             com.xlrw.builder.DryRun.tick(client);
+            com.xlrw.account.AccountManager.get().tick(client);
             WorldStateManager.tickAutoSave(client);
         });
 

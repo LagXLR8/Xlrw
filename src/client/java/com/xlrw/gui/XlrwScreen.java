@@ -538,9 +538,16 @@ public class XlrwScreen extends Screen {
 
     private void drawHeader(GuiGraphics g, int mx, int my, long now, float open) {
         BuilderConfig cfg = BuilderConfig.getInstance();
-        // logo block
+        // logo block: account avatar when logged in (click: account / Plus key)
+        com.xlrw.account.AccountManager acc = com.xlrw.account.AccountManager.get();
         chamfer(g, wx + 10, wy + 8, 26, 26, 5, RED);
-        g.drawString(font, "X", wx + 20, wy + 17, INK, false);
+        net.minecraft.resources.ResourceLocation av = acc.avatar();
+        if (av != null) com.xlrw.compat.GuiCompat.blitTex(g, av, wx + 12, wy + 10, 22, 22, 0, 0, 64, 64, 64, 64);
+        else g.drawString(font, "X", wx + 20, wy + 17, INK, false);
+        hit(wx + 10, wy + 8, 26, 26, () -> minecraft.setScreen(new AccountScreen(this)));
+        tip("account", acc.isLoggedIn() ? "Tài khoản " + acc.username() + (acc.isPlus() ? " · PLUS" : "") : "Đăng nhập tài khoản Xlrw",
+                mx, my, wx + 10, wy + 8, 26, 26);
+        hover("account", mx, my, wx + 10, wy + 8, 26, 26);
         // Persona-style title: tilted cream slab with an orange offset shadow, ink letters sheared forward
         String title = "XLRW";
         int gx = open < 1f && (now / 40) % 2 == 0 ? 1 : 0;
@@ -554,6 +561,11 @@ public class XlrwScreen extends Screen {
         g.drawString(font, title, 0, 0, INK, false);
         com.xlrw.compat.GuiCompat.pop(g);
         g.drawString(font, "PRINTER", wx + 44 + tw + 8, wy + 13, RED, false);
+        if (acc.isPlus()) {
+            int bx = wx + 44 + tw + 8 + font.width("PRINTER") + 6;
+            skewRect(g, bx, wy + 11, font.width("PLUS") + 8, 11, 4, 0xFFF3C04E);
+            g.drawString(font, "PLUS", bx + 4, wy + 13, INK, false);
+        }
         // diagonal halftone stripes (P5 flavour) behind the status dots
         for (int i = 0; i < 14; i++) {
             int sx = wx + ww / 2 - 30 + i * 6;
@@ -561,7 +573,12 @@ public class XlrwScreen extends Screen {
         }
         Schematic s = SchematicManager.getInstance().getActiveSchematic();
         String sub = s != null ? trim(s.getName().replaceFirst("\\.[^.]+$", ""), 26).toUpperCase() : "NO SCHEMATIC";
-        g.drawString(font, sub, wx + 44, wy + 27, TEXT_DIM, false);
+        if (acc.isLoggedIn()) {
+            g.drawString(font, acc.username().toUpperCase(), wx + 44, wy + 27, CREAM, false);
+        } else {
+            g.drawString(font, sub, wx + 44, wy + 27, TEXT_DIM, false);
+        }
+        hit(wx + 44, wy + 25, 120, 11, () -> minecraft.setScreen(new AccountScreen(this)));
 
         // compass-like status dots
         int dotsX = wx + ww / 2 + 10;
@@ -947,7 +964,7 @@ public class XlrwScreen extends Screen {
         // speed
         g.drawString(font, "⏱ " + cfg.placeDelayMs + "ms", x + 8, by + 7, RED, false);
         padButton(g, mx, my, "d-", x + 70, by, "−", () -> {
-            cfg.placeDelayMs = Math.max(50, cfg.placeDelayMs - 20);
+            cfg.placeDelayMs = Math.max(com.xlrw.account.Plus.minDelaySetting(), cfg.placeDelayMs - 20);
             BuilderConfig.save();
         }, "Nhanh hơn");
         padButton(g, mx, my, "d+", x + 96, by, "+", () -> {

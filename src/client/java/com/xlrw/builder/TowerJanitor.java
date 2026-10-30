@@ -113,7 +113,7 @@ public final class TowerJanitor {
         if (DemolishManager.getInstance().isBreaking()) return false;
         rescan(mc, player, schematic, config.currentLayer);
         if (uselessCache.isEmpty()) return false;
-        double reach = config.reachDistance - 0.2;
+        double reach = com.xlrw.account.Plus.reach() - 0.2;
         Vec3 eye = player.getEyePosition();
         for (BlockPos base : uselessCache) {
             if (!mc.level.getBlockState(base).is(Blocks.SCAFFOLDING)) continue;
@@ -150,7 +150,7 @@ public final class TowerJanitor {
         }
         BlockPos base = uselessCache.stream()
                 .min(java.util.Comparator.comparingDouble(b -> b.distSqr(player.blockPosition()))).orElse(null);
-        double reach = config.reachDistance - 0.2;
+        double reach = com.xlrw.account.Plus.reach() - 0.2;
         if (player.getEyePosition().distanceToSqr(Vec3.atCenterOf(base)) <= reach * reach) {
             walkTarget = null;
             return breakBase(mc, player, base);

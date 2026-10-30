@@ -39,19 +39,19 @@ public class StationPlanner {
 
     private static final long PLAN_TIMEOUT_MS = 25_000;
     private static final long TOWER_PLAN_TIMEOUT_MS = 45_000;
-    private static final int MAX_ANCHORS_TRIED = 80;
-    private static final int ANCHORS_WITH_STATION_TO_COMPARE = 8;
-    private static final int MAX_TOWER_ANCHORS = 10;
+    // private static final int MAX_ANCHORS_TRIED = 80; (now from Plus)
+    // private static final int ANCHORS_WITH_STATION_TO_COMPARE = 8; (now from Plus)
+    // private static final int MAX_TOWER_ANCHORS = 10; (now from Plus)
     private static final int ARRIVED_IDLE_LIMIT = 25;
-    private static final int FLOOD_NODES = 10000;
-    private static final int FLOOD_RADIUS = 40;
+    // private static final int FLOOD_NODES = 10000; (now from Plus)
+    // private static final int FLOOD_RADIUS = 40; (now from Plus)
     private static final int MAX_TOWER_HEIGHT = 24;
     /** Cost bonus per OTHER unfinished block that can also be done from a station (ground / tower top). */
     private static final double COVER_WEIGHT_GROUND = 1.2;
     private static final double COVER_WEIGHT_TOWER = 3.0;
     private static final int COVER_CAP = 40;
     /** Ground stations per anchor whose coverage is evaluated (the cheapest by walking cost). */
-    private static final int GROUND_COVER_CANDIDATES = 6;
+    // private static final int GROUND_COVER_CANDIDATES = 6; (now from Plus)
 
     public enum Kind { PLACE, INTERACT, FLUID, BREAK }
 
@@ -449,7 +449,7 @@ public class StationPlanner {
         if (anchors.isEmpty() && lastFloating.isEmpty()) return null;
 
         BlockPos playerFeet = LocalPathfinder.normalizeStart(level, player.blockPosition());
-        LocalPathfinder.Reachability reach = LocalPathfinder.flood(level, playerFeet, FLOOD_NODES, FLOOD_RADIUS);
+        LocalPathfinder.Reachability reach = LocalPathfinder.flood(level, playerFeet, com.xlrw.account.Plus.floodNodes(), com.xlrw.account.Plus.floodRadius());
         // "No standing spot" is only meaningful for where we are: moved somewhere else (fell, chorus, climbed) ->
         // start counting again, so work is never given up on because of time spent stuck somewhere unrelated
         if (noStationRef == null || noStationRef.distSqr(playerFeet) > 16) {
@@ -482,10 +482,10 @@ public class StationPlanner {
         int tried = 0;
         List<Anchor> noGroundStation = new ArrayList<>();
         for (Anchor anchor : anchors) {
-            if (tried++ >= MAX_ANCHORS_TRIED || withStation >= ANCHORS_WITH_STATION_TO_COMPARE) break;
+            if (tried++ >= com.xlrw.account.Plus.anchorsTried() || withStation >= com.xlrw.account.Plus.anchorsCompared()) break;
             Choice c = findGroundStation(level, player, anchor, reach, anchors);
             if (c == null) {
-                if (noGroundStation.size() < MAX_TOWER_ANCHORS) noGroundStation.add(anchor);
+                if (noGroundStation.size() < com.xlrw.account.Plus.towerAnchors()) noGroundStation.add(anchor);
                 continue;
             }
             withStation++;
@@ -665,7 +665,7 @@ public class StationPlanner {
                                      List<Anchor> all) {
         BuilderConfig config = BuilderConfig.getInstance();
         // Slightly shorter than the real reach so the placer (which uses the full reach) always agrees
-        double reachDist = Math.max(2.5, config.reachDistance - 0.3);
+        double reachDist = Math.max(2.5, com.xlrw.account.Plus.reach() - 0.3);
         double reachSq = reachDist * reachDist;
         int range = (int) Math.ceil(reachDist);
 
@@ -732,7 +732,7 @@ public class StationPlanner {
         found.sort(Map.Entry.comparingByValue());
         BlockPos bestFeet = null;
         double bestAdj = Double.MAX_VALUE;
-        for (int i = 0; i < Math.min(GROUND_COVER_CANDIDATES, found.size()); i++) {
+        for (int i = 0; i < Math.min(com.xlrw.account.Plus.groundCoverCandidates(), found.size()); i++) {
             BlockPos feet = found.get(i).getKey();
             Vec3 eye = new Vec3(feet.getX() + 0.5, feet.getY() + 1.62, feet.getZ() + 0.5);
             double adj = found.get(i).getValue() - coverage(level, player, eye, all, anchor, reachDist) * COVER_WEIGHT_GROUND;
@@ -809,7 +809,7 @@ public class StationPlanner {
     private Choice findTowerStation(ClientLevel level, LocalPlayer player, Schematic schematic, Anchor anchor,
                                     LocalPathfinder.Reachability reach, int scaffoldCount, List<Anchor> all) {
         BuilderConfig config = BuilderConfig.getInstance();
-        double reachDist = Math.max(2.5, config.reachDistance - 0.3);
+        double reachDist = Math.max(2.5, com.xlrw.account.Plus.reach() - 0.3);
         double reachSq = reachDist * reachDist;
         Vec3 anchorCenter = Vec3.atCenterOf(anchor.pos);
 

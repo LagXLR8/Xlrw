@@ -1,0 +1,9 @@
+name = "xlrw-api"
+main = "src/index.js"
+compatibility_date = "2025-09-01"
+workers_dev = true
+
+# The KV namespace id is filled in by the deploy workflow (it creates the namespace on first deploy)
+[[kv_namespaces]]
+binding = "DB"
+id = "__KV_ID__"
