@@ -59,6 +59,8 @@ public class BuilderConfig {
     public String accountServer = "";
     /** Plus only: place from 5 blocks away instead of the normal reach. */
     public boolean plusReach = false;
+    /** Last time Bit asked to log in (ms). */
+    public long loginPromptAt = 0;
     public boolean rotationSpoof = true; // place facing blocks (piston, observer...) without really looking that way
     public boolean chorusEscape = true; // stuck in a deep hole: eat a chorus fruit instead of pillaring out
     public boolean workWithInventoryOpen = true; // keep building while the player has the inventory open

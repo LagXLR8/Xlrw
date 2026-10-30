@@ -81,7 +81,7 @@ public class SchematicRenderer {
         }
         // 4b. Dry run markers: stuck blocks (red), scaffolding towers (yellow), standing spots (cyan)
         com.xlrw.builder.DryRun.Report dry = com.xlrw.builder.DryRun.get();
-        if (dry != null && config.renderDryRun && editor == null) {
+        if (dry != null && config.renderDryRun && com.xlrw.account.Plus.on() && editor == null) {
             float pulse = 0.6f + 0.4f * (float) Math.sin(now * 0.008);
             for (BlockPos p : dry.problems.keySet()) {
                 if (p.distToCenterSqr(cam) > 96 * 96) continue;

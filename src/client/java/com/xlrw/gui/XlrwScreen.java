@@ -93,7 +93,7 @@ public class XlrwScreen extends Screen {
     private int pvx, pvy, pvw, pvh;      // right panel (hologram preview)
     private boolean showPreview;
     private int panel = 0;                // panel currently drawing (0 = deck, 1 = preview)
-    private final Tilt[] tilts = {new Tilt(), new Tilt()};
+    private final Tilt[] tilts = {new Tilt(), new Tilt(), new Tilt()}; // 2 = screen space (overlays)
     private final HoloPreview holo = new HoloPreview();
     private static final Mascot MASCOT = new Mascot();
     private boolean lastEnabled = BuilderConfig.getInstance().enabled;
@@ -223,6 +223,11 @@ public class XlrwScreen extends Screen {
         tr.a = -(smooth("tiltR", base * (1.25f - 0.45f * nx), 0.12f) + swing);
         tr.ox = (d3 ? -nx * 5f : 0f) + (1f - open) * 40f;
         tr.oy = d3 ? -ny * 3f : 0f;
+        // inline login panel: the two panels slide apart to make room in the middle
+        float lo = ease(smooth("loginOpen", loginOpen ? 1f : 0f, 0.2f));
+        float push = lo * Math.min(LOGIN_W / 2f + 10, wx + 24f); // "a little": never far off-screen
+        tl.ox -= showPreview ? push : push * 0.5f;
+        tr.ox += push;
 
         // ---- left: control deck ----
         panel = 0;
@@ -286,6 +291,12 @@ public class XlrwScreen extends Screen {
             float[] r0 = tr.toScreen(pvx + 4, pvy), r1 = tr.toScreen(pvx + pvw - 12, pvy);
             re = new Mascot.Edge(r0[0], r0[1], r1[0], r1[1]);
         }
+        panel = 2;
+        maybeStartLoginPrompt(now, open);
+        drawLoginPrompt(g, mx, my, now);
+        if (lo > 0.02f) drawLoginPanel(g, mx, my, now, lo);
+        drawPlusToast(g, now);
+        panel = 0;
         if (open > 0.85f) MASCOT.render(g, font, le, re, mx, my, now);
         com.xlrw.compat.GuiCompat.flush(g);
 
@@ -544,7 +555,7 @@ public class XlrwScreen extends Screen {
         net.minecraft.resources.ResourceLocation av = acc.avatar();
         if (av != null) com.xlrw.compat.GuiCompat.blitTex(g, av, wx + 12, wy + 10, 22, 22, 0, 0, 64, 64, 64, 64);
         else g.drawString(font, "X", wx + 20, wy + 17, INK, false);
-        hit(wx + 10, wy + 8, 26, 26, () -> minecraft.setScreen(new AccountScreen(this)));
+        hit(wx + 10, wy + 8, 26, 26, () -> setLoginOpen(!loginOpen));
         tip("account", acc.isLoggedIn() ? "Tài khoản " + acc.username() + (acc.isPlus() ? " · PLUS" : "") : "Đăng nhập tài khoản Xlrw",
                 mx, my, wx + 10, wy + 8, 26, 26);
         hover("account", mx, my, wx + 10, wy + 8, 26, 26);
@@ -578,7 +589,7 @@ public class XlrwScreen extends Screen {
         } else {
             g.drawString(font, sub, wx + 44, wy + 27, TEXT_DIM, false);
         }
-        hit(wx + 44, wy + 25, 120, 11, () -> minecraft.setScreen(new AccountScreen(this)));
+        hit(wx + 44, wy + 25, 120, 11, () -> setLoginOpen(!loginOpen));
 
         // compass-like status dots
         int dotsX = wx + ww / 2 + 10;
@@ -607,8 +618,8 @@ public class XlrwScreen extends Screen {
         boolean ie = UiImages.editing;
         chamfer(g, ix, py, 20, 18, 4, ie ? RED : lerpColor(TEAL, TEAL_HI, ih));
         g.drawCenteredString(font, "▣", ix + 10, py + 5, ie ? INK : lerpColor(TEXT_DIM, CREAM, ih));
-        hit(ix, py, 20, 18, () -> { UiImages.editing = !UiImages.editing; UiImages.picker = false; });
-        tip("imgEdit", "Thêm / chỉnh ảnh trên tab", mx, my, ix, py, 20, 18);
+        hit(ix, py, 20, 18, () -> { if (UiImages.editing || requirePlus("Thêm ảnh vào UI")) { UiImages.editing = !UiImages.editing; UiImages.picker = false; } });
+        tip("imgEdit", "Thêm / chỉnh ảnh trên tab (PLUS)", mx, my, ix, py, 20, 18);
     }
 
     private void drawNav(GuiGraphics g, int mx, int my, long now) {
@@ -917,17 +928,17 @@ public class XlrwScreen extends Screen {
                 {"FIX", "Tự đập block sai"}, {"AIR PLACE", "Đặt block giữa không trung"},
                 {"FAST", "Đặt nhanh block thường"}, {"SPOOF", "Đặt block có hướng không cần nhìn đúng hướng"},
                 {"CHORUS", "Ăn chorus thoát hố"}, {"CLEAN", "Dọn block tạm & trụ thừa"},
-                {"WALL", "Đặt xuyên tường ở mọi nơi trong tầm với (tắt nếu server có anti-cheat)"}, {"DRY MARK", "Hiện khung đánh dấu của chạy thử"},
+                {"WALL", "Đặt xuyên tường ở mọi nơi trong tầm với (tắt nếu server có anti-cheat)"},
         };
         BooleanSupplier[] get = {
                 () -> cfg.autoMove, () -> cfg.useScaffolding, () -> cfg.autoDemolish, () -> cfg.airPlace,
                 () -> cfg.fastSimpleBlocks, () -> cfg.rotationSpoof, () -> cfg.chorusEscape, () -> cfg.cleanupTempBlocks,
-                () -> cfg.throughWallAnywhere, () -> cfg.renderDryRun
+                () -> cfg.throughWallAnywhere
         };
         List<java.util.function.Consumer<Boolean>> set = List.of(
                 v -> cfg.autoMove = v, v -> cfg.useScaffolding = v, v -> cfg.autoDemolish = v, v -> cfg.airPlace = v,
                 v -> cfg.fastSimpleBlocks = v, v -> cfg.rotationSpoof = v, v -> cfg.chorusEscape = v, v -> cfg.cleanupTempBlocks = v,
-                v -> cfg.throughWallAnywhere = v, v -> cfg.renderDryRun = v
+                v -> cfg.throughWallAnywhere = v
         );
         for (int i = 0; i < items.length; i++) {
             int tx = x + (i % 2) * (colW + 6), ty = y + (i / 2) * 24;
@@ -1000,6 +1011,377 @@ public class XlrwScreen extends Screen {
             int tx = cx + (i % 2) * (colW + 6), ty = cy + (i / 2) * 24;
             toggle(g, mx, my, "v" + i, tx, ty, colW, items[i][0], get[i], set.get(i), items[i][1]);
         }
+        // ---- Plus features ----
+        int n = items.length;
+        int[][] pos = new int[3][];
+        for (int k = 0; k < 3; k++) pos[k] = new int[]{cx + ((n + k) % 2) * (colW + 6), cy + ((n + k) / 2) * 24};
+        plusToggle(g, mx, my, "vp0", pos[0][0], pos[0][1], colW, "DRY MARK", () -> cfg.renderDryRun, v -> cfg.renderDryRun = v,
+                "Khung đánh dấu của chạy thử trong thế giới");
+        plusToggle(g, mx, my, "vp1", pos[1][0], pos[1][1], colW, "REACH+", () -> cfg.plusReach, v -> cfg.plusReach = v,
+                "Đặt block từ 5 block (server có anti-cheat có thể kick)");
+        bigButton(g, mx, my, "vp2", pos[2][0], pos[2][1], colW, 20, "★ ĐỔI AVATAR", TEAL, com.xlrw.account.Plus.on() ? 0xFFF3C04E : TEXT_DIM, () -> {
+            if (!com.xlrw.account.AccountManager.get().isLoggedIn()) {
+                setLoginOpen(true);
+                loginSay("Đăng nhập trước đã.", true);
+            } else if (requirePlus("Đổi avatar")) {
+                pickAvatar();
+            }
+        });
+        tip("vp2", "Ảnh đại diện ở góc trái menu (PLUS)", mx, my, pos[2][0], pos[2][1], colW, 20);
+    }
+
+    // ------------------------------------------------------------------------------------------------
+    // Account: inline login panel, Bit's login prompt, Plus gate
+    // ------------------------------------------------------------------------------------------------
+
+    private static final int LOGIN_W = 178;
+    private static final int GOLD = 0xFFF3C04E;
+    private static final long PROMPT_EVERY_MS = 15 * 60_000L;
+    private static final long FIRST_PROMPT_MS = 20_000L;
+
+    private boolean loginOpen;
+    private String focus = "";
+    private final Map<String, StringBuilder> fields = new HashMap<>();
+    private String loginMsg = "";
+    private boolean loginMsgBad;
+    private long plusToastUntil;
+    private String plusToastText = "";
+    // Bit's "log in?" banner
+    private long bannerAt = -1, bannerCloseAt = -1;
+    private static long sessionPromptAt = 0;
+
+    private StringBuilder field(String id) {
+        return fields.computeIfAbsent(id, k -> new StringBuilder());
+    }
+
+    private void setLoginOpen(boolean open) {
+        if (open == loginOpen) return;
+        loginOpen = open;
+        focus = open ? (com.xlrw.account.AccountManager.get().isLoggedIn() ? "key" : "user") : "";
+        if (open && bannerAt >= 0 && bannerCloseAt < 0) bannerCloseAt = System.currentTimeMillis();
+        XlrwSounds.play(open ? "ui.open" : "ui.close", 1.2f, 0.4f);
+        soundDone = true;
+    }
+
+    private void loginSay(String m, boolean bad) {
+        loginMsg = m == null ? "" : m;
+        loginMsgBad = bad;
+    }
+
+    /** True if Plus is active; otherwise shows the Plus notice and lets Bit point it out. */
+    private boolean requirePlus(String what) {
+        if (com.xlrw.account.Plus.on()) return true;
+        plusToastText = "★ " + what + " là tính năng PLUS — "
+                + (com.xlrw.account.AccountManager.get().isLoggedIn() ? "nhập key để mở" : "đăng nhập và nhập key để mở");
+        plusToastUntil = System.currentTimeMillis() + 3200;
+        MASCOT.react("plus");
+        XlrwSounds.play("ui.power_off", 1.3f, 0.4f);
+        soundDone = true;
+        return false;
+    }
+
+    /** Toggle that only works with Plus (shown off and gold-tagged without it). */
+    private void plusToggle(GuiGraphics g, int mx, int my, String id, int x, int y, int w, String text,
+                            BooleanSupplier get, java.util.function.Consumer<Boolean> set, String tipText) {
+        boolean plus = com.xlrw.account.Plus.on();
+        toggle(g, mx, my, id, x, y, w, text, () -> plus && get.getAsBoolean(), v -> {
+            if (requirePlus(text)) set.accept(v);
+        }, tipText + " (PLUS)");
+        // gold PLUS tag next to the switch
+        int tw = font.width("PLUS") + 6, tx = x + w - 22 - 6 - tw - 4;
+        skewRect(g, tx, y + 5, tw, 10, 3, plus ? GOLD : 0xFF5A4A28);
+        g.drawString(font, "PLUS", tx + 3, y + 6, plus ? INK : 0xFFB89A55, false);
+    }
+
+    private void drawPlusToast(GuiGraphics g, long now) {
+        if (now > plusToastUntil) return;
+        float a = Mth.clamp((plusToastUntil - now) / 400f, 0f, 1f) * Mth.clamp((now - (plusToastUntil - 3200)) / 150f, 0f, 1f);
+        int w = font.width(plusToastText) + 20, h = 18;
+        int x = (width - w) / 2, y = height - 46 - (int) (6 * (1 - a));
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, 0, 0, 350);
+        skewRect(g, x + 2, y + 2, w, h, 6, alpha(0xFF000000, 0.5f * a));
+        skewRect(g, x, y, w, h, 6, alpha(0xFF2A2214, 0.96f * a));
+        g.fill(x + 6, y + h - 2, x + w - 2, y + h - 1, alpha(GOLD, a));
+        g.drawString(font, plusToastText, x + 10, y + 5, alpha(GOLD, a), false);
+        com.xlrw.compat.GuiCompat.pop(g);
+    }
+
+    // ---- Bit's prompt: every ~15 minutes while not logged in ----
+
+    private void maybeStartLoginPrompt(long now, float open) {
+        if (open < 0.98f || loginOpen || bannerAt >= 0 || com.xlrw.account.AccountManager.get().isLoggedIn()) return;
+        BuilderConfig cfg = BuilderConfig.getInstance();
+        if (sessionPromptAt == 0) sessionPromptAt = now + FIRST_PROMPT_MS; // the first one 20 s after opening the deck
+        long due = Math.max(sessionPromptAt, cfg.loginPromptAt + PROMPT_EVERY_MS);
+        if (now < due) return;
+        bannerAt = now;
+        bannerCloseAt = -1;
+        cfg.loginPromptAt = now;
+        sessionPromptAt = now + PROMPT_EVERY_MS;
+        BuilderConfig.save();
+        MASCOT.bigJump();
+    }
+
+    private void drawLoginPrompt(GuiGraphics g, int mx, int my, long now) {
+        if (bannerAt < 0) return;
+        long t = now - bannerAt;
+        if (t < 450) return; // Bit is still flying up
+        if (bannerCloseAt < 0 && t > 30_000) bannerCloseAt = now; // nobody answered
+        int bw = 236, bh = 50;
+        int bx = (width - bw) / 2;
+        float targetY = 6;
+        float y;
+        if (bannerCloseAt >= 0) {
+            float k = Mth.clamp((now - bannerCloseAt) / 380f, 0f, 1f);
+            y = targetY + (-bh - 30 - targetY) * k * k;
+            if (k >= 1f) {
+                bannerAt = -1;
+                return;
+            }
+        } else {
+            float k = Mth.clamp((t - 450) / 650f, 0f, 1f);
+            // falls in from above with a little overshoot (as if Bit pulled it down)
+            float c1 = 1.70158f, c3 = c1 + 1;
+            float e = 1 + c3 * (float) Math.pow(k - 1, 3) + c1 * (float) Math.pow(k - 1, 2);
+            y = -bh - 30 + (targetY + bh + 30) * e;
+        }
+        int by = Math.round(y);
+        // strings it hangs from + the rope Bit pulled
+        g.fill(bx + 18, 0, bx + 19, by, alpha(CREAM, 0.6f));
+        g.fill(bx + bw - 19, 0, bx + bw - 18, by, alpha(CREAM, 0.6f));
+        float[] bit = MASCOT.head();
+        if (bit != null && bannerCloseAt < 0) ropeLine(g, bx + bw / 2f, by + bh, bit[0], bit[1], alpha(ORANGE_ROPE, 0.85f));
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, 0, 0, 320);
+        skewRect(g, bx + 3, by + 3, bw, bh, 8, 0x88000000);
+        skewRect(g, bx, by, bw, bh, 8, 0xF51A1A1D);
+        g.fill(bx + 8, by + bh - 2, bx + bw - 2, by + bh - 1, RED);
+        g.drawString(font, "Bạn có muốn đăng nhập tài khoản Xlrw không?", bx + 14, by + 8, CREAM, false);
+        g.drawString(font, "Lưu tên, avatar và mở được bản PLUS.", bx + 14, by + 19, TEXT_DIM, false);
+        hit(bx, by, bw, bh, () -> soundDone = true);
+        int btY = by + 31;
+        smallButton(g, mx, my, "pr.yes", bx + bw - 136, btY, 60, 14, "CÓ", true, () -> {
+            setLoginOpen(true);
+            MASCOT.react("happy");
+        });
+        smallButton(g, mx, my, "pr.no", bx + bw - 70, btY, 60, 14, "ĐỂ SAU", false, () -> {
+            bannerCloseAt = System.currentTimeMillis();
+            MASCOT.react("click");
+        });
+        com.xlrw.compat.GuiCompat.pop(g);
+    }
+
+    private static final int ORANGE_ROPE = 0xFFF3701E;
+
+    /** A slightly sagging rope made of short segments. */
+    private void ropeLine(GuiGraphics g, float x0, float y0, float x1, float y1, int color) {
+        int n = 18;
+        float sag = Math.min(24f, Math.abs(x1 - x0) * 0.15f + 6f);
+        float px = x0, py = y0;
+        for (int i = 1; i <= n; i++) {
+            float t = i / (float) n;
+            float x = x0 + (x1 - x0) * t, y = y0 + (y1 - y0) * t + sag * 4 * t * (1 - t);
+            int ax = Math.round(Math.min(px, x)), ay = Math.round(Math.min(py, y));
+            int bx2 = Math.round(Math.max(px, x)) + 1, by2 = Math.round(Math.max(py, y)) + 1;
+            g.fill(ax, ay, Math.max(ax + 1, bx2), Math.max(ay + 1, by2), color);
+            px = x;
+            py = y;
+        }
+    }
+
+    // ---- inline login panel ----
+
+    private void drawLoginPanel(GuiGraphics g, int mx, int my, long now, float lo) {
+        com.xlrw.account.AccountManager acc = com.xlrw.account.AccountManager.get();
+        boolean in = acc.isLoggedIn();
+        int w = LOGIN_W, h = in ? 162 : 170;
+        float cxs = showPreview ? (wx + ww + pvx) / 2f : width / 2f;
+        int x = Math.round(cxs - w / 2f), y = wy + (wh - h) / 2;
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, 0, 0, 300);
+        float sc = 0.86f + 0.14f * lo;
+        com.xlrw.compat.GuiCompat.translate(g, cxs, y + h / 2f, 0);
+        com.xlrw.compat.GuiCompat.scale(g, sc, sc, 1f);
+        com.xlrw.compat.GuiCompat.translate(g, -cxs, -(y + h / 2f), 0);
+        int lmx = Math.round(cxs + (mx - cxs) / sc), lmy = Math.round(y + h / 2f + (my - (y + h / 2f)) / sc);
+        if (lo < 0.98f) { mx = -999; my = -999; } else { mx = lmx; my = lmy; }
+
+        hit(x, y, w, h, () -> { focus = ""; soundDone = true; }); // the panel itself swallows clicks
+        chamfer(g, x + 3, y + 4, w, h, 10, 0x88000000);
+        chamfer(g, x, y, w, h, 10, 0xFA1A1A1D);
+        chamferOutline(g, x, y, w, h, 10, alpha(RED_DIM, 0.9f));
+        g.fill(x + 3, y + 3, x + 14, y + 4, RED);
+        g.fill(x + 3, y + 3, x + 4, y + 14, RED);
+        // title slab
+        String title = in ? "TÀI KHOẢN" : "ĐĂNG NHẬP";
+        int tw = font.width(title) + 16;
+        skewRect(g, x + 12 + 2, y + 9 + 2, tw, 13, 5, RED);
+        skewRect(g, x + 12, y + 9, tw, 13, 5, CREAM);
+        g.drawString(font, title, x + 20, y + 12, INK, false);
+        smallButton(g, mx, my, "lg.close", x + w - 24, y + 8, 16, 14, "x", false, () -> setLoginOpen(false));
+
+        int fx = x + 12, fw = w - 24;
+        if (!in) {
+            textField(g, mx, my, "user", fx, y + 34, fw, "TÊN", "tên tài khoản", false, now);
+            textField(g, mx, my, "pass", fx, y + 66, fw, "MẬT KHẨU", "ít nhất 6 ký tự", true, now);
+            int bw = (fw - 6) / 2;
+            bigButton(g, mx, my, "lg.login", fx, y + 98, bw, 18, "ĐĂNG NHẬP", RED, INK, () -> doLogin(false));
+            bigButton(g, mx, my, "lg.reg", fx + bw + 6, y + 98, bw, 18, "ĐĂNG KÝ", TEAL, CREAM, () -> doLogin(true));
+            g.drawString(font, "Không đăng nhập vẫn dùng bình thường.", fx, y + h - 14, alpha(TEXT_DIM, 0.8f), false);
+        } else {
+            // avatar + name
+            chamfer(g, fx, y + 32, 26, 26, 5, RED);
+            net.minecraft.resources.ResourceLocation av = acc.avatar();
+            if (av != null) com.xlrw.compat.GuiCompat.blitTex(g, av, fx + 2, y + 34, 22, 22, 0, 0, 64, 64, 64, 64);
+            else g.drawString(font, "X", fx + 10, y + 41, INK, false);
+            g.drawString(font, trim(acc.username(), 16), fx + 34, y + 34, CREAM, false);
+            boolean plus = acc.isPlus();
+            if (plus) {
+                String d = new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date(acc.plusUntil()));
+                skewRect(g, fx + 34, y + 46, font.width("PLUS") + 8, 10, 3, GOLD);
+                g.drawString(font, "PLUS", fx + 38, y + 47, INK, false);
+                g.drawString(font, "đến " + d, fx + 34 + font.width("PLUS") + 12, y + 47, GOLD, false);
+            } else {
+                g.drawString(font, "Bản thường", fx + 34, y + 47, TEXT_DIM, false);
+            }
+            textField(g, mx, my, "key", fx, y + 66, fw, "KEY PLUS", "XLRW-XXXX-XXXX-XXXX", false, now);
+            bigButton(g, mx, my, "lg.redeem", fx, y + 98, fw, 18, plus ? "GIA HẠN PLUS" : "KÍCH HOẠT PLUS", GOLD, INK, this::doRedeem);
+            smallButton(g, mx, my, "lg.out", fx, y + h - 22, 70, 14, "ĐĂNG XUẤT", false, () -> {
+                acc.logout();
+                field("pass").setLength(0);
+                focus = "user";
+                loginSay("Đã đăng xuất.", false);
+            });
+        }
+        // message
+        String msg = acc.busy() ? "Đang kết nối" + ".".repeat((int) (now / 300 % 4)) : loginMsg;
+        if (!msg.isEmpty()) {
+            int my0 = y + 122;
+            for (var line : font.split(Component.literal(msg), fw)) {
+                g.drawString(font, line, fx, my0, acc.busy() ? TEXT_DIM : loginMsgBad ? 0xFFE0403A : 0xFF5FD38D, false);
+                my0 += 10;
+            }
+        }
+        com.xlrw.compat.GuiCompat.pop(g);
+    }
+
+    /** Custom text field (click to focus, type, Backspace, Ctrl+V, Tab to the next one, Enter to submit). */
+    private void textField(GuiGraphics g, int mx, int my, String id, int x, int y, int w, String label, String hint,
+                           boolean secret, long now) {
+        boolean f = id.equals(focus);
+        float hv = hover("tf." + id, mx, my, x, y + 10, w, 16);
+        g.drawString(font, label, x, y, f ? RED : TEXT_DIM, false);
+        chamfer(g, x, y + 10, w, 16, 4, f ? 0xFF2F3644 : lerpColor(0xFF22262F, TEAL, hv));
+        g.fill(x + 4, y + 25, x + w, y + 26, f ? RED : alpha(RED_DIM, 0.8f));
+        String v = field(id).toString();
+        String shown = secret ? "•".repeat(v.length()) : v;
+        while (font.width(shown) > w - 14 && shown.length() > 0) shown = shown.substring(1);
+        if (v.isEmpty() && !f) g.drawString(font, hint, x + 6, y + 14, alpha(TEXT_DIM, 0.6f), false);
+        else g.drawString(font, shown, x + 6, y + 14, CREAM, false);
+        if (f && (now / 500) % 2 == 0) {
+            int cxp = x + 6 + font.width(shown);
+            g.fill(cxp, y + 13, cxp + 1, y + 23, RED);
+        }
+        hit(x, y + 8, w, 20, () -> focus = id);
+    }
+
+    private boolean loginChar(String s) {
+        if (!loginOpen || focus.isEmpty() || s == null || s.isEmpty()) return false;
+        int c = s.codePointAt(0);
+        if (c < 32 || c == 127) return true;
+        StringBuilder b = field(focus);
+        int max = focus.equals("user") ? 16 : focus.equals("key") ? 24 : 64;
+        if (focus.equals("user") && !(Character.isLetterOrDigit(c) && c < 128 || c == '_')) return true;
+        if (b.length() < max) b.append(focus.equals("key") ? s.toUpperCase() : s);
+        return true;
+    }
+
+    private boolean loginKey(int key, int mods) {
+        if (!loginOpen) return false;
+        if (key == 256) { // ESC closes the panel first
+            setLoginOpen(false);
+            return true;
+        }
+        if (focus.isEmpty()) return false;
+        StringBuilder b = field(focus);
+        boolean in = com.xlrw.account.AccountManager.get().isLoggedIn();
+        switch (key) {
+            case 259 -> { if (b.length() > 0) b.setLength(b.length() - 1); }                 // Backspace
+            case 258 -> focus = in ? "key" : focus.equals("user") ? "pass" : "user";        // Tab
+            case 257, 335 -> { if (in) doRedeem(); else if (focus.equals("user")) focus = "pass"; else doLogin(false); }
+            case 86 -> { // Ctrl+V
+                if ((mods & 2) != 0) {
+                    String clip = minecraft.keyboardHandler.getClipboard();
+                    if (clip != null) for (int i = 0; i < clip.length(); ) {
+                        int cp = clip.codePointAt(i);
+                        loginChar(new String(Character.toChars(cp)));
+                        i += Character.charCount(cp);
+                    }
+                } else return true;
+            }
+            default -> { return true; } // swallow letters etc. so they do not trigger shortcuts while typing
+        }
+        return true;
+    }
+
+    private void doLogin(boolean register) {
+        String u = field("user").toString().trim(), p = field("pass").toString();
+        if (u.isEmpty() || p.isEmpty()) {
+            loginSay("Nhập tên và mật khẩu.", true);
+            return;
+        }
+        com.xlrw.account.AccountManager acc = com.xlrw.account.AccountManager.get();
+        java.util.function.Consumer<String> done = m -> {
+            loginSay(m, !acc.isLoggedIn());
+            if (acc.isLoggedIn()) {
+                field("pass").setLength(0);
+                focus = "key";
+                MASCOT.react("win");
+            }
+        };
+        if (register) acc.register(u, p, done);
+        else acc.login(u, p, done);
+    }
+
+    private void doRedeem() {
+        String k = field("key").toString().trim();
+        if (k.isEmpty()) {
+            loginSay("Nhập key.", true);
+            return;
+        }
+        com.xlrw.account.AccountManager.get().redeem(k, m -> {
+            boolean ok = m != null && m.startsWith("Đã kích hoạt");
+            loginSay(m, !ok);
+            if (ok) {
+                field("key").setLength(0);
+                MASCOT.react("win");
+            }
+        });
+    }
+
+    /** Native file picker (LWJGL tinyfd); falls back to config/xlrw/avatar.png. */
+    private void pickAvatar() {
+        Thread t = new Thread(() -> {
+            String path = null;
+            try (org.lwjgl.system.MemoryStack stack = org.lwjgl.system.MemoryStack.stackPush()) {
+                org.lwjgl.PointerBuffer filters = stack.mallocPointer(4);
+                filters.put(stack.UTF8("*.png")).put(stack.UTF8("*.jpg")).put(stack.UTF8("*.jpeg")).put(stack.UTF8("*.gif"));
+                filters.flip();
+                path = org.lwjgl.util.tinyfd.TinyFileDialogs.tinyfd_openFileDialog("Chọn ảnh avatar", "", filters, "Ảnh", false);
+            } catch (Throwable e) {
+                File f = new File(net.fabricmc.loader.api.FabricLoader.getInstance().getConfigDir().toFile(), "xlrw/avatar.png");
+                if (f.exists()) path = f.getAbsolutePath();
+            }
+            if (path == null) return;
+            File file = new File(path);
+            minecraft.execute(() -> com.xlrw.account.AccountManager.get().uploadAvatar(file, m -> {
+                plusToastText = m == null ? "" : m;
+                plusToastUntil = System.currentTimeMillis() + 2600;
+            }));
+        }, "xlrw-avatar-picker");
+        t.setDaemon(true);
+        t.start();
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -1225,6 +1607,7 @@ public class XlrwScreen extends Screen {
     }
 
     boolean xKeyPressed(int key, int scan, int mods) {
+        if (loginKey(key, mods)) return true;
         if (tab == Tab.HUB && HubWidgets.keyPressed(key)) return true;
         if (key == com.mojang.blaze3d.platform.InputConstants.KEY_F && UiImages.toggleLayer()) return true;
         // the same key that opens the deck (V by default) closes it again
@@ -1404,6 +1787,12 @@ public class XlrwScreen extends Screen {
     private static int brighten(int c) {
         return lerpColor(c, 0xFFFFFFFF, 0.15f) | 0xFF000000;
     }
+
+    //? if >=1.21.11 {
+    /*@Override public boolean charTyped(net.minecraft.client.input.CharacterEvent e) { return loginChar(e.codepointAsString()) || super.charTyped(e); }
+    *///?} else {
+    @Override public boolean charTyped(char c, int m) { return loginChar(String.valueOf(c)) || super.charTyped(c, m); }
+    //?}
 
     //? if >=1.21.11 {
     /*private net.minecraft.client.input.MouseButtonEvent xLastMouse;

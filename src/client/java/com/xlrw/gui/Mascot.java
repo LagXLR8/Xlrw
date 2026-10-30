@@ -195,9 +195,27 @@ final class Mascot {
             }
             case "win" -> { setMood(Mood.DANCE, now, 7000); say("YAY!", now, 3000); XlrwSounds.play("bit.happy", 1.1f, 0.5f); }
             case "edit" -> { setMood(Mood.HAPPY, now, 1200); say("✥", now, 1200); }
+            case "plus" -> { setMood(Mood.SURPRISED, now, 900); say("PLUS!", now, 1600); }
+            case "happy" -> { setMood(Mood.HAPPY, now, 1200); say("♥", now, 1200); XlrwSounds.playVar("bit.happy", 1f, 0.35f, 0.1f); }
             default -> {
             }
         }
+    }
+
+    /** Jumps very high (to pull down the login banner). */
+    void bigJump() {
+        long now = System.currentTimeMillis();
+        if (mood == Mood.HELD || mood == Mood.FALL || x < 0) return;
+        mood = Mood.JUMP;
+        moodUntil = now + 1600;
+        vy = -240f;
+        say("!", now, 900);
+        XlrwSounds.play("bit.surprise", 1.1f, 0.45f);
+    }
+
+    /** Head position in screen coordinates, or null before Bit has appeared. */
+    float[] head() {
+        return x < 0 ? null : new float[]{x, y - H};
     }
 
     boolean contains(double mx, double my) {
