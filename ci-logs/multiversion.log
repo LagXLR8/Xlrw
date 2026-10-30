@@ -1,5 +1,5 @@
 status: success
-commit: c500d3cb5367fc977a34ff2a8f47adde56c821da
+commit: 405a63877a0ad171910ea2198476ec7b7109d4d4
 
 Fetching distribution.
 Downloading https://services.gradle.org/distributions/gradle-9.8.0-bin.zip
@@ -62,10 +62,10 @@ Cannot remap modifiers because it does not exists in any of the targets [] or th
 > Task :1.21.11:stonecutterPrepare
 > Task :1.21.11:stonecutterGenerate
 > Task :1.21.11:compileJava NO-SOURCE
-> Task :1.21.1:processResources
-> Task :1.21.1:classes
 > Task :1.21.11:processResources
 > Task :1.21.11:classes
+> Task :1.21.1:processResources
+> Task :1.21.1:classes
 > Task :1.21.11:stonecutterPrepareClient
 > Task :1.21.11:stonecutterGenerateClient
 
@@ -74,12 +74,12 @@ Note: /home/runner/work/Xlrw/Xlrw/src/client/java/com/xlrw/builder/DryRun.java u
 Note: Recompile with -Xlint:deprecation for details.
 
 > Task :1.21.1:processClientResources
+> Task :1.21.1:jar
 
 > Task :1.21.11:compileClientJava
 Note: Some input files use or override a deprecated API.
 Note: Recompile with -Xlint:deprecation for details.
 
-> Task :1.21.1:jar
 > Task :1.21.1:processIncludeJars
 > Task :1.21.1:sourcesJar
 > Task :1.21.1:clientClasses
