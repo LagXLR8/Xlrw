@@ -42,7 +42,19 @@ jobs:
             echo "== KV id: $ID"
             [ -n "$ID" ] || { echo "no KV id"; exit 1; }
             sed -i "s/__KV_ID__/$ID/" wrangler.toml
+            # workers.dev subdomain (needed once per Cloudflare account)
+            API="https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/workers/subdomain"
+            SUB=$(curl -s -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$API" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const j=JSON.parse(s);console.log(j.result&&j.result.subdomain||"")}catch{console.log("")}})')
+            if [ -z "$SUB" ]; then
+              for name in lagxlr8 xlrw-lagxlr8 xlrw-$(echo "$CLOUDFLARE_ACCOUNT_ID" | cut -c1-6); do
+                R=$(curl -s -X PUT -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "content-type: application/json" --data "{\"subdomain\":\"$name\"}" "$API")
+                echo "== register subdomain $name: $(echo "$R" | head -c 300)"
+                if echo "$R" | grep -q '"success":true'; then SUB=$name; break; fi
+              done
+            fi
+            echo "== workers.dev subdomain: $SUB"
             wrangler deploy 2>&1
+            echo "== URL: https://xlrw-api.$SUB.workers.dev"
             if [ -n "$XLRW_ADMIN_PASSWORD" ]; then
               printf '%s' "$XLRW_ADMIN_PASSWORD" | wrangler secret put ADMIN_PASSWORD 2>&1
             fi
