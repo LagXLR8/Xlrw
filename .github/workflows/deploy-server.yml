@@ -49,12 +49,15 @@ jobs:
               for name in lagxlr8 xlrw-lagxlr8 xlrw-$(echo "$CLOUDFLARE_ACCOUNT_ID" | cut -c1-6); do
                 R=$(curl -s -X PUT -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "content-type: application/json" --data "{\"subdomain\":\"$name\"}" "$API")
                 echo "== register subdomain $name: $(echo "$R" | head -c 300)"
-                if echo "$R" | grep -q '"success":true'; then SUB=$name; break; fi
+                if echo "$R" | grep -qE '"success": ?true'; then SUB=$name; break; fi
               done
             fi
             echo "== workers.dev subdomain: $SUB"
             wrangler deploy 2>&1
-            echo "== URL: https://xlrw-api.$SUB.workers.dev"
+            URL=$(curl -s -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "$API" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log("https://xlrw-api."+JSON.parse(s).result.subdomain+".workers.dev")}catch{console.log("")}})')
+            echo "== URL: $URL"
+            sleep 15
+            echo "== PUBKEY: $(curl -s "$URL/api/pubkey")"
             if [ -n "$XLRW_ADMIN_PASSWORD" ]; then
               printf '%s' "$XLRW_ADMIN_PASSWORD" | wrangler secret put ADMIN_PASSWORD 2>&1
             fi
