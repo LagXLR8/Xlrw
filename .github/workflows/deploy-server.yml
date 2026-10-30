@@ -53,10 +53,12 @@ jobs:
           git config user.name "ci-bot"
           git config user.email "ci-bot@users.noreply.github.com"
           cp deploy.log /tmp/deploy.log 2>/dev/null || echo "no log" > /tmp/deploy.log
-          git fetch origin ci-logs || true
-          git checkout -B ci-logs origin/ci-logs
-          mkdir -p ci-logs
-          { echo "status: ${{ steps.deploy.outcome }}"; echo "commit: $GITHUB_SHA"; echo; cat /tmp/deploy.log; } > ci-logs/deploy-server.log
-          git add ci-logs/deploy-server.log
-          git commit -m "deploy log $GITHUB_SHA (${{ steps.deploy.outcome }})" || true
-          git push origin ci-logs
+          for i in 1 2 3 4 5; do
+            git fetch origin ci-logs && git checkout -f -B ci-logs origin/ci-logs || exit 1
+            mkdir -p ci-logs
+            { echo "status: ${{ steps.deploy.outcome }}"; echo "run: $GITHUB_RUN_ID"; echo "commit: $GITHUB_SHA"; echo; cat /tmp/deploy.log; } > ci-logs/deploy-server.log
+            git add ci-logs/deploy-server.log
+            git commit -m "deploy log $GITHUB_RUN_ID (${{ steps.deploy.outcome }})" || true
+            git push origin ci-logs && break
+            sleep 5
+          done
