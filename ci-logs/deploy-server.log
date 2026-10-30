@@ -1,5 +1,24 @@
 status: failure
-commit: c500d3cb5367fc977a34ff2a8f47adde56c821da
+run: 41048239368
+commit: 405a63877a0ad171910ea2198476ec7b7109d4d4
 
-== secrets present: token=NO account=NO admin=NO
+== secrets present: token=yes account=yes admin=yes
 4.156.0
+== KV id: 40d16232a5214eb7992493f1dd8cd5b0
+
+ ⛅️ wrangler 4.156.0
+────────────────────
+
+Cloudflare collects anonymous telemetry about your usage of Wrangler. Learn more at https://github.com/cloudflare/workers-sdk/tree/main/packages/wrangler/telemetry.md
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mYou need to register a workers.dev subdomain before publishing to workers.dev[0m
+
+
+? Would you like to register a workers.dev subdomain now?
+🤖 Using fallback value in non-interactive context: no
+
+[31m✘ [41;31m[[41;97mERROR[41;31m][0m [1mYou can either deploy your worker to one or more routes by specifying them in your wrangler.toml file, or register a workers.dev subdomain here:[0m
+
+  [4mhttps://dash.cloudflare.com/f958b50e2ccb63593cd76a7b8726809f/workers/onboarding[0m
+
+
+🪵  Logs were written to "/home/runner/.config/.wrangler/logs/wrangler-2026-10-30_11-27-57_155.log"
