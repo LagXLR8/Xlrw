@@ -23,8 +23,14 @@ public final class HubWidgets {
 
     interface Hitter { void hit(int x, int y, int w, int h, Runnable r); }
 
-    private static final int INK = 0xFF141416, CREAM = 0xFFE8D8C9, ORANGE = 0xFFF3701E, SLATE = 0xFF4B607F,
+    private static int INK = 0xFF141416, CREAM = 0xFFE8D8C9, ORANGE = 0xFFF3701E, SLATE = 0xFF4B607F,
             PANEL = 0xFF232429, DIM = 0xFF8D97AB, WELL = 0xFF121215;
+
+    /** Follows the deck colour theme. */
+    static void theme(UiTheme t) {
+        INK = t.ink; CREAM = t.cream; ORANGE = t.accent; SLATE = t.outline; PANEL = t.bg2; DIM = t.textDim;
+        WELL = UiTheme.mix(t.bg2, 0xFF000000, 0.45f);
+    }
     private static final Random RND = new Random();
 
     private HubWidgets() {}

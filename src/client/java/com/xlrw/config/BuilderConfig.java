@@ -61,6 +61,8 @@ public class BuilderConfig {
     public boolean plusReach = false;
     /** Last time Bit asked to log in (ms). */
     public long loginPromptAt = 0;
+    /** Plus only: deck colour theme (index into UiTheme.ALL, 0 = original). */
+    public int uiTheme = 0;
     public boolean rotationSpoof = true; // place facing blocks (piston, observer...) without really looking that way
     public boolean chorusEscape = true; // stuck in a deep hole: eat a chorus fruit instead of pillaring out
     public boolean workWithInventoryOpen = true; // keep building while the player has the inventory open

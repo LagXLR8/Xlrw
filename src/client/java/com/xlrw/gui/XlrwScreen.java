@@ -48,18 +48,18 @@ public class XlrwScreen extends Screen {
     // Palette (night city: deep maroon-black, hot coral red, cold teal panels)
     // ------------------------------------------------------------------------------------------------
     // Palette: Zenless Zone Zero "retro" trio - cream #E8D8C9, slate blue #4B607F, signal orange #F3701E - on ink black
-    private static final int BG = 0xF21A1A1D;
-    private static final int BG2 = 0xFF232429;
-    private static final int RED = 0xFFF3701E;      // accent (orange)
-    private static final int RED_DIM = 0xFF4B607F;  // slate blue
-    private static final int RED_DEEP = 0xFF3B2A20; // warm dark (selected rows)
-    private static final int TEAL = 0xFF2B3240;     // panel / button
-    private static final int TEAL_HI = 0xFF4B607F;  // hover
-    private static final int CYAN = 0xFFE8D8C9;     // cream
-    private static final int TEXT_DIM = 0xFF8D97AB;
+    private static int BG = 0xF21A1A1D;
+    private static int BG2 = 0xFF232429;
+    private static int RED = 0xFFF3701E;      // accent (orange)
+    private static int RED_DIM = 0xFF4B607F;  // slate blue
+    private static int RED_DEEP = 0xFF3B2A20; // warm dark (selected rows)
+    private static int TEAL = 0xFF2B3240;     // panel / button
+    private static int TEAL_HI = 0xFF4B607F;  // hover
+    private static int CYAN = 0xFFE8D8C9;     // cream
+    private static int TEXT_DIM = 0xFF8D97AB;
     private static final int OK = 0xFF7FD18B;
-    private static final int CREAM = 0xFFE8D8C9;
-    private static final int INK = 0xFF141416;
+    private static int CREAM = 0xFFE8D8C9;
+    private static int INK = 0xFF141416;
 
     private enum Tab {
         DECK("◆", "DECK"), FILES("▤", "FILES"), PLACE("✥", "PLACE"), ENGINE("⚙", "ENGINE"), VIEW("◉", "VIEW"), HUB("✦", "HUB");
@@ -202,6 +202,7 @@ public class XlrwScreen extends Screen {
         lastMx = mx;
         lastMy = my;
         long now = System.currentTimeMillis();
+        applyTheme();
         float open = ease(Mth.clamp((now - openedAt) / 420f, 0f, 1f));
         boolean d3 = BuilderConfig.getInstance().ui3d;
 
@@ -585,9 +586,9 @@ public class XlrwScreen extends Screen {
         Schematic s = SchematicManager.getInstance().getActiveSchematic();
         String sub = s != null ? trim(s.getName().replaceFirst("\\.[^.]+$", ""), 26).toUpperCase() : "NO SCHEMATIC";
         if (acc.isLoggedIn()) {
-            g.drawString(font, acc.username().toUpperCase(), wx + 44, wy + 27, CREAM, false);
+            fitString(g, acc.username().toUpperCase(), wx + 44, wy + 27, ww - 44 - 120, CREAM);
         } else {
-            g.drawString(font, sub, wx + 44, wy + 27, TEXT_DIM, false);
+            fitString(g, sub, wx + 44, wy + 27, ww - 44 - 120, TEXT_DIM);
         }
         hit(wx + 44, wy + 25, 120, 11, () -> setLoginOpen(!loginOpen));
 
@@ -1028,6 +1029,7 @@ public class XlrwScreen extends Screen {
             }
         });
         tip("vp2", "Ảnh đại diện ở góc trái menu (PLUS)", mx, my, pos[2][0], pos[2][1], colW, 20);
+        drawThemePicker(g, mx, my, cx, cy + ((n + 3 + 1) / 2) * 24 + 4, cw);
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -1036,10 +1038,62 @@ public class XlrwScreen extends Screen {
 
     private static final int LOGIN_W = 178;
     private static final int GOLD = 0xFFF3C04E;
+    private static int themeApplied = -1;
+
+    /** Copies the active theme into the colour fields (Plus only; everyone else gets the original look). */
+    private static void applyTheme() {
+        int id = com.xlrw.account.Plus.on() ? BuilderConfig.getInstance().uiTheme : 0;
+        if (id == themeApplied) return;
+        themeApplied = id;
+        UiTheme t = UiTheme.get(id);
+        BG = t.bg; BG2 = t.bg2; RED = t.accent; RED_DIM = t.outline; RED_DEEP = t.accentDeep;
+        TEAL = t.widget; TEAL_HI = t.widgetHi; TEXT_DIM = t.textDim; CREAM = t.cream; CYAN = t.cream; INK = t.ink;
+        HubWidgets.theme(t);
+    }
+
+    /** Theme picker: a grid of 3-colour swatches. */
+    private void drawThemePicker(GuiGraphics g, int mx, int my, int x, int y, int w) {
+        boolean plus = com.xlrw.account.Plus.on();
+        int cur = plus ? BuilderConfig.getInstance().uiTheme : 0;
+        label(g, x, y, "MÀU UI");
+        int lw = font.width("MÀU UI") + 12;
+        int tw = font.width("PLUS") + 6;
+        skewRect(g, x + lw, y, tw, 9, 3, plus ? GOLD : 0xFF5A4A28);
+        g.drawString(font, "PLUS", x + lw + 3, y + 1, plus ? 0xFF141416 : 0xFFB89A55, false);
+        int n = UiTheme.ALL.length, cols = 7, gap = 4;
+        int sw = (w - gap * (cols - 1)) / cols, sh = 16;
+        String hoverName = UiTheme.get(cur).name;
+        for (int i = 0; i < n; i++) {
+            UiTheme t = UiTheme.ALL[i];
+            int sx = x + (i % cols) * (sw + gap), sy = y + 13 + (i / cols) * (sh + gap);
+            float hv = hover("th" + i, mx, my, sx, sy, sw, sh);
+            if (hv > 0.5f) hoverName = t.name;
+            int lift = Math.round(hv * 2);
+            int[] c = t.swatch;
+            chamfer(g, sx - 1 - lift, sy - 1 - lift, sw + 2, sh + 2, 4, i == cur ? CREAM : 0xFF0C0C0E);
+            int third = sw / 3;
+            // three stripes, like the reference cards
+            chamfer(g, sx - lift, sy - lift, sw, sh, 3, c[0] | 0xFF000000);
+            g.fill(sx - lift + third, sy - lift + sh / 2, sx - lift + 2 * third, sy - lift + sh, c[1] | 0xFF000000);
+            g.fill(sx - lift + 2 * third, sy - lift + sh / 2, sx - lift + sw - 3, sy - lift + sh, c[2] | 0xFF000000);
+            if (i == cur) g.drawCenteredString(font, "✓", sx - lift + sw / 2, sy - lift + 1, UiTheme.lum(c[0]) > 0.45f ? 0xFF141416 : 0xFFFFFFFF);
+            final int id = i;
+            hit(sx, sy, sw, sh, () -> {
+                if (id == 0 || requirePlus("Đổi màu UI")) {
+                    BuilderConfig.getInstance().uiTheme = id;
+                    BuilderConfig.save();
+                    MASCOT.react("edit");
+                }
+            });
+        }
+        int rows = (n + cols - 1) / cols;
+        fitString(g, hoverName, x + lw + tw + 8, y + 1, w - lw - tw - 8, TEXT_DIM);
+    }
     private static final long PROMPT_EVERY_MS = 15 * 60_000L;
     private static final long FIRST_PROMPT_MS = 20_000L;
 
     private boolean loginOpen;
+    private int toggleReserve; // extra room taken on the right of a toggle (PLUS tag)
     private String focus = "";
     private final Map<String, StringBuilder> fields = new HashMap<>();
     private String loginMsg = "";
@@ -1084,9 +1138,11 @@ public class XlrwScreen extends Screen {
     private void plusToggle(GuiGraphics g, int mx, int my, String id, int x, int y, int w, String text,
                             BooleanSupplier get, java.util.function.Consumer<Boolean> set, String tipText) {
         boolean plus = com.xlrw.account.Plus.on();
+        toggleReserve = font.width("PLUS") + 12;
         toggle(g, mx, my, id, x, y, w, text, () -> plus && get.getAsBoolean(), v -> {
             if (requirePlus(text)) set.accept(v);
         }, tipText + " (PLUS)");
+        toggleReserve = 0;
         // gold PLUS tag next to the switch
         int tw = font.width("PLUS") + 6, tx = x + w - 22 - 6 - tw - 4;
         skewRect(g, tx, y + 5, tw, 10, 3, plus ? GOLD : 0xFF5A4A28);
@@ -1096,14 +1152,14 @@ public class XlrwScreen extends Screen {
     private void drawPlusToast(GuiGraphics g, long now) {
         if (now > plusToastUntil) return;
         float a = Mth.clamp((plusToastUntil - now) / 400f, 0f, 1f) * Mth.clamp((now - (plusToastUntil - 3200)) / 150f, 0f, 1f);
-        int w = font.width(plusToastText) + 20, h = 18;
+        int w = Math.min(font.width(plusToastText) + 20, width - 16), h = 18;
         int x = (width - w) / 2, y = height - 46 - (int) (6 * (1 - a));
         com.xlrw.compat.GuiCompat.push(g);
         com.xlrw.compat.GuiCompat.translate(g, 0, 0, 350);
         skewRect(g, x + 2, y + 2, w, h, 6, alpha(0xFF000000, 0.5f * a));
         skewRect(g, x, y, w, h, 6, alpha(0xFF2A2214, 0.96f * a));
         g.fill(x + 6, y + h - 2, x + w - 2, y + h - 1, alpha(GOLD, a));
-        g.drawString(font, plusToastText, x + 10, y + 5, alpha(GOLD, a), false);
+        fitString(g, plusToastText, x + 10, y + 5, w - 16, alpha(GOLD, a));
         com.xlrw.compat.GuiCompat.pop(g);
     }
 
@@ -1157,8 +1213,8 @@ public class XlrwScreen extends Screen {
         skewRect(g, bx + 3, by + 3, bw, bh, 8, 0x88000000);
         skewRect(g, bx, by, bw, bh, 8, 0xF51A1A1D);
         g.fill(bx + 8, by + bh - 2, bx + bw - 2, by + bh - 1, RED);
-        g.drawString(font, "Bạn có muốn đăng nhập tài khoản Xlrw không?", bx + 14, by + 8, CREAM, false);
-        g.drawString(font, "Lưu tên, avatar và mở được bản PLUS.", bx + 14, by + 19, TEXT_DIM, false);
+        fitString(g, "Bạn có muốn đăng nhập Xlrw không?", bx + 14, by + 8, bw - 28, CREAM);
+        fitString(g, "Lưu tên, avatar và mở được bản PLUS.", bx + 14, by + 19, bw - 28, TEXT_DIM);
         hit(bx, by, bw, bh, () -> soundDone = true);
         int btY = by + 31;
         smallButton(g, mx, my, "pr.yes", bx + bw - 136, btY, 60, 14, "CÓ", true, () -> {
@@ -1228,20 +1284,20 @@ public class XlrwScreen extends Screen {
             int bw = (fw - 6) / 2;
             bigButton(g, mx, my, "lg.login", fx, y + 98, bw, 18, "ĐĂNG NHẬP", RED, INK, () -> doLogin(false));
             bigButton(g, mx, my, "lg.reg", fx + bw + 6, y + 98, bw, 18, "ĐĂNG KÝ", TEAL, CREAM, () -> doLogin(true));
-            g.drawString(font, "Không đăng nhập vẫn dùng bình thường.", fx, y + h - 14, alpha(TEXT_DIM, 0.8f), false);
+            fitString(g, "Không đăng nhập vẫn dùng được.", fx, y + h - 14, fw, alpha(TEXT_DIM, 0.8f));
         } else {
             // avatar + name
             chamfer(g, fx, y + 32, 26, 26, 5, RED);
             net.minecraft.resources.ResourceLocation av = acc.avatar();
             if (av != null) com.xlrw.compat.GuiCompat.blitTex(g, av, fx + 2, y + 34, 22, 22, 0, 0, 64, 64, 64, 64);
             else g.drawString(font, "X", fx + 10, y + 41, INK, false);
-            g.drawString(font, trim(acc.username(), 16), fx + 34, y + 34, CREAM, false);
+            fitString(g, acc.username(), fx + 34, y + 34, fw - 34, CREAM);
             boolean plus = acc.isPlus();
             if (plus) {
                 String d = new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date(acc.plusUntil()));
                 skewRect(g, fx + 34, y + 46, font.width("PLUS") + 8, 10, 3, GOLD);
                 g.drawString(font, "PLUS", fx + 38, y + 47, INK, false);
-                g.drawString(font, "đến " + d, fx + 34 + font.width("PLUS") + 12, y + 47, GOLD, false);
+                fitString(g, "đến " + d, fx + 34 + font.width("PLUS") + 12, y + 47, fw - 34 - font.width("PLUS") - 12, GOLD);
             } else {
                 g.drawString(font, "Bản thường", fx + 34, y + 47, TEXT_DIM, false);
             }
@@ -1271,13 +1327,13 @@ public class XlrwScreen extends Screen {
                            boolean secret, long now) {
         boolean f = id.equals(focus);
         float hv = hover("tf." + id, mx, my, x, y + 10, w, 16);
-        g.drawString(font, label, x, y, f ? RED : TEXT_DIM, false);
+        fitString(g, label, x, y, w, f ? RED : TEXT_DIM);
         chamfer(g, x, y + 10, w, 16, 4, f ? 0xFF2F3644 : lerpColor(0xFF22262F, TEAL, hv));
         g.fill(x + 4, y + 25, x + w, y + 26, f ? RED : alpha(RED_DIM, 0.8f));
         String v = field(id).toString();
         String shown = secret ? "•".repeat(v.length()) : v;
         while (font.width(shown) > w - 14 && shown.length() > 0) shown = shown.substring(1);
-        if (v.isEmpty() && !f) g.drawString(font, hint, x + 6, y + 14, alpha(TEXT_DIM, 0.6f), false);
+        if (v.isEmpty() && !f) fitString(g, hint, x + 6, y + 14, w - 12, alpha(TEXT_DIM, 0.6f));
         else g.drawString(font, shown, x + 6, y + 14, CREAM, false);
         if (f && (now / 500) % 2 == 0) {
             int cxp = x + 6 + font.width(shown);
@@ -1396,7 +1452,7 @@ public class XlrwScreen extends Screen {
         liftBegin(g, hv, x, y, w, 20, 5);
         chamfer(g, x, y, w, 20, 5, lerpColor(TEAL, TEAL_HI, hv));
         if (k > 0.01f) g.fill(x + 5, y + 18, x + 5 + (int) ((w - 5) * k), y + 19, RED); // underline grows when on
-        g.drawString(font, text, x + 7, y + 6, lerpColor(TEXT_DIM, RED, Math.max(k, hv * 0.6f)), false);
+        fitString(g, text, x + 7, y + 6, w - 7 - 34 - toggleReserve, lerpColor(TEXT_DIM, RED, Math.max(k, hv * 0.6f)));
         // switch
         int sw = 22, sx = x + w - sw - 6, sy = y + 6;
         g.fill(sx, sy, sx + sw, sy + 8, lerpColor(0xFF2B2F3A, RED_DEEP, k));
@@ -1418,7 +1474,7 @@ public class XlrwScreen extends Screen {
         chamfer(g, x, y, w, h, 6, lerpColor(bg, brighten(bg), hv));
         // hover sweep
         if (hv > 0.02f) g.fill(x + 6, y + h - 2, x + 6 + (int) ((w - 8) * hv), y + h - 1, fg);
-        g.drawCenteredString(font, text, x + w / 2, y + (h - 8) / 2, fg);
+        fitCentered(g, text, x + w / 2, y + (h - 8) / 2, w - 8, fg);
         liftEnd(g);
         hit(x, y, w, h, r);
     }
@@ -1428,7 +1484,7 @@ public class XlrwScreen extends Screen {
         int bg = active ? RED : lerpColor(TEAL, TEAL_HI, hv);
         liftBegin(g, hv, x, y, w, h, 4);
         chamfer(g, x, y, w, h, 4, bg);
-        g.drawCenteredString(font, text, x + w / 2, y + (h - 8) / 2, active ? INK : lerpColor(TEXT_DIM, RED, hv));
+        fitCentered(g, text, x + w / 2, y + (h - 8) / 2, w - 4, active ? INK : lerpColor(TEXT_DIM, RED, hv));
         liftEnd(g);
         hit(x, y, w, h, r);
     }
@@ -1460,6 +1516,7 @@ public class XlrwScreen extends Screen {
     }
 
     private void label(GuiGraphics g, int x, int y, String s) {
+        if (font.width(s) > cw) s = trimToWidth(s, cw);
         skewRect(g, x, y, 4, 8, 2, RED);
         g.drawString(font, s, x + 7, y, CREAM, false);
     }
@@ -1475,13 +1532,21 @@ public class XlrwScreen extends Screen {
     }
 
     private void drawTooltip(GuiGraphics g, int mx, int my, String text) {
-        int w = font.width(text) + 10, h = 14;
-        int x = Math.min(mx + 8, width - w - 2), y = Math.max(2, my - 16);
+        int maxW = Math.min(200, width - 14);
+        var lines = font.split(Component.literal(text), maxW);
+        int tw = 0;
+        for (var l : lines) tw = Math.max(tw, font.width(l));
+        int w = tw + 10, h = lines.size() * 10 + 4;
+        int x = Mth.clamp(mx + 8, 2, width - w - 2), y = Mth.clamp(my - 6 - h, 2, height - h - 2);
         com.xlrw.compat.GuiCompat.push(g);
         com.xlrw.compat.GuiCompat.translate(g, 0, 0, 400);
         chamfer(g, x, y, w, h, 3, 0xF0201418);
         g.fill(x, y + h - 1, x + w, y + h, RED);
-        g.drawString(font, text, x + 5, y + 3, 0xFFFFC9C4, false);
+        int ly = y + 3;
+        for (var l : lines) {
+            g.drawString(font, l, x + 5, ly, 0xFFFFC9C4, false);
+            ly += 10;
+        }
         com.xlrw.compat.GuiCompat.pop(g);
     }
 
@@ -1737,6 +1802,30 @@ public class XlrwScreen extends Screen {
             g.fill(x + w - cut + i, y + i, x + w - cut + i + 1, y + i + 1, color);   // top-right diagonal
             g.fill(x + i, y + h - cut + i, x + i + 1, y + h - cut + i + 1, color);   // bottom-left diagonal
         }
+    }
+
+    /** Draws text no wider than maxW: shrinks it a little first, then cuts it with "…". */
+    private void fitString(GuiGraphics g, String s, int x, int y, int maxW, int color) {
+        int tw = font.width(s);
+        if (tw <= maxW || maxW <= 8) {
+            g.drawString(font, s, x, y, color, false);
+            return;
+        }
+        float k = maxW / (float) tw;
+        if (k < 0.75f) {
+            s = trimToWidth(s, (int) (maxW / 0.75f));
+            k = Math.min(1f, maxW / (float) font.width(s));
+        }
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, x, y + (1f - k) * 4f, 0);
+        com.xlrw.compat.GuiCompat.scale(g, k, k, 1f);
+        g.drawString(font, s, 0, 0, color, false);
+        com.xlrw.compat.GuiCompat.pop(g);
+    }
+
+    private void fitCentered(GuiGraphics g, String s, int centerX, int y, int maxW, int color) {
+        int w = Math.min(font.width(s), maxW);
+        fitString(g, s, centerX - w / 2, y, maxW, color);
     }
 
     private void drawRight(GuiGraphics g, String s, int rightX, int y, int color) {
