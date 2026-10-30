@@ -37,9 +37,9 @@ public final class AccountManager {
     private static final AccountManager INSTANCE = new AccountManager();
 
     /** Server address (overridable with "accountServer" in config/xlrw.json). */
-    public static final String DEFAULT_SERVER = "https://xlrw-api.CHANGE-ME.workers.dev";
+    public static final String DEFAULT_SERVER = "https://xlrw-api.lagxlr8.workers.dev";
     /** ECDSA P-256 public key of the server (X.509 / SPKI, base64). Entitlements not signed by it are ignored. */
-    public static final String PUBLIC_KEY = "CHANGE-ME";
+    public static final String PUBLIC_KEY = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAETLnjNkaTJi0eD64fnAub66hAluPAruLehlwNf9XP7ajRTXoKq6GOtOIQ718g8qX2vVJySEaOjgJK1kcok1k+1g==";
 
     private static final long REFRESH_MS = 60_000;
     /** How long a signed entitlement stays valid without a fresh one (server unreachable for a short while). */
