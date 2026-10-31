@@ -46,6 +46,12 @@ public class StationPlanner {
     private static final int FLOOD_NODES = 10000;
     private static final int FLOOD_RADIUS = 40;
     private static final int MAX_TOWER_HEIGHT = 24;
+    /** Cost bonus per OTHER unfinished block that can also be done from a station (ground / tower top). */
+    private static final double COVER_WEIGHT_GROUND = 1.2;
+    private static final double COVER_WEIGHT_TOWER = 3.0;
+    private static final int COVER_CAP = 40;
+    /** Ground stations per anchor whose coverage is evaluated (the cheapest by walking cost). */
+    private static final int GROUND_COVER_CANDIDATES = 6;
 
     public enum Kind { PLACE, INTERACT, FLUID, BREAK }
 
@@ -477,7 +483,7 @@ public class StationPlanner {
         List<Anchor> noGroundStation = new ArrayList<>();
         for (Anchor anchor : anchors) {
             if (tried++ >= MAX_ANCHORS_TRIED || withStation >= ANCHORS_WITH_STATION_TO_COMPARE) break;
-            Choice c = findGroundStation(level, player, anchor, reach);
+            Choice c = findGroundStation(level, player, anchor, reach, anchors);
             if (c == null) {
                 if (noGroundStation.size() < MAX_TOWER_ANCHORS) noGroundStation.add(anchor);
                 continue;
@@ -502,7 +508,7 @@ public class StationPlanner {
             int scaffoldCount = player.isCreative() ? 999 : countItem(player, Items.SCAFFOLDING);
             Choice bestTower = null;
             for (Anchor anchor : noGroundStation) {
-                Choice c = findTowerStation(level, player, schematic, anchor, reach, scaffoldCount);
+                Choice c = findTowerStation(level, player, schematic, anchor, reach, scaffoldCount, anchors);
                 if (c != null && (bestTower == null || c.cost < bestTower.cost)) {
                     bestTower = c;
                 }
@@ -655,7 +661,8 @@ public class StationPlanner {
     // Ground station search
     // ------------------------------------------------------------------------------------------------
 
-    private Choice findGroundStation(ClientLevel level, LocalPlayer player, Anchor anchor, LocalPathfinder.Reachability reach) {
+    private Choice findGroundStation(ClientLevel level, LocalPlayer player, Anchor anchor, LocalPathfinder.Reachability reach,
+                                     List<Anchor> all) {
         BuilderConfig config = BuilderConfig.getInstance();
         // Slightly shorter than the real reach so the placer (which uses the full reach) always agrees
         double reachDist = Math.max(2.5, config.reachDistance - 0.3);
@@ -665,8 +672,9 @@ public class StationPlanner {
         BlockPos anchorPos = anchor.pos;
         Vec3 anchorCenter = Vec3.atCenterOf(anchorPos);
 
-        BlockPos bestFeet = null;
-        double bestCost = Double.MAX_VALUE;
+        // feet -> cost, all valid stations (coverage is evaluated afterwards on the cheapest few only)
+        List<Map.Entry<BlockPos, Double>> found = new ArrayList<>();
+        double bestCost = Double.MAX_VALUE; // cheapest so far, only used to prune hopeless cells early
         boolean oriented = anchor.kind == Kind.PLACE && BuildRules.hasOrientation(anchor.expected);
         int playerFeetY = (int) Math.floor(player.getY() + 0.01);
 
@@ -678,7 +686,8 @@ public class StationPlanner {
                     // Cheapest checks first: must be a reachable standing cell
                     double walk = reach.costTo(feet);
                     if (walk == Double.MAX_VALUE) continue;
-                    if (walk >= bestCost) continue;
+                    // a station may still win on coverage, so keep anything up to a few blocks of extra walking
+                    if (walk >= bestCost + 8.0) continue;
 
                     // Never stand inside / directly on top of the block we want to build
                     if (dx == 0 && dz == 0 && anchorPos.getY() <= feet.getY() + 1 && anchorPos.getY() >= feet.getY() - 1) continue;
@@ -714,15 +723,46 @@ public class StationPlanner {
                     // Facing-sensitive blocks (observer, piston, stairs...): the result must not change if the bot
                     // stops a little off-centre. Spots on a facing boundary get a big penalty.
                     if (oriented && !robustFrom(level, player, anchor, eye, reachDist)) cost += 25.0;
-                    if (cost < bestCost) {
-                        bestCost = cost;
-                        bestFeet = feet.immutable();
-                    }
+                    found.add(new AbstractMap.SimpleEntry<>(feet.immutable(), cost));
+                    if (cost < bestCost) bestCost = cost;
                 }
             }
         }
-        if (bestFeet == null) return null;
-        return new Choice(anchor, bestFeet, bestCost, null, null, 0);
+        if (found.isEmpty()) return null;
+        found.sort(Map.Entry.comparingByValue());
+        BlockPos bestFeet = null;
+        double bestAdj = Double.MAX_VALUE;
+        for (int i = 0; i < Math.min(GROUND_COVER_CANDIDATES, found.size()); i++) {
+            BlockPos feet = found.get(i).getKey();
+            Vec3 eye = new Vec3(feet.getX() + 0.5, feet.getY() + 1.62, feet.getZ() + 0.5);
+            double adj = found.get(i).getValue() - coverage(level, player, eye, all, anchor, reachDist) * COVER_WEIGHT_GROUND;
+            if (adj < bestAdj) {
+                bestAdj = adj;
+                bestFeet = feet;
+            }
+        }
+        return new Choice(anchor, bestFeet, bestAdj, null, null, 0);
+    }
+
+    /**
+     * How many OTHER unfinished blocks could also be done from this eye position. A station / tower top that covers
+     * a whole patch of work beats one that is a little closer but only reaches its own block - that was the
+     * "climb up, place one block, climb down, build the next tower" loop.
+     */
+    private int coverage(ClientLevel level, LocalPlayer player, Vec3 eye, List<Anchor> all, Anchor self, double reach) {
+        if (all == null) return 0;
+        double r2 = (reach + 0.5) * (reach + 0.5);
+        int n = 0;
+        for (Anchor a : all) {
+            if (a == self || a.kind == Kind.FLUID) continue;
+            if (eye.distanceToSqr(Vec3.atCenterOf(a.pos)) > r2) continue;
+            BlockPos feet = BlockPos.containing(eye.x, eye.y - 1.62, eye.z);
+            if (a.pos.equals(feet) || a.pos.equals(feet.above())) continue; // would be inside the player
+            if (canActFrom(level, player, a, eye, reach)) {
+                if (++n >= COVER_CAP) break;
+            }
+        }
+        return n;
     }
 
     /** True if the action also works from 4 eye positions 0.25 off the station centre (and when crouching). */
@@ -743,8 +783,10 @@ public class StationPlanner {
             return PlacementFinder.canPlaceFluidFrom(level, player, pos, anchor.expected, eye, reach);
         }
 
-        // Interact / break: the target block must be visible from here
-        return PlacementFinder.findInteractPoint(level, player, eye, pos, reach * reach) != null;
+        // Interact / break: the target block must be visible from here (anywhere mode: in reach is enough)
+        if (PlacementFinder.findInteractPoint(level, player, eye, pos, reach * reach) != null) return true;
+        return anchor.kind == Kind.INTERACT && PlacementFinder.throughWallAnywhere()
+                && eye.distanceToSqr(Vec3.atCenterOf(pos)) <= reach * reach;
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -765,7 +807,7 @@ public class StationPlanner {
     }
 
     private Choice findTowerStation(ClientLevel level, LocalPlayer player, Schematic schematic, Anchor anchor,
-                                    LocalPathfinder.Reachability reach, int scaffoldCount) {
+                                    LocalPathfinder.Reachability reach, int scaffoldCount, List<Anchor> all) {
         BuilderConfig config = BuilderConfig.getInstance();
         double reachDist = Math.max(2.5, config.reachDistance - 0.3);
         double reachSq = reachDist * reachDist;
@@ -855,6 +897,9 @@ public class StationPlanner {
                     // Reuse strongly: every existing piece saves a placement and the walk to a new base
                     double cost = accessCost + toPlace * 1.5 + height * 0.8 - Math.min(existing, 12) * 2.5
                             + (existing == 0 ? 6.0 : 0.0);
+                    // A top that reaches a whole patch of the layer (or lets the bot step onto it) beats one that
+                    // only reaches this single block
+                    cost -= coverage(level, player, eye, all, anchor, reachDist) * COVER_WEIGHT_TOWER;
                     if (best == null || cost < best.cost) {
                         best = new Choice(anchor, top, cost, base, stand, elev);
                     }

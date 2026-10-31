@@ -92,6 +92,29 @@ public class SchematicRenderer {
         for (BlockPos chestPos : config.getChestPositions()) {
             LevelRenderer.renderLineBox(ps, lines, new AABB(chestPos).inflate(0.01), 0.91f, 0.85f, 0.79f, 0.8f);
         }
+        // 4b. Dry run markers: stuck blocks (red), scaffolding towers (yellow), standing spots (cyan)
+        com.xlrw.builder.DryRun.Report dry = com.xlrw.builder.DryRun.get();
+        if (dry != null && config.renderDryRun && editor == null) {
+            float pulse = 0.6f + 0.4f * (float) Math.sin(now * 0.008);
+            for (BlockPos p : dry.problems.keySet()) {
+                if (p.distToCenterSqr(cam) > 96 * 96) continue;
+                LevelRenderer.renderLineBox(ps, lines, new AABB(p).inflate(0.04), 1.0f, 0.15f, 0.15f, pulse);
+            }
+            for (BlockPos p : dry.floatingWarnings) {
+                if (p.distToCenterSqr(cam) > 96 * 96) continue;
+                LevelRenderer.renderLineBox(ps, lines, new AABB(p).inflate(0.02), 1.0f, 0.6f, 0.1f, 0.8f);
+            }
+            for (com.xlrw.builder.DryRun.Tower t : dry.towers) {
+                if (t.base.distToCenterSqr(cam) > 128 * 128) continue;
+                LevelRenderer.renderLineBox(ps, lines, new AABB(t.base.getX() + 0.15, t.base.getY(), t.base.getZ() + 0.15,
+                        t.base.getX() + 0.85, t.topY, t.base.getZ() + 0.85), 1.0f, 0.85f, 0.1f, 0.9f);
+            }
+            for (BlockPos p : dry.stations) {
+                if (p.distToCenterSqr(cam) > 64 * 64) continue;
+                LevelRenderer.renderLineBox(ps, lines, new AABB(p.getX() + 0.35, p.getY(), p.getZ() + 0.35,
+                        p.getX() + 0.65, p.getY() + 0.1, p.getZ() + 0.65), 0.2f, 0.85f, 1.0f, 0.7f);
+            }
+        }
         flush(consumers, RenderType.lines());
 
         // 5. Editor gizmo, always on top
