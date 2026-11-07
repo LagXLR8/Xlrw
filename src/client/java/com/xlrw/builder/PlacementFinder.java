@@ -911,6 +911,11 @@ public class PlacementFinder {
             if (neighborState.isAir() || neighborState.canBeReplaced() || BuildRules.isLiquid(neighborState)) {
                 continue;
             }
+            // ...and one the server has CONFIRMED: a block still waiting for its answer may be refused, and then the
+            // server would put this block into that empty cell instead
+            if (BuilderController.getInstance().isUnconfirmed(neighborPos)) {
+                continue;
+            }
 
             Direction clickFace = dir.getOpposite();
 

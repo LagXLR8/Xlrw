@@ -130,6 +130,20 @@ public class BuilderController {
             return;
         }
 
+        // A container screen that popped up right after one of the bot's own clicks (crafting table, furnace,
+        // hopper... clicked by mistake): close it and carry on instead of pausing forever
+        if (BuilderConfig.getInstance().enabled
+                && mc.screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?>
+                && !(mc.screen instanceof net.minecraft.client.gui.screens.inventory.InventoryScreen)
+                && !(mc.screen instanceof net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen)
+                && printerState != PrinterState.REFILLING_CHEST && printerState != PrinterState.TRAVELING_TO_CHEST
+                && ServerSafe.screenOpenedByBot()) {
+            player.closeContainer();
+            currentCandidate = null;
+            nextActionTime = System.currentTimeMillis() + 150;
+            return;
+        }
+
         // If the player opened a user screen (inventory, chat, pause, mod screen, etc.)
         // Pause all builder actions so the player has 100% full control without any interference!
         // Inventory open: keep working (unless disabled or the player is holding an item on the cursor -
@@ -1808,6 +1822,11 @@ public class BuilderController {
                 && !BuildRules.hasOrientation(c.requiredState) && !BuildRules.isLiquid(c.requiredState);
     }
 
+    /** Block the bot clicked but the server has not confirmed yet (only the client's prediction shows it). */
+    public boolean isUnconfirmed(BlockPos pos) {
+        return inFlightContains(pos) || (pos != null && pos.equals(pendingPlacementPos));
+    }
+
     private boolean inFlightContains(BlockPos pos) {
         if (pos == null) return false;
         for (InFlight f : inFlight) if (f.pos().equals(pos)) return true;
@@ -1872,6 +1891,7 @@ public class BuilderController {
         if (player.input != null) com.xlrw.compat.InputCompat.shiftKeyDown(player, down);
     }
 
+    private long lastClickMs = 0;
     private long lastThroughWallAt = 0;
     private BlockPos rotSyncPos = null;
     private float rotSyncYaw, rotSyncPitch;
@@ -1889,7 +1909,8 @@ public class BuilderController {
                 currentCandidate = null;
                 return;
             }
-            if (ServerSafe.paused() || !ServerSafe.readyToAct(player)) {
+            boolean ready = pipelined(candidate) ? !ServerSafe.recentSetback(350) : ServerSafe.readyToAct(player);
+            if (ServerSafe.paused() || !ready) {
                 PrinterMovement.stop(mc);
                 if (candidate.requiresSneak) holdSneakKey(mc, player, true);
                 nextActionTime = System.currentTimeMillis() + 50;
@@ -1941,11 +1962,24 @@ public class BuilderController {
         }
 
         // 2. Synchronize view rotation before action
+        Vec3 clickVec = candidate.hitVec;
         if (safe) {
             // Look EXACTLY at the hit point with the real camera and click only once vanilla has already sent that
             // rotation to the server (next tick). No extra rotation packets -> nothing for an anti-cheat to flag,
             // and the server checks the click against the rotation it really has.
-            boolean synced = ServerSafe.faceForClick(player, candidate.targetYaw, candidate.targetPitch);
+            // aim from where we stand NOW (we may still be drifting a little)
+            float[] aimNow = pipelined(candidate) ? HumanAim.calculateRotations(player.getEyePosition(), candidate.hitVec)
+                    : new float[]{candidate.targetYaw, candidate.targetPitch};
+            boolean synced = ServerSafe.faceForClick(player, aimNow[0], aimNow[1]);
+            if (pipelined(candidate)) {
+                // Plain block: the exact angle does not matter, only that the rotation the server ALREADY has hits
+                // the face we click. Then click exactly where that ray lands - what a real click would send.
+                Vec3 ray = ServerSafe.serverRayHit(player, mc.level, candidate.neighborPos, candidate.clickFace, com.xlrw.account.Plus.reach() + 0.3);
+                if (ray != null) {
+                    synced = true;
+                    clickVec = ray;
+                }
+            }
             // Sneak (click against a chest / door...): the server must know we sneak BEFORE the click arrives
             boolean sneakReady = true;
             if (candidate.requiresSneak) {
@@ -2041,7 +2075,7 @@ public class BuilderController {
                 || candidate.type == PlacementCandidate.Type.BUCKET_FILL) {
             hitResult = new BlockHitResult(candidate.hitVec, candidate.clickFace, candidate.targetPos, false);
         } else {
-            hitResult = new BlockHitResult(candidate.hitVec, candidate.clickFace, candidate.neighborPos, false);
+            hitResult = new BlockHitResult(clickVec, candidate.clickFace, candidate.neighborPos, false);
         }
 
         // 4b. Last check for facing-sensitive blocks: simulate EXACTLY what is about to be sent (rotation + hit).
@@ -2093,8 +2127,11 @@ public class BuilderController {
             player.connection.send(com.xlrw.compat.MC.sneakPacket(player, true));
         }
         player.swing(hand);
+        long clickNow = System.currentTimeMillis();
+        long gap = lastClickMs > 0 ? clickNow - lastClickMs : -1;
+        lastClickMs = clickNow;
         XlrwDebug.logBuildAttempt(candidate.targetPos, candidate.requiredState.getBlock().getName().getString(),
-                "Type=" + candidate.type + " face=" + candidate.clickFace + " targetOn=" + (candidate.type == PlacementCandidate.Type.ADJUST || candidate.type == PlacementCandidate.Type.STACK || candidate.type == PlacementCandidate.Type.WATERLOG || candidate.type == PlacementCandidate.Type.BUCKET_FILL ? candidate.targetPos.toShortString() : candidate.neighborPos.toShortString()) + " result=" + useResult);
+                "gap=" + gap + "ms inflight=" + inFlight.size() + " Type=" + candidate.type + " face=" + candidate.clickFace + " targetOn=" + (candidate.type == PlacementCandidate.Type.ADJUST || candidate.type == PlacementCandidate.Type.STACK || candidate.type == PlacementCandidate.Type.WATERLOG || candidate.type == PlacementCandidate.Type.BUCKET_FILL ? candidate.targetPos.toShortString() : candidate.neighborPos.toShortString()) + " result=" + useResult);
 
         // 6. Release sneak (unless we stand at an edge: then anti-fall keeps it held)
         if (candidate.requiresSneak && !PrinterMovement.isNearDangerousEdge(mc.level, player)) {

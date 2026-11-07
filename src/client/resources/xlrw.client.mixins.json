@@ -6,7 +6,8 @@
 		"LocalPlayerAccessor",
 		"ClientLevelAccessor",
 		"ClientLevelMixin",
-		"ClientPacketListenerMixin"
+		"ClientPacketListenerMixin",
+		"MultiPlayerGameModeMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

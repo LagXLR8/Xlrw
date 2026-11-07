@@ -111,9 +111,18 @@ public class PrinterMovement {
         boolean offPath = currentPath != null && pathIndex < currentPath.size()
                 && currentPath.get(pathIndex).distSqr(startCell) > 8.0 && player.onGround();
         boolean stuckRepath = stuckTicks >= 20 && now - lastPathCalcTime > 1000;
-        boolean needPath = goalChanged || currentPath == null || offPath || stuckRepath
+        // A block was just placed on the route (the bot builds the layer it walks on): re-plan right away
+        boolean pathBlocked = false;
+        if (currentPath != null && now - lastPathCalcTime > 250) {
+            for (int i = pathIndex; i < Math.min(currentPath.size(), pathIndex + 3) && !pathBlocked; i++) {
+                BlockPos c = currentPath.get(i);
+                pathBlocked = (!LocalPathfinder.isPassable(level, c) && !LocalPathfinder.isScaffold(level, c))
+                        || (!LocalPathfinder.isPassable(level, c.above()) && !LocalPathfinder.isScaffold(level, c.above()));
+            }
+        }
+        boolean needPath = goalChanged || currentPath == null || offPath || stuckRepath || pathBlocked
                 || (pathIsPartial && pathIndex >= currentPath.size() - 2);
-        if (needPath && (goalChanged || stuckRepath || now - lastPathCalcTime > 500)) {
+        if (needPath && (goalChanged || pathBlocked || stuckRepath || now - lastPathCalcTime > 500)) {
             lastPathCalcTime = now;
             lastGoal = goalBlock;
             List<BlockPos> path = LocalPathfinder.findPath(level, startCell, goalBlock, PATH_NODES);
@@ -264,6 +273,10 @@ public class PrinterMovement {
         boolean sneak = false;
         boolean jump = false;
         int allowedDrop = wpDy < 0 ? (int) -wpDy : 0;
+        // Standing on the rim of a block (centre over air) the start cell is snapped one block down, so the path
+        // looks flat although stepping to the waypoint IS a 1-block drop: measure from where we really stand
+        int realDy = wpBlock.getY() - Mth.floor(player.getY() + 0.01);
+        if (realDy < 0) allowedDrop = Math.max(allowedDrop, -realDy);
         if (player.onGround() && !feetInScaffold && !onWaypoint) {
             BlockPos probe = BlockPos.containing(player.getX() + moveX * 0.55, player.getY() + 0.01, player.getZ() + moveZ * 0.55);
             // Stepping onto / into a scaffolding column is never a ledge. (While sneaking, scaffolding has NO top
