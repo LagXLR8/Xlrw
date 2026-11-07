@@ -1,5 +1,6 @@
 package com.xlrw.printer;
 
+import com.xlrw.builder.ServerSafe;
 import com.xlrw.builder.BuildRules;
 import com.xlrw.builder.InventoryHelper;
 import com.xlrw.debug.XlrwDebug;
@@ -133,15 +134,15 @@ public class SneakBridgeHelper {
         float targetPitch = (float) (-(Mth.atan2(dY, distXZ) * (180.0 / Math.PI)));
         targetPitch = Mth.clamp(targetPitch, 65.0f, 85.0f);
 
-        // Sync view angles to client and send server rotation packet
-        player.setYRot(targetYaw);
-        player.setXRot(targetPitch);
-        player.connection.send(new ServerboundMovePlayerPacket.Rot(targetYaw, targetPitch, player.onGround()));
+        // Turn the real camera (server-safe: the click waits until the server has this rotation)
+        boolean rotSynced = ServerSafe.faceForClick(player, targetYaw, targetPitch);
 
         // 5. Gently steer toward the block edge while sneak is locked
         double edgeTargetX = currentSupport.getX() + 0.5 + bridgeDir.getStepX() * 0.42;
         double edgeTargetZ = currentSupport.getZ() + 0.5 + bridgeDir.getStepZ() * 0.42;
         steerTowardsEdge(mc, player, edgeTargetX, edgeTargetZ, 0.05);
+
+        if (!rotSynced) return true; // click next tick
 
         // 6. Execute place action (right click side face)
         BlockHitResult hitResult = new BlockHitResult(hitVec, clickFace, currentSupport, false);

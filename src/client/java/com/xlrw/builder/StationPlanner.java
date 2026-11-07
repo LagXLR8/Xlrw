@@ -614,7 +614,7 @@ public class StationPlanner {
                 if (!player.isCreative() && !InventoryHelper.hasItem(player, item)) continue;
                 // Nothing to place against yet: part of a floating section, handled by support columns
                 // (with Air Place on, such blocks are placed directly in the air instead)
-                if (!config.airPlace && !BuilderController.hasSolidNeighbor(level, pos)) {
+                if (!config.airPlaceOn() && !BuilderController.hasSolidNeighbor(level, pos)) {
                     lastFloating.add(pos.immutable());
                     continue;
                 }
@@ -665,7 +665,7 @@ public class StationPlanner {
                                      List<Anchor> all) {
         BuilderConfig config = BuilderConfig.getInstance();
         // Slightly shorter than the real reach so the placer (which uses the full reach) always agrees
-        double reachDist = Math.max(2.5, config.reachDistance - 0.3);
+        double reachDist = Math.max(2.5, config.reach() - 0.3);
         double reachSq = reachDist * reachDist;
         int range = (int) Math.ceil(reachDist);
 
@@ -809,7 +809,7 @@ public class StationPlanner {
     private Choice findTowerStation(ClientLevel level, LocalPlayer player, Schematic schematic, Anchor anchor,
                                     LocalPathfinder.Reachability reach, int scaffoldCount, List<Anchor> all) {
         BuilderConfig config = BuilderConfig.getInstance();
-        double reachDist = Math.max(2.5, config.reachDistance - 0.3);
+        double reachDist = Math.max(2.5, config.reach() - 0.3);
         double reachSq = reachDist * reachDist;
         Vec3 anchorCenter = Vec3.atCenterOf(anchor.pos);
 

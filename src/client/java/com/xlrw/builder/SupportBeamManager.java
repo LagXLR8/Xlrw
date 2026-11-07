@@ -302,12 +302,11 @@ public class SupportBeamManager {
             // Base scaffolding block doesn't exist yet: place it on the top face of ground!
             Vec3 hitVec = new Vec3(basePos.getX() + 0.5, ground.getY() + 1.0, basePos.getZ() + 0.5);
             float[] rots = HumanAim.calculateRotations(player.getEyePosition(), hitVec);
-            player.setYRot(rots[0]);
-            player.setXRot(rots[1]);
-            player.connection.send(new ServerboundMovePlayerPacket.Rot(rots[0], rots[1], player.onGround()));
-
             mc.options.keyShift.setDown(false);
             if (player.input != null) player.input.shiftKeyDown = false;
+            if (!ServerSafe.faceForClick(player, rots[0], rots[1]) || !ServerSafe.sneakSynced(player, false) && ServerSafe.enabled()) {
+                return true; // server-safe: click next tick once the server has this rotation
+            }
 
             BlockHitResult bhr = new BlockHitResult(hitVec, Direction.UP, ground, false);
             mc.gameMode.useItemOn(player, InteractionHand.MAIN_HAND, bhr);
@@ -328,12 +327,11 @@ public class SupportBeamManager {
             );
 
             float[] rots = HumanAim.calculateRotations(player.getEyePosition(), hitVec);
-            player.setYRot(rots[0]);
-            player.setXRot(rots[1]);
-            player.connection.send(new ServerboundMovePlayerPacket.Rot(rots[0], rots[1], player.onGround()));
-
             mc.options.keyShift.setDown(false);
             if (player.input != null) player.input.shiftKeyDown = false;
+            if (!ServerSafe.faceForClick(player, rots[0], rots[1]) || !ServerSafe.sneakSynced(player, false) && ServerSafe.enabled()) {
+                return true; // server-safe: click next tick once the server has this rotation
+            }
 
             BlockHitResult bhr = new BlockHitResult(hitVec, sideFace, basePos, false);
             mc.gameMode.useItemOn(player, InteractionHand.MAIN_HAND, bhr);
@@ -408,12 +406,11 @@ public class SupportBeamManager {
 
         Vec3 hitVec = new Vec3(prev.getX() + 0.5, prev.getY() + 1.0, prev.getZ() + 0.5);
         float[] rots = HumanAim.calculateRotations(player.getEyePosition(), hitVec);
-        player.setYRot(rots[0]);
-        player.setXRot(rots[1]);
-        player.connection.send(new ServerboundMovePlayerPacket.Rot(rots[0], rots[1], player.onGround()));
-
         mc.options.keyShift.setDown(false);
         if (player.input != null) player.input.shiftKeyDown = false;
+        if (!ServerSafe.faceForClick(player, rots[0], rots[1]) || !ServerSafe.sneakSynced(player, false) && ServerSafe.enabled()) {
+            return true; // server-safe: click next tick once the server has this rotation
+        }
 
         BlockHitResult bhr = new BlockHitResult(hitVec, Direction.UP, prev, false);
         mc.gameMode.useItemOn(player, InteractionHand.MAIN_HAND, bhr);
@@ -501,12 +498,11 @@ public class SupportBeamManager {
         );
 
         float[] rots = HumanAim.calculateRotations(player.getEyePosition(), hitVec);
-        player.setYRot(rots[0]);
-        player.setXRot(rots[1]);
-        player.connection.send(new ServerboundMovePlayerPacket.Rot(rots[0], rots[1], player.onGround()));
-
         mc.options.keyShift.setDown(false);
         if (player.input != null) player.input.shiftKeyDown = false;
+        if (!ServerSafe.faceForClick(player, rots[0], rots[1]) || !ServerSafe.sneakSynced(player, false) && ServerSafe.enabled()) {
+            return true; // server-safe: click next tick once the server has this rotation
+        }
 
         BlockHitResult bhr = new BlockHitResult(hitVec, clickFace, prev, false);
         mc.gameMode.useItemOn(player, InteractionHand.MAIN_HAND, bhr);
