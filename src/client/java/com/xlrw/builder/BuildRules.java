@@ -195,6 +195,7 @@ public final class BuildRules {
     public static boolean isInteractable(BlockState state) {
         Block b = state.getBlock();
         if (b instanceof BaseEntityBlock) return true; // chests, furnaces, hoppers, signs, beds, barrels, lecterns...
+        if (ServerSafe.isLearnedInteractable(b)) return true; // opened a screen when the bot clicked it once
         return b instanceof DoorBlock || b instanceof TrapDoorBlock || b instanceof FenceGateBlock
                 || b instanceof ButtonBlock || b instanceof LeverBlock || b instanceof DiodeBlock
                 || b instanceof NoteBlock || b instanceof BedBlock || b instanceof CakeBlock

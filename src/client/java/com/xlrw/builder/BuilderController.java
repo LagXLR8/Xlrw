@@ -130,6 +130,20 @@ public class BuilderController {
             return;
         }
 
+        // A container screen that popped up right after one of the bot's own clicks (crafting table, furnace,
+        // hopper... clicked by mistake): close it and carry on instead of pausing forever
+        if (BuilderConfig.getInstance().enabled
+                && mc.screen instanceof net.minecraft.client.gui.screens.inventory.AbstractContainerScreen<?>
+                && !(mc.screen instanceof net.minecraft.client.gui.screens.inventory.InventoryScreen)
+                && !(mc.screen instanceof net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen)
+                && printerState != PrinterState.REFILLING_CHEST && printerState != PrinterState.TRAVELING_TO_CHEST
+                && ServerSafe.screenOpenedByBot()) {
+            player.closeContainer();
+            currentCandidate = null;
+            nextActionTime = System.currentTimeMillis() + 150;
+            return;
+        }
+
         // If the player opened a user screen (inventory, chat, pause, mod screen, etc.)
         // Pause all builder actions so the player has 100% full control without any interference!
         // Inventory open: keep working (unless disabled or the player is holding an item on the cursor -
@@ -180,6 +194,7 @@ public class BuilderController {
         // Black-box monitor: status line every second, snapshot + escalation when nothing progresses
         com.xlrw.debug.BotMonitor.tick(mc, player, schematic, this);
         tickFastPending(mc.level);
+        tickInFlight(mc, player);
         ServerSafe.tickWatches(mc.level);
 
         // 0. Scaffold Jump Guard: If executing a multi-tick scaffold jump, let it run exclusively
@@ -214,7 +229,8 @@ public class BuilderController {
         // 2. Check if current layer is complete -> Auto Layer Advance
         if (config.layerMode && config.autoLayer) {
             checkLayerLeftovers(mc, schematic, config.currentLayer);
-            if (isLayerComplete(schematic, config.currentLayer, mc.level)) {
+            // (blocks still waiting for the server's answer only LOOK placed: wait for them before moving on)
+            if (inFlight.isEmpty() && isLayerComplete(schematic, config.currentLayer, mc.level)) {
                 // Remove throw-away bridge/pillar blocks before moving on
                 if (DemolishManager.getInstance().isBreaking()) {
                     DemolishManager.getInstance().tickBreaking(mc, player);
@@ -1790,12 +1806,92 @@ public class BuilderController {
         }
     }
 
+    // ------------------------------------------------------------------------------------------------
+    // Turbo pipeline (server-safe): several clicks may wait for the server's answer at the same time
+    // ------------------------------------------------------------------------------------------------
+
+    private record InFlight(BlockPos pos, BlockState expected, int seq, long sentAt, long timeout) {}
+    private final java.util.ArrayDeque<InFlight> inFlight = new java.util.ArrayDeque<>();
+    private static final int MAX_IN_FLIGHT = 8;
+
+    /** Plain placements (no facing to verify afterwards) don't need to wait for the server before the next click. */
+    private boolean pipelined(PlacementCandidate c) {
+        BuilderConfig config = BuilderConfig.getInstance();
+        return config.serverSafe && config.serverTurbo && c != null
+                && c.type == PlacementCandidate.Type.PLACE && c.item != null
+                && !BuildRules.hasOrientation(c.requiredState) && !BuildRules.isLiquid(c.requiredState);
+    }
+
+    /** Block the bot clicked but the server has not confirmed yet (only the client's prediction shows it). */
+    public boolean isUnconfirmed(BlockPos pos) {
+        return inFlightContains(pos) || (pos != null && pos.equals(pendingPlacementPos));
+    }
+
+    private boolean inFlightContains(BlockPos pos) {
+        if (pos == null) return false;
+        for (InFlight f : inFlight) if (f.pos().equals(pos)) return true;
+        return false;
+    }
+
+    /** Picks the next block right after a click and turns toward it, so it is ready on the very next tick. */
+    private void prefetchNext(Minecraft mc, LocalPlayer player) {
+        PlacementCandidate next = PlacementFinder.findBestCandidate();
+        if (next == null) return;
+        currentCandidate = next;
+        candidateEye = player.getEyePosition();
+        candidateAlignTicks = 0;
+        if (pipelined(next) && next.item != null && player.getMainHandItem().is(next.item)) {
+            ServerSafe.faceForClick(player, next.targetYaw, next.targetPitch);
+        }
+    }
+
+    /** Reads the server's answers to pipelined clicks. */
+    private void tickInFlight(Minecraft mc, LocalPlayer player) {
+        if (inFlight.isEmpty() || mc.level == null) return;
+        long now = System.currentTimeMillis();
+        java.util.Iterator<InFlight> it = inFlight.iterator();
+        while (it.hasNext()) {
+            InFlight f = it.next();
+            boolean acked = ServerSafe.isAcked(mc.level, f.seq());
+            if (!acked && now <= f.timeout()) continue;
+            it.remove();
+            BlockState w = mc.level.getBlockState(f.pos());
+            String name = f.expected().getBlock().getName().getString();
+            boolean ok = w.getBlock() == f.expected().getBlock()
+                    || BuildRules.buildStatus(w, f.expected()) == BuildRules.BuildStatus.DONE;
+            if (ok) {
+                if (!acked) {
+                    XlrwDebug.log("SERVER/NO_ACK", "Không nhận được xác nhận cho " + f.pos().toShortString()
+                            + " sau " + (now - f.sentAt()) + "ms (ping " + ServerSafe.pingMs(mc) + "ms)");
+                }
+                ServerSafe.onAccepted();
+                ServerSafe.watch(f.pos(), f.expected());
+                XlrwDebug.logBuildSuccess(f.pos(), name, "turbo, " + (now - f.sentAt()) + "ms");
+                TaskTracker.getInstance().onSuccess(f.pos());
+                StationPlanner.getInstance().onPlaced(f.pos());
+                lastConfirmedPos = f.pos();
+            } else {
+                ServerSafe.onRejected(f.pos(), name, (acked ? "ack đã về nhưng ô vẫn là " : "không có ack, ô là ")
+                        + w.getBlock().getName().getString()
+                        + (ServerSafe.recentSetback(1500) ? ", vừa bị server kéo lại vị trí" : ""));
+                XlrwDebug.logBuildReject(f.pos(), name, "Turbo: server từ chối (sau " + (now - f.sentAt()) + "ms)");
+                if (TaskTracker.getInstance().getAttempts(f.pos()) >= 2) {
+                    PlacementFinder.recordBadPlacementSpot(f.pos(), player.blockPosition());
+                    TaskTracker.getInstance().blacklist(f.pos(), 3000);
+                }
+                // anything clicked against this cell will be refused too: pause the pipeline a moment
+                nextActionTime = Math.max(nextActionTime, now + 150 + ServerSafe.extraDelayMs());
+            }
+        }
+    }
+
     /** Holds / releases the real sneak key, so vanilla tells the server in its normal movement update. */
     private static void holdSneakKey(Minecraft mc, LocalPlayer player, boolean down) {
         mc.options.keyShift.setDown(down);
         if (player.input != null) com.xlrw.compat.InputCompat.shiftKeyDown(player, down);
     }
 
+    private long lastClickMs = 0;
     private long lastThroughWallAt = 0;
     private BlockPos rotSyncPos = null;
     private float rotSyncYaw, rotSyncPitch;
@@ -1813,11 +1909,21 @@ public class BuilderController {
                 currentCandidate = null;
                 return;
             }
-            if (ServerSafe.paused() || !ServerSafe.readyToAct(player)) {
+            boolean ready = pipelined(candidate) ? !ServerSafe.recentSetback(350) : ServerSafe.readyToAct(player);
+            if (ServerSafe.paused() || !ready) {
                 PrinterMovement.stop(mc);
                 if (candidate.requiresSneak) holdSneakKey(mc, player, true);
                 nextActionTime = System.currentTimeMillis() + 50;
                 return;
+            }
+            if (pipelined(candidate)) {
+                // Never click against a block the server has not confirmed yet: if that one gets refused, the server
+                // would put THIS block into its cell instead. Also keep the number of unanswered clicks bounded.
+                if (inFlightContains(candidate.neighborPos) || inFlight.size() >= MAX_IN_FLIGHT) {
+                    ServerSafe.faceForClick(player, candidate.targetYaw, candidate.targetPitch);
+                    nextActionTime = System.currentTimeMillis() + 20;
+                    return;
+                }
             }
         }
 
@@ -1856,11 +1962,24 @@ public class BuilderController {
         }
 
         // 2. Synchronize view rotation before action
+        Vec3 clickVec = candidate.hitVec;
         if (safe) {
             // Look EXACTLY at the hit point with the real camera and click only once vanilla has already sent that
             // rotation to the server (next tick). No extra rotation packets -> nothing for an anti-cheat to flag,
             // and the server checks the click against the rotation it really has.
-            boolean synced = ServerSafe.faceForClick(player, candidate.targetYaw, candidate.targetPitch);
+            // aim from where we stand NOW (we may still be drifting a little)
+            float[] aimNow = pipelined(candidate) ? HumanAim.calculateRotations(player.getEyePosition(), candidate.hitVec)
+                    : new float[]{candidate.targetYaw, candidate.targetPitch};
+            boolean synced = ServerSafe.faceForClick(player, aimNow[0], aimNow[1]);
+            if (pipelined(candidate)) {
+                // Plain block: the exact angle does not matter, only that the rotation the server ALREADY has hits
+                // the face we click. Then click exactly where that ray lands - what a real click would send.
+                Vec3 ray = ServerSafe.serverRayHit(player, mc.level, candidate.neighborPos, candidate.clickFace, com.xlrw.account.Plus.reach() + 0.3);
+                if (ray != null) {
+                    synced = true;
+                    clickVec = ray;
+                }
+            }
             // Sneak (click against a chest / door...): the server must know we sneak BEFORE the click arrives
             boolean sneakReady = true;
             if (candidate.requiresSneak) {
@@ -1956,7 +2075,7 @@ public class BuilderController {
                 || candidate.type == PlacementCandidate.Type.BUCKET_FILL) {
             hitResult = new BlockHitResult(candidate.hitVec, candidate.clickFace, candidate.targetPos, false);
         } else {
-            hitResult = new BlockHitResult(candidate.hitVec, candidate.clickFace, candidate.neighborPos, false);
+            hitResult = new BlockHitResult(clickVec, candidate.clickFace, candidate.neighborPos, false);
         }
 
         // 4b. Last check for facing-sensitive blocks: simulate EXACTLY what is about to be sent (rotation + hit).
@@ -2008,8 +2127,11 @@ public class BuilderController {
             player.connection.send(com.xlrw.compat.MC.sneakPacket(player, true));
         }
         player.swing(hand);
+        long clickNow = System.currentTimeMillis();
+        long gap = lastClickMs > 0 ? clickNow - lastClickMs : -1;
+        lastClickMs = clickNow;
         XlrwDebug.logBuildAttempt(candidate.targetPos, candidate.requiredState.getBlock().getName().getString(),
-                "Type=" + candidate.type + " face=" + candidate.clickFace + " targetOn=" + (candidate.type == PlacementCandidate.Type.ADJUST || candidate.type == PlacementCandidate.Type.STACK || candidate.type == PlacementCandidate.Type.WATERLOG || candidate.type == PlacementCandidate.Type.BUCKET_FILL ? candidate.targetPos.toShortString() : candidate.neighborPos.toShortString()) + " result=" + useResult);
+                "gap=" + gap + "ms inflight=" + inFlight.size() + " Type=" + candidate.type + " face=" + candidate.clickFace + " targetOn=" + (candidate.type == PlacementCandidate.Type.ADJUST || candidate.type == PlacementCandidate.Type.STACK || candidate.type == PlacementCandidate.Type.WATERLOG || candidate.type == PlacementCandidate.Type.BUCKET_FILL ? candidate.targetPos.toShortString() : candidate.neighborPos.toShortString()) + " result=" + useResult);
 
         // 6. Release sneak (unless we stand at an edge: then anti-fall keeps it held)
         if (candidate.requiresSneak && !PrinterMovement.isNearDangerousEdge(mc.level, player)) {
@@ -2037,7 +2159,21 @@ public class BuilderController {
         }
 
         if (safe) delay += ServerSafe.extraDelayMs();
-        nextActionTime = System.currentTimeMillis() + Math.max(100, delay);
+        boolean pipe = safe && pipelined(candidate);
+        // Turbo: the next click can go out one tick later (the rotation needs one movement packet)
+        nextActionTime = System.currentTimeMillis() + Math.max(pipe ? 45 : 100, delay);
+
+        if (pipe) {
+            // Don't stand still waiting for the server's answer: remember the click, check the answer in
+            // tickInFlight(), and already turn toward the next block so it can be clicked on the next tick.
+            int seq = ServerSafe.lastSentSequence(mc);
+            inFlight.addLast(new InFlight(candidate.targetPos.immutable(), candidate.requiredState, seq,
+                    System.currentTimeMillis(), System.currentTimeMillis() + ServerSafe.ackTimeoutMs(mc)));
+            TaskTracker.getInstance().onAction(candidate.targetPos, (int) ServerSafe.ackTimeoutMs(mc) + 200);
+            currentCandidate = null;
+            prefetchNext(mc, player);
+            return;
+        }
 
         // Await server placement confirmation: DO NOT pre-fetch or whip camera to next block prematurely!
         pendingPlacementPos = candidate.targetPos;
@@ -2295,6 +2431,7 @@ public class BuilderController {
         pendingExpectedState = null;
         pendingSeq = -1;
         fastPending.clear();
+        inFlight.clear();
         ServerSafe.reset();
         lastConfirmedPos = null;
         standstillTicks = 0;

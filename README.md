@@ -154,3 +154,14 @@ Grim/Vulcan/NCP… từ chối hoặc kéo người chơi lại (setback), và m
 
 > Nếu vẫn thấy `SERVER/REJECT` liên tục ở một khu vực: thường là vùng được bảo vệ (spawn, claim, WorldGuard) –
 > mod không thể vượt qua cái đó.
+
+### ⚡ TURBO (v1.3.1)
+Nút **TURBO** nằm cạnh **SAFE** (menu `V` → ENGINE), mặc định bật, chỉ có tác dụng khi SAFE đang bật.
+- Block thường (không có hướng) **không chờ server trả lời** mới đặt block tiếp. Câu trả lời được kiểm tra ngầm;
+  block nào bị từ chối thì tự đặt lại. Tối đa 8 cú click chờ cùng lúc.
+- Vừa click xong là bot quay ngay sang block kế tiếp, nên tick sau đã click được: tối đa 1 block/tick (20 block/s).
+- Không bao giờ click vào block chưa được server xác nhận (nếu block đó bị từ chối, server sẽ đặt nhầm ô).
+- Không lên tầng mới khi còn click đang chờ server trả lời.
+- Tốc độ chỉnh bằng ⏱ (delay): 120 ms ≈ 7–8 block/s, 50 ms ≈ 15–20 block/s. Nếu `logs/xlrw_debug.log` có nhiều
+  `SERVER/REJECT` thì tăng delay lên.
+- Block có hướng (cầu thang, piston, observer…) vẫn đặt từng cái và chờ server, để còn kiểm tra hướng.

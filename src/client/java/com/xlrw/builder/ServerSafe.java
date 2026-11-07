@@ -157,6 +157,57 @@ public final class ServerSafe {
         return v.x * v.x + v.z * v.z < 0.0025; // < 0.05 blocks/tick sideways
     }
 
+    /**
+     * Where the ray of the rotation the server ALREADY knows (last movement packet) hits {@code clickPos} on
+     * {@code face}, seen from the current eye; null when it misses. This is what the server / an anti-cheat checks.
+     */
+    public static net.minecraft.world.phys.Vec3 serverRayHit(LocalPlayer p, ClientLevel level, BlockPos clickPos,
+                                                            net.minecraft.core.Direction face, double reach) {
+        if (p == null || level == null) return null;
+        LocalPlayerAccessor a = (LocalPlayerAccessor) p;
+        float pitch = a.xlrw$getXRotLast() * Mth.DEG_TO_RAD;
+        float yaw = -a.xlrw$getYRotLast() * Mth.DEG_TO_RAD;
+        float cy = Mth.cos(yaw), sy = Mth.sin(yaw), cp = Mth.cos(pitch), sp = Mth.sin(pitch);
+        net.minecraft.world.phys.Vec3 dir = new net.minecraft.world.phys.Vec3(sy * cp, -sp, cy * cp);
+        net.minecraft.world.phys.Vec3 eye = p.getEyePosition();
+        net.minecraft.world.phys.BlockHitResult hit = level.clip(new net.minecraft.world.level.ClipContext(eye, eye.add(dir.scale(reach)),
+                net.minecraft.world.level.ClipContext.Block.OUTLINE, net.minecraft.world.level.ClipContext.Fluid.NONE, p));
+        if (hit.getType() != net.minecraft.world.phys.HitResult.Type.BLOCK) return null;
+        if (!hit.getBlockPos().equals(clickPos) || hit.getDirection() != face) return null;
+        return hit.getLocation();
+    }
+
+    // ---------------------------------------------------------------- accidental screens
+
+    private static BlockPos lastClickPos = null;
+    private static Block lastClickBlock = null;
+    private static long lastClickAt = 0;
+    private static final java.util.Set<Block> learnedInteractables = new java.util.HashSet<>();
+
+    /** Called (via mixin) for every right-click on a block. */
+    public static void noteClick(ClientLevel level, BlockPos pos) {
+        lastClickPos = pos != null ? pos.immutable() : null;
+        lastClickBlock = level != null && pos != null ? level.getBlockState(pos).getBlock() : null;
+        lastClickAt = System.currentTimeMillis();
+    }
+
+    /**
+     * A container screen opened right after one of the bot's clicks: the bot clicked a block with a GUI by mistake.
+     * Remember that block type (clicks against it will sneak from now on) and tell the caller to close the screen.
+     */
+    public static boolean screenOpenedByBot() {
+        if (System.currentTimeMillis() - lastClickAt > 3000) return false;
+        if (lastClickBlock != null && learnedInteractables.add(lastClickBlock)) {
+            XlrwDebug.log("SERVER/GUI", "Bot lỡ mở GUI của " + lastClickBlock.getName().getString() + " tại "
+                    + (lastClickPos != null ? lastClickPos.toShortString() : "-") + " -> đóng lại, từ giờ sẽ sneak khi đặt vào block này");
+        }
+        return true;
+    }
+
+    public static boolean isLearnedInteractable(Block b) {
+        return learnedInteractables.contains(b);
+    }
+
     // ---------------------------------------------------------------- adaptive speed
 
     private static int extraDelayMs = 0;
