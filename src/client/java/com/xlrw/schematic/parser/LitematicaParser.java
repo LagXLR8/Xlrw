@@ -1,5 +1,7 @@
 package com.xlrw.schematic.parser;
 
+import com.xlrw.compat.NbtCompat;
+
 import com.xlrw.schematic.Schematic;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -27,31 +29,31 @@ public class LitematicaParser {
         }
 
         String name = file.getName();
-        if (root.contains("Metadata", Tag.TAG_COMPOUND)) {
-            CompoundTag meta = root.getCompound("Metadata");
-            if (meta.contains("Name", Tag.TAG_STRING) && !meta.getString("Name").isBlank()) {
-                name = meta.getString("Name");
+        if (NbtCompat.has(root, "Metadata", Tag.TAG_COMPOUND)) {
+            CompoundTag meta = NbtCompat.getCompound(root, "Metadata");
+            if (NbtCompat.has(meta, "Name", Tag.TAG_STRING) && !NbtCompat.getString(meta, "Name").isBlank()) {
+                name = NbtCompat.getString(meta, "Name");
             }
         }
 
-        CompoundTag regionsTag = root.getCompound("Regions");
+        CompoundTag regionsTag = NbtCompat.getCompound(root, "Regions");
         Map<BlockPos, BlockState> blocks = new HashMap<>();
 
         int minX = Integer.MAX_VALUE, minY = Integer.MAX_VALUE, minZ = Integer.MAX_VALUE;
         int maxX = Integer.MIN_VALUE, maxY = Integer.MIN_VALUE, maxZ = Integer.MIN_VALUE;
 
-        for (String regionKey : regionsTag.getAllKeys()) {
-            CompoundTag region = regionsTag.getCompound(regionKey);
+        for (String regionKey : NbtCompat.keys(regionsTag)) {
+            CompoundTag region = NbtCompat.getCompound(regionsTag, regionKey);
 
-            CompoundTag posTag = region.getCompound("Position");
-            int posX = posTag.getInt("x");
-            int posY = posTag.getInt("y");
-            int posZ = posTag.getInt("z");
+            CompoundTag posTag = NbtCompat.getCompound(region, "Position");
+            int posX = NbtCompat.getInt(posTag, "x");
+            int posY = NbtCompat.getInt(posTag, "y");
+            int posZ = NbtCompat.getInt(posTag, "z");
 
-            CompoundTag sizeTag = region.getCompound("Size");
-            int sizeX = sizeTag.getInt("x");
-            int sizeY = sizeTag.getInt("y");
-            int sizeZ = sizeTag.getInt("z");
+            CompoundTag sizeTag = NbtCompat.getCompound(region, "Size");
+            int sizeX = NbtCompat.getInt(sizeTag, "x");
+            int sizeY = NbtCompat.getInt(sizeTag, "y");
+            int sizeZ = NbtCompat.getInt(sizeTag, "z");
 
             int absX = Math.abs(sizeX);
             int absY = Math.abs(sizeY);
@@ -62,16 +64,16 @@ public class LitematicaParser {
             int startZ = posZ + (sizeZ < 0 ? sizeZ + 1 : 0);
 
             // Decode Palette
-            ListTag paletteList = region.getList("BlockStatePalette", Tag.TAG_COMPOUND);
+            ListTag paletteList = NbtCompat.getList(region, "BlockStatePalette", Tag.TAG_COMPOUND);
             List<BlockState> palette = new ArrayList<>(paletteList.size());
             for (int i = 0; i < paletteList.size(); i++) {
-                CompoundTag entry = paletteList.getCompound(i);
-                String blockName = entry.getString("Name");
-                CompoundTag properties = entry.contains("Properties", Tag.TAG_COMPOUND) ? entry.getCompound("Properties") : null;
+                CompoundTag entry = NbtCompat.listCompound(paletteList, i);
+                String blockName = NbtCompat.getString(entry, "Name");
+                CompoundTag properties = NbtCompat.has(entry, "Properties", Tag.TAG_COMPOUND) ? NbtCompat.getCompound(entry, "Properties") : null;
                 palette.add(BlockStateParser.fromNbt(blockName, properties));
             }
 
-            long[] blockStates = region.getLongArray("BlockStates");
+            long[] blockStates = NbtCompat.getLongArray(region, "BlockStates");
             int bitsPerBlock = Math.max(2, 32 - Integer.numberOfLeadingZeros(Math.max(1, palette.size() - 1)));
             long mask = (1L << bitsPerBlock) - 1L;
 

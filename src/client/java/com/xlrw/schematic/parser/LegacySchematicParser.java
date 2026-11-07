@@ -1,5 +1,7 @@
 package com.xlrw.schematic.parser;
 
+import com.xlrw.compat.NbtCompat;
+
 import com.xlrw.schematic.Schematic;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -22,13 +24,13 @@ public class LegacySchematicParser {
             root = NbtIo.readCompressed(is, NbtAccounter.unlimitedHeap());
         }
 
-        int width = root.getShort("Width");
-        int height = root.getShort("Height");
-        int length = root.getShort("Length");
+        int width = NbtCompat.getShort(root, "Width");
+        int height = NbtCompat.getShort(root, "Height");
+        int length = NbtCompat.getShort(root, "Length");
 
-        byte[] blockIds = root.getByteArray("Blocks");
-        byte[] blockData = root.getByteArray("Data");
-        byte[] addBlocks = root.contains("AddBlocks") ? root.getByteArray("AddBlocks") : null;
+        byte[] blockIds = NbtCompat.getByteArray(root, "Blocks");
+        byte[] blockData = NbtCompat.getByteArray(root, "Data");
+        byte[] addBlocks = root.contains("AddBlocks") ? NbtCompat.getByteArray(root, "AddBlocks") : null;
 
         Map<BlockPos, BlockState> blocks = new HashMap<>();
 

@@ -111,7 +111,7 @@ public class DemolishManager {
         if (!config.autoDemolish) return null;
 
         Vec3 eyePos = player.getEyePosition();
-        double maxReach = config.reachDistance;
+        double maxReach = com.xlrw.account.Plus.reach();
         double maxReachSq = maxReach * maxReach;
 
         List<Map.Entry<BlockPos, BlockState>> entries = config.layerMode ?
@@ -233,7 +233,7 @@ public class DemolishManager {
         // 2. Range safety: if moved out of reach, abort
         Vec3 eyePos = player.getEyePosition();
         double distSq = activeBreakPos.distToCenterSqr(eyePos);
-        double maxReach = BuilderConfig.getInstance().reachDistance + 0.6;
+        double maxReach = com.xlrw.account.Plus.reach() + 0.6;
         if (distSq > maxReach * maxReach) {
             stopBreaking(mc);
             return false;
@@ -270,10 +270,10 @@ public class DemolishManager {
         Vec3 blockCenter = Vec3.atCenterOf(activeBreakPos);
         float[] rots = HumanAim.calculateRotations(eyePos, blockCenter);
         HumanAim.stepRotation(player, rots[0], rots[1]);
-        player.connection.send(new ServerboundMovePlayerPacket.Rot(player.getYRot(), player.getXRot(), player.onGround()));
+        ServerSafe.syncCurrentRotation(player); // server-safe: vanilla's own movement packet carries it
 
         // 6. Execute authentic destroy packets
-        breakFace = Direction.getNearest(eyePos.x - blockCenter.x, eyePos.y - blockCenter.y, eyePos.z - blockCenter.z);
+        breakFace = com.xlrw.compat.MC.nearestDir(eyePos.x - blockCenter.x, eyePos.y - blockCenter.y, eyePos.z - blockCenter.z);
 
         if (breakTicks == 1) {
             mc.gameMode.startDestroyBlock(activeBreakPos, breakFace);
@@ -297,7 +297,7 @@ public class DemolishManager {
         breakTicks = 0;
         Vec3 eyePos = player.getEyePosition();
         Vec3 blockCenter = Vec3.atCenterOf(pos);
-        breakFace = Direction.getNearest(eyePos.x - blockCenter.x, eyePos.y - blockCenter.y, eyePos.z - blockCenter.z);
+        breakFace = com.xlrw.compat.MC.nearestDir(eyePos.x - blockCenter.x, eyePos.y - blockCenter.y, eyePos.z - blockCenter.z);
         return tickBreaking(mc, player);
     }
 }

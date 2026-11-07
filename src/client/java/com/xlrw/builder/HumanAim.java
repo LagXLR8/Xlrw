@@ -45,7 +45,7 @@ public class HumanAim {
             return true;
         }
 
-        float maxSpeed = Math.max(20.0f, config.aimSpeed);
+        float maxSpeed = Math.max(20.0f, config.aimSpeed) * com.xlrw.account.Plus.aimSpeedFactor();
         // Exponential deceleration as crosshair nears target face
         float factor = Math.min(1.0f, (absDiffYaw + absDiffPitch) / 20.0f);
         float speed = Math.max(4.0f, maxSpeed * factor);

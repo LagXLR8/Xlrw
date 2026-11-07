@@ -17,7 +17,7 @@ public class XlrwClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        LOGGER.info("[XLRW] Initializing XLRW Client for Fabric 1.21.1...");
+        LOGGER.info("[XLRW] Initializing XLRW Client...");
 
         // Load configuration
         BuilderConfig.load();
@@ -25,11 +25,17 @@ public class XlrwClient implements ClientModInitializer {
         // Initialize diagnostic logging system
         com.xlrw.debug.XlrwDebug.init();
 
+        // Xlrw account (optional login, Plus)
+        com.xlrw.account.AccountManager.get().init();
+
         // Initialize keybindings
         ModKeybinds.init();
 
         // Initialize world rendering (hologram & highlights)
         SchematicRenderer.init();
+        //? if >=1.21.11 {
+        /*com.xlrw.gui.HoloPip.register(); // 3D preview in the deck (picture-in-picture)
+        *///?}
 
         // Initialize in-game HUD overlay (top-left next block status)
         com.xlrw.gui.BuilderHud.init();
@@ -51,6 +57,7 @@ public class XlrwClient implements ClientModInitializer {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             BuilderController.getInstance().onClientTick(client);
             com.xlrw.builder.DryRun.tick(client);
+            com.xlrw.account.AccountManager.get().tick(client);
             WorldStateManager.tickAutoSave(client);
         });
 

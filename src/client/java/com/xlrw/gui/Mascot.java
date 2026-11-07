@@ -195,9 +195,27 @@ final class Mascot {
             }
             case "win" -> { setMood(Mood.DANCE, now, 7000); say("YAY!", now, 3000); XlrwSounds.play("bit.happy", 1.1f, 0.5f); }
             case "edit" -> { setMood(Mood.HAPPY, now, 1200); say("✥", now, 1200); }
+            case "plus" -> { setMood(Mood.SURPRISED, now, 900); say("PLUS!", now, 1600); }
+            case "happy" -> { setMood(Mood.HAPPY, now, 1200); say("♥", now, 1200); XlrwSounds.playVar("bit.happy", 1f, 0.35f, 0.1f); }
             default -> {
             }
         }
+    }
+
+    /** Jumps very high (to pull down the login banner). */
+    void bigJump() {
+        long now = System.currentTimeMillis();
+        if (mood == Mood.HELD || mood == Mood.FALL || x < 0) return;
+        mood = Mood.JUMP;
+        moodUntil = now + 1600;
+        vy = -240f;
+        say("!", now, 900);
+        XlrwSounds.play("bit.surprise", 1.1f, 0.45f);
+    }
+
+    /** Head position in screen coordinates, or null before Bit has appeared. */
+    float[] head() {
+        return x < 0 ? null : new float[]{x, y - H};
     }
 
     boolean contains(double mx, double my) {
@@ -443,29 +461,29 @@ final class Mascot {
             g.fill(Math.round(x - shw / 2f), Math.round(gy) - 1, Math.round(x + shw / 2f), Math.round(gy), 0x55000000);
         }
 
-        g.pose().pushPose();
-        g.pose().translate(0, 0, 300);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, 0, 0, 300);
         if (mood == Mood.HELD || Math.abs(swing) > 0.5f) {
-            g.pose().translate(x, sy, 0);
-            g.pose().mulPose(com.mojang.math.Axis.ZP.rotationDegrees(Math.max(-35, Math.min(35, swing))));
-            g.pose().translate(-x, -sy, 0);
+            com.xlrw.compat.GuiCompat.translate(g, x, sy, 0);
+            com.xlrw.compat.GuiCompat.rotateZ(g, Math.max(-35, Math.min(35, swing)));
+            com.xlrw.compat.GuiCompat.translate(g, -x, -sy, 0);
         }
         loadSkin();
         if (skin != null) drawSkin(g, sx, sy);
         else drawRobot(g, font, sx, sy, mx, my, now);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
 
         if (bubble != null && now < bubbleUntil) {
             int tw = font.width(bubble);
             int bx = Math.round(x) - tw / 2 - 3, by = sy - 14;
-            g.pose().pushPose();
-            g.pose().translate(0, 0, 310);
+            com.xlrw.compat.GuiCompat.push(g);
+            com.xlrw.compat.GuiCompat.translate(g, 0, 0, 310);
             g.fill(bx, by, bx + tw + 6, by + 11, CREAM);
             g.fill(bx - 1, by + 1, bx, by + 10, CREAM);
             g.fill(bx + tw + 6, by + 1, bx + tw + 7, by + 10, CREAM);
             g.fill(Math.round(x) - 1, by + 11, Math.round(x) + 2, by + 13, CREAM);
             g.drawString(font, bubble, bx + 3, by + 2, INK, false);
-            g.pose().popPose();
+            com.xlrw.compat.GuiCompat.pop(g);
         }
     }
 
@@ -575,7 +593,7 @@ final class Mascot {
                 skinW = img.getWidth();
                 skinH = img.getHeight();
                 ResourceLocation loc = ResourceLocation.fromNamespaceAndPath("xlrw", "dynamic/mascot");
-                Minecraft.getInstance().getTextureManager().register(loc, new DynamicTexture(img));
+                Minecraft.getInstance().getTextureManager().register(loc, com.xlrw.compat.GuiCompat.texture(img));
                 skin = loc;
             }
         } catch (Throwable t) {
@@ -588,8 +606,8 @@ final class Mascot {
         float bob = (mood == Mood.WALK || mood == Mood.CROSS) ? ((System.currentTimeMillis() / 140) % 2) : 0;
         int dx = Math.round(x - w / 2f), dy = Math.round(y - h - bob);
         // face left by flipping the texture coordinates (a negative pose scale would get the quad culled)
-        if (dir < 0) g.blit(skin, dx, dy, w, h, skinW, 0, -skinW, skinH, skinW, skinH);
-        else g.blit(skin, dx, dy, w, h, 0, 0, skinW, skinH, skinW, skinH);
+        if (dir < 0) com.xlrw.compat.GuiCompat.blitTex(g, skin, dx, dy, w, h, skinW, 0, -skinW, skinH, skinW, skinH);
+        else com.xlrw.compat.GuiCompat.blitTex(g, skin, dx, dy, w, h, 0, 0, skinW, skinH, skinW, skinH);
     }
 
     private static void px(GuiGraphics g, int sx, int sy, int c, int r, int w, int h, int color) {

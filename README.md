@@ -106,3 +106,51 @@ Copy vào `.minecraft/mods` và chạy với **Fabric Loader 1.21.1** + **Fabric
 - In ra chat: thời gian ước tính, số lần đặt, số chỗ đứng, quãng đường đi bộ, số trụ và số khối giàn giáo (so với số đang có), vật liệu còn thiếu trong túi.
 - Đánh dấu trong thế giới: 🟥 block bot không với tới được, 🟧 block lơ lửng cần cột đỡ, 🟨 vị trí trụ giàn giáo, 🟦 các chỗ đứng.
 - Bấm `N` lần nữa để tắt khung đánh dấu. Chi tiết từng block bị kẹt được ghi vào `logs/xlrw_debug.log` (mục `DRYRUN/STUCK`).
+
+
+---
+
+## 🧩 Hỗ trợ cả Minecraft 1.21.1 và 1.21.11 (Stonecutter)
+
+Một bộ code, mỗi lần build ra **hai file JAR**:
+
+| Phiên bản game | File JAR |
+| :--- | :--- |
+| 1.21.1 (Fabric API 0.116.17) | `versions/1.21.1/build/libs/xlrw-1.2.0+1.21.1.jar` |
+| 1.21.11 (Fabric API 0.141.6) | `versions/1.21.11/build/libs/xlrw-1.2.0+1.21.11.jar` |
+
+- Build cả hai: `gradlew build` (cần JDK 21). Hoặc `gradlew buildAndCollect` để gom hai file vào `build/libs/1.2.0/`.
+- Code trong `src/` viết cho 1.21.1. Chỗ nào API khác nhau thì dùng chú thích Stonecutter (`//? if >=1.21.11 { ... }`), phần lớn gom trong `com.xlrw.compat` (`MC`, `InputCompat`, `NbtCompat`, `GuiCompat`, `RenderCompat`).
+- Mỗi lần đẩy code lên GitHub, Actions tự build cả hai bản; log build nằm ở nhánh `ci-logs`.
+
+**Khác biệt trên 1.21.11** (do Mojang viết lại bộ vẽ):
+- Bảng điều khiển 3D (nút 3D UI) nghiêng kiểu 2D (co + xiên theo chuột) vì GUI mới không còn phối cảnh thật.
+- Bản xem trước 3D trong menu vẽ bằng các ô màu (vẫn xoay được), thay vì mô hình khối thật.
+- Mũi tên kéo/xoay của trình chỉnh vị trí có thể bị khối che khuất.
+
+---
+
+## 🛡️ v1.3: SERVER SAFE – block đặt ra không còn bị biến mất trên server
+
+Bật/tắt ở menu `V` → ENGINE → **SERVER SAFE** (mặc định BẬT).
+
+**Vì sao trước đây block bị mất:** `useItemOn` cho block hiện ra ngay ở client (dự đoán). Bot đọc thế giới client
+ngay sau cú click nên tưởng là đã đặt xong rồi đi tiếp; khi server/anti-cheat từ chối, server gửi lại ô trống sau
+~1 ping → block "biến mất". Thêm vào đó bot gửi thêm gói xoay đầu cho mỗi cú click (nhiều gói/tick, có chỗ còn không
+xoay camera thật), đặt xuyên tường, đặt giữa không trung, spoof hướng, 3 block/tick – vanilla chấp nhận nhưng
+Grim/Vulcan/NCP… từ chối hoặc kéo người chơi lại (setback), và mọi cú click trong lúc bị kéo lại đều bị bỏ qua.
+
+**SERVER SAFE làm gì:**
+- Chỉ tính là "đã đặt" khi server **xác nhận đúng cú click đó** (gói `BlockChangedAck`) và block vẫn còn đó.
+  Server trả lời mà ô vẫn trống → biết ngay là bị từ chối, chậm lại một chút rồi đặt lại.
+- Theo dõi thêm 3 giây sau khi đặt: plugin xoá block muộn → tự đặt lại và giảm tốc.
+- Xoay camera thật, không gửi gói xoay đầu riêng; chỉ click khi server **đã nhận** góc nhìn đó (tick sau).
+  Sneak (đặt vào rương, cửa…) cũng chờ server biết đang sneak rồi mới click.
+- Không click khi vừa bị server kéo lại vị trí hoặc người còn đang trượt.
+- Tự tắt: xuyên tường, air place, spoof hướng, đặt nhanh nhiều block/tick; luôn kiểm tra tầm nhìn; tầm với tối đa 4.4 (REACH+ của Plus cũng bị tắt).
+  (Cài đặt riêng của bạn vẫn giữ nguyên – tắt SERVER SAFE là dùng lại như cũ cho singleplayer.)
+- Tự giảm tốc khi server từ chối liên tục (5 lần liền → nghỉ 1.5 s). Xem lý do trong `logs/xlrw_debug.log`
+  (`SERVER/REJECT`, `SERVER/NO_ACK`, `SERVER/PAUSE`).
+
+> Nếu vẫn thấy `SERVER/REJECT` liên tục ở một khu vực: thường là vùng được bảo vệ (spawn, claim, WorldGuard) –
+> mod không thể vượt qua cái đó.

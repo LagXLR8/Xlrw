@@ -25,7 +25,7 @@ public class MaterialReport {
 
         public Entry(Item item) {
             this.item = item;
-            this.name = item.getDescription().getString();
+            this.name = com.xlrw.compat.MC.itemName(item).getString();
         }
 
         public int getMissingTotal() {

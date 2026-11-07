@@ -79,7 +79,7 @@ public class BuilderHud {
                     displayStack = new ItemStack(item);
                     blockName = targetState.getBlock().getName().getString();
                     if (!InventoryHelper.hasItem(mc.player, item) && !mc.player.isCreative()) {
-                        diagnostic = "Thiếu vật liệu: " + item.getDescription().getString();
+                        diagnostic = "Thiếu vật liệu: " + com.xlrw.compat.MC.itemName(item).getString();
                     } else {
                         diagnostic = "Đang tìm đường tiếp cận...";
                     }

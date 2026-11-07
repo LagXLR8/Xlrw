@@ -14,7 +14,11 @@ import net.minecraft.network.chat.Component;
 import org.lwjgl.glfw.GLFW;
 
 public class ModKeybinds {
+    //? if >=1.21.11 {
+    /*private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("xlrw", "main"));
+    *///?} else {
     private static final String CATEGORY = "category.xlrw";
+    //?}
 
     public static KeyMapping TOGGLE_BUILD;
     public static KeyMapping OPEN_GUI;

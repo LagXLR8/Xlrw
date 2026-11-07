@@ -43,8 +43,8 @@ public final class TowerJanitor {
     private static List<BlockPos> findTowerBases(ClientLevel level, Schematic schematic, BlockPos center) {
         List<BlockPos> bases = new ArrayList<>();
         BlockPos.MutableBlockPos m = new BlockPos.MutableBlockPos();
-        int minY = Math.max(level.getMinBuildHeight(), center.getY() - 40);
-        int maxY = Math.min(level.getMaxBuildHeight() - 1, center.getY() + 30);
+        int minY = Math.max(com.xlrw.compat.MC.minY(level), center.getY() - 40);
+        int maxY = Math.min(com.xlrw.compat.MC.maxYExclusive(level) - 1, center.getY() + 30);
         for (int dx = -SCAN_RADIUS; dx <= SCAN_RADIUS; dx++) {
             for (int dz = -SCAN_RADIUS; dz <= SCAN_RADIUS; dz++) {
                 int x = center.getX() + dx, z = center.getZ() + dz;
@@ -113,7 +113,7 @@ public final class TowerJanitor {
         if (DemolishManager.getInstance().isBreaking()) return false;
         rescan(mc, player, schematic, config.currentLayer);
         if (uselessCache.isEmpty()) return false;
-        double reach = config.reachDistance - 0.2;
+        double reach = com.xlrw.account.Plus.reach() - 0.2;
         Vec3 eye = player.getEyePosition();
         for (BlockPos base : uselessCache) {
             if (!mc.level.getBlockState(base).is(Blocks.SCAFFOLDING)) continue;
@@ -150,7 +150,7 @@ public final class TowerJanitor {
         }
         BlockPos base = uselessCache.stream()
                 .min(java.util.Comparator.comparingDouble(b -> b.distSqr(player.blockPosition()))).orElse(null);
-        double reach = config.reachDistance - 0.2;
+        double reach = com.xlrw.account.Plus.reach() - 0.2;
         if (player.getEyePosition().distanceToSqr(Vec3.atCenterOf(base)) <= reach * reach) {
             walkTarget = null;
             return breakBase(mc, player, base);

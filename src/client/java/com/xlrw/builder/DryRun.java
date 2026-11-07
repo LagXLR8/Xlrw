@@ -161,7 +161,7 @@ public final class DryRun {
             this.player = player;
             this.schematic = schematic;
             this.out = out;
-            this.reach = Math.max(2.5, cfg.reachDistance - 0.3); // same margin as the StationPlanner
+            this.reach = Math.max(2.5, com.xlrw.account.Plus.reach() - 0.3); // same margin as the StationPlanner
             int x0 = Integer.MAX_VALUE, x1 = Integer.MIN_VALUE, z0 = Integer.MAX_VALUE, z1 = Integer.MIN_VALUE;
             for (BlockPos p : schematic.getWorldBlocks().keySet()) {
                 x0 = Math.min(x0, p.getX()); x1 = Math.max(x1, p.getX());
@@ -306,7 +306,7 @@ public final class DryRun {
         }
 
         boolean supported(BlockPos p) {
-            if (cfg.airPlace) return true;
+            if (cfg.airPlaceOn()) return true;
             for (Direction d : Direction.values()) {
                 if (solid(p.relative(d))) return true;
             }
@@ -499,7 +499,7 @@ public final class DryRun {
         if (player == null) return;
 
         double perBlockSec = (cfg.placeDelayMs + cfg.jitterMs * 0.5 + 60) / 1000.0;
-        if (cfg.fastSimpleBlocks) perBlockSec *= 0.6;
+        if (cfg.fastSimpleBlocksOn()) perBlockSec *= 0.6;
         double sec = r.actions * perBlockSec
                 + r.walkMeters / 4.3
                 + r.scaffoldBlocks * 0.75
@@ -512,7 +512,7 @@ public final class DryRun {
             need.sort((a, b) -> b.getValue() - a.getValue());
             for (Map.Entry<Item, Integer> e : need) {
                 int have = count(player, e.getKey());
-                if (have < e.getValue()) missing.add((e.getValue() - have) + "× " + e.getKey().getDescription().getString());
+                if (have < e.getValue()) missing.add((e.getValue() - have) + "× " + com.xlrw.compat.MC.itemName(e.getKey()).getString());
             }
         }
 
@@ -530,7 +530,7 @@ public final class DryRun {
             chat(mc, "§a✔ Không có block nào bị kẹt.");
         }
         if (!r.floatingWarnings.isEmpty()) {
-            chat(mc, "§6• " + r.floatingWarnings.size() + " block lơ lửng cần cột đỡ" + (cfg.airPlace ? "" : " §7(bật AIR PLACE để bỏ qua)"));
+            chat(mc, "§6• " + r.floatingWarnings.size() + " block lơ lửng cần cột đỡ" + (cfg.airPlaceOn() ? "" : cfg.serverSafe ? " §7(SERVER SAFE: bot tự dựng cột đỡ)" : " §7(bật AIR PLACE để bỏ qua)"));
         }
         if (!missing.isEmpty()) {
             chat(mc, "§6• Thiếu vật liệu (trong túi): §f" + String.join(", ", missing.subList(0, Math.min(5, missing.size())))

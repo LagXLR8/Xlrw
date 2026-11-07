@@ -129,7 +129,7 @@ public final class TempBlockTracker {
             return true;
         }
 
-        double reach = BuilderConfig.getInstance().reachDistance - 0.2;
+        double reach = com.xlrw.account.Plus.reach() - 0.2;
         if (player.getEyePosition().distanceToSqr(Vec3.atCenterOf(target)) <= reach * reach) {
             PrinterMovement.stop(mc);
             BuilderController.getInstance().setStatusMessage("3D Printer: Dọn block tạm tại " + target.toShortString());
@@ -164,7 +164,7 @@ public final class TempBlockTracker {
         if (DemolishManager.getInstance().isBreaking()) return false;
         prune(level, schematic);
         long now = System.currentTimeMillis();
-        double reach = BuilderConfig.getInstance().reachDistance - 0.2;
+        double reach = com.xlrw.account.Plus.reach() - 0.2;
         BlockPos best = null;
         double bestD = Double.MAX_VALUE;
         for (Map.Entry<BlockPos, Entry> e : TEMP.entrySet()) {

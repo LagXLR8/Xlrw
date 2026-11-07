@@ -23,8 +23,14 @@ public final class HubWidgets {
 
     interface Hitter { void hit(int x, int y, int w, int h, Runnable r); }
 
-    private static final int INK = 0xFF141416, CREAM = 0xFFE8D8C9, ORANGE = 0xFFF3701E, SLATE = 0xFF4B607F,
+    private static int INK = 0xFF141416, CREAM = 0xFFE8D8C9, ORANGE = 0xFFF3701E, SLATE = 0xFF4B607F,
             PANEL = 0xFF232429, DIM = 0xFF8D97AB, WELL = 0xFF121215;
+
+    /** Follows the deck colour theme. */
+    static void theme(UiTheme t) {
+        INK = t.ink; CREAM = t.cream; ORANGE = t.accent; SLATE = t.outline; PANEL = t.bg2; DIM = t.textDim;
+        WELL = UiTheme.mix(t.bg2, 0xFF000000, 0.45f);
+    }
     private static final Random RND = new Random();
 
     private HubWidgets() {}
@@ -72,11 +78,11 @@ public final class HubWidgets {
         LocalDateTime t = LocalDateTime.now();
         // real time, big
         String hhmm = t.format(DateTimeFormatter.ofPattern("HH:mm"));
-        g.pose().pushPose();
-        g.pose().translate(x + 8, y + 17, 0);
-        g.pose().scale(2f, 2f, 1f);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, x + 8, y + 17, 0);
+        com.xlrw.compat.GuiCompat.scale(g, 2f, 2f, 1f);
         g.drawString(font, hhmm, 0, 0, ORANGE, false);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
         String ss = t.format(DateTimeFormatter.ofPattern("ss"));
         g.drawString(font, ss, x + 10 + font.width(hhmm) * 2, y + 25, CREAM, false);
         g.drawString(font, t.format(DateTimeFormatter.ofPattern("EEE dd/MM")).toUpperCase(), x + w - 6 - font.width(t.format(DateTimeFormatter.ofPattern("EEE dd/MM")).toUpperCase()), y + 5, DIM, false);

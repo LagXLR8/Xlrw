@@ -1,5 +1,6 @@
 package com.xlrw.printer;
 
+import com.xlrw.builder.ServerSafe;
 import com.xlrw.builder.BuildRules;
 import com.xlrw.builder.InventoryHelper;
 import com.xlrw.builder.PlacementFinder;
@@ -66,14 +67,14 @@ public final class ScaffoldNavigator {
         mc.options.keyShift.setDown(false);
         mc.options.keySprint.setDown(false);
         if (p.input != null) {
-            p.input.up = false;
-            p.input.down = false;
-            p.input.left = false;
-            p.input.right = false;
-            p.input.jumping = false;
-            p.input.shiftKeyDown = false;
-            p.input.forwardImpulse = 0.0f;
-            p.input.leftImpulse = 0.0f;
+            com.xlrw.compat.InputCompat.up(p, false);
+            com.xlrw.compat.InputCompat.down(p, false);
+            com.xlrw.compat.InputCompat.left(p, false);
+            com.xlrw.compat.InputCompat.right(p, false);
+            com.xlrw.compat.InputCompat.jumping(p, false);
+            com.xlrw.compat.InputCompat.shiftKeyDown(p, false);
+            com.xlrw.compat.InputCompat.forwardImpulse(p, 0.0f);
+            com.xlrw.compat.InputCompat.leftImpulse(p, 0.0f);
         }
         p.setSprinting(false);
     }
@@ -98,20 +99,20 @@ public final class ScaffoldNavigator {
         mc.options.keySprint.setDown(false);
         mc.options.keyShift.setDown(false);
         if (p.input != null) {
-            p.input.up = up;
-            p.input.down = down;
-            p.input.left = l;
-            p.input.right = r;
-            p.input.shiftKeyDown = false;
-            p.input.forwardImpulse = up ? 1.0f : (down ? -1.0f : 0.0f);
-            p.input.leftImpulse = l ? 1.0f : (r ? -1.0f : 0.0f);
+            com.xlrw.compat.InputCompat.up(p, up);
+            com.xlrw.compat.InputCompat.down(p, down);
+            com.xlrw.compat.InputCompat.left(p, l);
+            com.xlrw.compat.InputCompat.right(p, r);
+            com.xlrw.compat.InputCompat.shiftKeyDown(p, false);
+            com.xlrw.compat.InputCompat.forwardImpulse(p, up ? 1.0f : (down ? -1.0f : 0.0f));
+            com.xlrw.compat.InputCompat.leftImpulse(p, l ? 1.0f : (r ? -1.0f : 0.0f));
         }
         p.setSprinting(false);
     }
 
     private static void setJump(Minecraft mc, LocalPlayer p, boolean jump) {
         mc.options.keyJump.setDown(jump);
-        if (p.input != null) p.input.jumping = jump;
+        if (p.input != null) com.xlrw.compat.InputCompat.jumping(p, jump);
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -163,13 +164,13 @@ public final class ScaffoldNavigator {
         mc.options.keyRight.setDown(false);
         mc.options.keyShift.setDown(false);
         if (p.input != null) {
-            p.input.up = false;
-            p.input.down = false;
-            p.input.left = false;
-            p.input.right = false;
-            p.input.shiftKeyDown = false;
-            p.input.forwardImpulse = 0.0f;
-            p.input.leftImpulse = 0.0f;
+            com.xlrw.compat.InputCompat.up(p, false);
+            com.xlrw.compat.InputCompat.down(p, false);
+            com.xlrw.compat.InputCompat.left(p, false);
+            com.xlrw.compat.InputCompat.right(p, false);
+            com.xlrw.compat.InputCompat.shiftKeyDown(p, false);
+            com.xlrw.compat.InputCompat.forwardImpulse(p, 0.0f);
+            com.xlrw.compat.InputCompat.leftImpulse(p, 0.0f);
         }
 
         // Gently damp and center using velocity without teleporting/setPos or pressing WASD
@@ -380,13 +381,12 @@ public final class ScaffoldNavigator {
         // Set player facing direction so client getDirection() matches dir!
         float yaw = dir.toYRot();
         float pitch = 55.0f;
-        p.setYRot(yaw);
-        p.setXRot(pitch);
-        p.connection.send(new ServerboundMovePlayerPacket.Rot(yaw, pitch, p.onGround()));
-
         // Ensure sneak is OFF
         mc.options.keyShift.setDown(false);
-        if (p.input != null) p.input.shiftKeyDown = false;
+        if (p.input != null) com.xlrw.compat.InputCompat.shiftKeyDown(p, false);
+        if (!ServerSafe.faceForClick(p, yaw, pitch) || !ServerSafe.sneakSynced(p, false) && ServerSafe.enabled()) {
+            return BridgeResult.WORKING; // server-safe: click next tick once the server has this facing
+        }
 
         Direction face = Direction.UP;
         Vec3 hit = new Vec3(fx + dir.getStepX() * 0.3, floor.getY() + 1.0, fz + dir.getStepZ() * 0.3);

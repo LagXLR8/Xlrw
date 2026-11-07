@@ -268,10 +268,10 @@ public final class BotMonitor {
         for (int i = 0; i < p.getInventory().getContainerSize(); i++) {
             ItemStack s = p.getInventory().getItem(i);
             if (s.is(Items.SCAFFOLDING)) scaff += s.getCount();
-            if (i < 9) hotbar.append(i).append(':').append(s.isEmpty() ? "-" : s.getItem().getDescription().getString() + "x" + s.getCount()).append(' ');
+            if (i < 9) hotbar.append(i).append(':').append(s.isEmpty() ? "-" : com.xlrw.compat.MC.itemName(s.getItem()).getString() + "x" + s.getCount()).append(' ');
         }
         Item support = InventoryHelper.getAvailableSolidSupportItem(p);
-        sb.append("scaffolding=").append(scaff).append(" solidSupport=").append(support != null ? support.getDescription().getString() : "NONE")
+        sb.append("scaffolding=").append(scaff).append(" solidSupport=").append(support != null ? com.xlrw.compat.MC.itemName(support).getString() : "NONE")
                 .append(" | hotbar: ").append(hotbar).append('\n');
 
         // Remaining work on the layer + nearest pieces

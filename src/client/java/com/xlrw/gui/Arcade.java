@@ -93,10 +93,10 @@ final class Arcade {
         else current.idle(dt, fw, fh, now);
 
         g.enableScissor(fx, fy, fx + fw, fy + fh);
-        g.pose().pushPose();
-        g.pose().translate(fx, fy, 0);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, fx, fy, 0);
         current.render(g, font, fw, fh, mxF, myF, now);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
 
         if (current.state != State.PLAY || paused) {
             g.fill(fx, fy + fh / 2 - 20, fx + fw, fy + fh / 2 + 20, 0xD0141416);
@@ -120,16 +120,16 @@ final class Arcade {
             if (hov) g.fill(tx + 1, ty + th - 1, tx + tw + 1, ty + th + 1, 0x77000000);
             g.fill(tx - lift, ty - lift, tx + tw - lift, ty + th - lift, hov ? 0xFF2B3240 : 0xFF1E2027);
             g.fill(tx - lift, ty - lift, tx + 2 - lift, ty + th - lift, hov ? ORANGE : SLATE);
-            g.pose().pushPose();
-            g.pose().translate(tx - lift + 6, ty - lift + (th - 10) / 2f, 0);
+            com.xlrw.compat.GuiCompat.push(g);
+            com.xlrw.compat.GuiCompat.translate(g, tx - lift + 6, ty - lift + (th - 10) / 2f, 0);
             gm.icon(g, now);
-            g.pose().popPose();
-            g.pose().pushPose();
-            g.pose().translate(tx - lift + 22, ty - lift + th / 2f - (gm.best > 0 ? 6 : 3), 0);
-            g.pose().scale(0.75f, 0.75f, 1f);
+            com.xlrw.compat.GuiCompat.pop(g);
+            com.xlrw.compat.GuiCompat.push(g);
+            com.xlrw.compat.GuiCompat.translate(g, tx - lift + 22, ty - lift + th / 2f - (gm.best > 0 ? 6 : 3), 0);
+            com.xlrw.compat.GuiCompat.scale(g, 0.75f, 0.75f, 1f);
             g.drawString(font, gm.name, 0, 0, hov ? ORANGE : CREAM, false);
             if (gm.best > 0) g.drawString(font, "★ " + gm.best, 0, 10, DIM, false);
-            g.pose().popPose();
+            com.xlrw.compat.GuiCompat.pop(g);
             hit.hit(tx, ty, tw, th, () -> enter(gm));
         }
     }

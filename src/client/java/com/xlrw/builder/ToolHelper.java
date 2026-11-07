@@ -74,7 +74,7 @@ public class ToolHelper {
         if (bestInvSlot != -1) {
             Minecraft mc = Minecraft.getInstance();
             if (mc.gameMode != null) {
-                mc.gameMode.handleInventoryMouseClick(player.inventoryMenu.containerId, bestInvSlot, inv.selected, ClickType.SWAP, player);
+                mc.gameMode.handleInventoryMouseClick(player.inventoryMenu.containerId, bestInvSlot, com.xlrw.compat.MC.selected(inv), ClickType.SWAP, player);
                 return true;
             }
         }
@@ -88,7 +88,7 @@ public class ToolHelper {
         if (speed > currentBestSpeed) return true;
         if (speed == currentBestSpeed) {
             // Tie-break: Prefer Pickaxes
-            return stack.getItem() instanceof PickaxeItem;
+            return stack.is(net.minecraft.tags.ItemTags.PICKAXES);
         }
         return false;
     }

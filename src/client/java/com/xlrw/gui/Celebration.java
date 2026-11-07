@@ -128,8 +128,8 @@ public final class Celebration {
             if (c[1] > h + 10) confetti.remove(i);
         }
 
-        g.pose().pushPose();
-        g.pose().translate(0, 0, 400);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, 0, 0, 400);
 
         // banner in / out
         float in = ease(t / 520f);
@@ -141,27 +141,27 @@ public final class Celebration {
         // rotating light rays behind the banner
         float rayA = Math.min(1, t / 500f) * (1 - out);
         if (rayA > 0.02f) {
-            g.pose().pushPose();
-            g.pose().translate(w / 2f + slide, by + bh / 2f, 0);
-            g.pose().mulPose(Axis.ZP.rotationDegrees((t / 40f) % 360));
+            com.xlrw.compat.GuiCompat.push(g);
+            com.xlrw.compat.GuiCompat.translate(g, w / 2f + slide, by + bh / 2f, 0);
+            com.xlrw.compat.GuiCompat.rotateZ(g, (t / 40f) % 360);
             for (int i = 0; i < 12; i++) {
-                g.pose().mulPose(Axis.ZP.rotationDegrees(30));
+                com.xlrw.compat.GuiCompat.rotateZ(g, 30);
                 int a = (int) (rayA * (i % 2 == 0 ? 0x30 : 0x18));
                 g.fill(0, -3, (int) (w * 0.6f), 3, (a << 24) | 0xF3C04E);
             }
-            g.pose().popPose();
+            com.xlrw.compat.GuiCompat.pop(g);
         }
 
         // slanted slabs: orange shadow + cream face (Persona flavour)
         skew(g, bx + 5, by + 4, bw, bh, 10, ORANGE);
         skew(g, bx, by, bw, bh, 10, CREAM);
-        g.pose().pushPose();
+        com.xlrw.compat.GuiCompat.push(g);
         float pop = 1f + 0.08f * (float) Math.max(0, Math.sin(Math.min(1, t / 600f) * Math.PI));
-        g.pose().translate(bx + bw / 2f, by + bh / 2f, 0);
-        g.pose().scale(2.2f * pop, 2.2f * pop, 1f);
-        g.pose().last().pose().mul(new org.joml.Matrix4f().m10(-0.25f)); // lean forward
+        com.xlrw.compat.GuiCompat.translate(g, bx + bw / 2f, by + bh / 2f, 0);
+        com.xlrw.compat.GuiCompat.scale(g, 2.2f * pop, 2.2f * pop, 1f);
+        com.xlrw.compat.GuiCompat.shearX(g, (-0.25f)); // lean forward
         g.drawString(font, title, -font.width(title) / 2, -4, INK, false);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
         // sub line chip
         int sw = font.width(sub) + 16, sx = (w - sw) / 2 + (int) slide, sy = by + bh + 8;
         g.fill(sx, sy, sx + sw, sy + 14, 0xE61A1A1D);
@@ -170,11 +170,11 @@ public final class Celebration {
 
         // Bit dancing on the banner
         float hop = (float) Math.abs(Math.sin(t / 180.0)) * 8;
-        g.pose().pushPose();
-        g.pose().translate(bx + bw - 40, by - 20 - hop, 0);
-        g.pose().scale(2f, 2f, 1f);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, bx + bw - 40, by - 20 - hop, 0);
+        com.xlrw.compat.GuiCompat.scale(g, 2f, 2f, 1f);
         Arcade.tinyBit(g, 0, 0, now, (t / 180) % 2 == 0, (t / 360) % 2 == 0);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
 
         // confetti on top
         for (float[] c : confetti) {
@@ -185,7 +185,7 @@ public final class Celebration {
             if (flip < 0) col = (col & 0xFF000000) | ((col & 0xFEFEFE) >> 1); // back side darker
             g.fill((int) c[0], (int) c[1], (int) c[0] + fw, (int) c[1] + s, col);
         }
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
     }
 
     private static void skew(GuiGraphics g, int x, int y, int w, int h, int slant, int color) {

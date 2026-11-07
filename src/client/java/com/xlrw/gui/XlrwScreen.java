@@ -1,5 +1,6 @@
 package com.xlrw.gui;
 
+//? if <1.21.11 {
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -7,8 +8,9 @@ import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
+//?}
+import net.minecraft.client.Minecraft;
 import com.xlrw.builder.BuilderController;
 import com.xlrw.config.BuilderConfig;
 import com.xlrw.printer.ChestManager;
@@ -46,18 +48,18 @@ public class XlrwScreen extends Screen {
     // Palette (night city: deep maroon-black, hot coral red, cold teal panels)
     // ------------------------------------------------------------------------------------------------
     // Palette: Zenless Zone Zero "retro" trio - cream #E8D8C9, slate blue #4B607F, signal orange #F3701E - on ink black
-    private static final int BG = 0xF21A1A1D;
-    private static final int BG2 = 0xFF232429;
-    private static final int RED = 0xFFF3701E;      // accent (orange)
-    private static final int RED_DIM = 0xFF4B607F;  // slate blue
-    private static final int RED_DEEP = 0xFF3B2A20; // warm dark (selected rows)
-    private static final int TEAL = 0xFF2B3240;     // panel / button
-    private static final int TEAL_HI = 0xFF4B607F;  // hover
-    private static final int CYAN = 0xFFE8D8C9;     // cream
-    private static final int TEXT_DIM = 0xFF8D97AB;
+    private static int BG = 0xF21A1A1D;
+    private static int BG2 = 0xFF232429;
+    private static int RED = 0xFFF3701E;      // accent (orange)
+    private static int RED_DIM = 0xFF4B607F;  // slate blue
+    private static int RED_DEEP = 0xFF3B2A20; // warm dark (selected rows)
+    private static int TEAL = 0xFF2B3240;     // panel / button
+    private static int TEAL_HI = 0xFF4B607F;  // hover
+    private static int CYAN = 0xFFE8D8C9;     // cream
+    private static int TEXT_DIM = 0xFF8D97AB;
     private static final int OK = 0xFF7FD18B;
-    private static final int CREAM = 0xFFE8D8C9;
-    private static final int INK = 0xFF141416;
+    private static int CREAM = 0xFFE8D8C9;
+    private static int INK = 0xFF141416;
 
     private enum Tab {
         DECK("◆", "DECK"), FILES("▤", "FILES"), PLACE("✥", "PLACE"), ENGINE("⚙", "ENGINE"), VIEW("◉", "VIEW"), HUB("✦", "HUB");
@@ -91,7 +93,7 @@ public class XlrwScreen extends Screen {
     private int pvx, pvy, pvw, pvh;      // right panel (hologram preview)
     private boolean showPreview;
     private int panel = 0;                // panel currently drawing (0 = deck, 1 = preview)
-    private final Tilt[] tilts = {new Tilt(), new Tilt()};
+    private final Tilt[] tilts = {new Tilt(), new Tilt(), new Tilt()}; // 2 = screen space (overlays)
     private final HoloPreview holo = new HoloPreview();
     private static final Mascot MASCOT = new Mascot();
     private boolean lastEnabled = BuilderConfig.getInstance().enabled;
@@ -101,14 +103,31 @@ public class XlrwScreen extends Screen {
 
     /** Perspective of one panel: local (x, y) -> screen, w = 1 + a * (x - px). */
     private static final class Tilt {
+        /**
+         * 1.21.11: GUI transforms are 2D affine only. A slant made the panel a parallelogram (one edge tilted the wrong
+         * way), so there the "3D" is just depth: the panel shrinks a little and drifts against the mouse (parallax).
+         */
+        static final boolean AFFINE = !com.xlrw.compat.GuiCompat.SUPPORTS_3D_PANELS;
         float px, py, a, ox, oy;
 
+        float squeeze() { return Math.max(0.75f, 1f - Math.abs(a) * 60f); }
+        float slant() { return 0f; }
+
         float[] toScreen(float x, float y) {
+            if (AFFINE) {
+                float X = x - px, Y = y - py;
+                return new float[]{px + ox + squeeze() * X, py + oy + slant() * X + squeeze() * Y};
+            }
             float X = x - px, Y = y - py, w = 1 + a * X;
             return new float[]{px + ox + X / w, py + oy + Y / w};
         }
 
         double[] toLocal(double sx, double sy) {
+            if (AFFINE) {
+                double X = (sx - px - ox) / squeeze();
+                double Y = ((sy - py - oy) - slant() * X) / squeeze();
+                return new double[]{px + X, py + Y};
+            }
             double U = sx - px - ox, V = sy - py - oy, d = 1 - a * U;
             if (d < 0.05) d = 0.05;
             return new double[]{px + U / d, py + V / d};
@@ -166,9 +185,11 @@ public class XlrwScreen extends Screen {
         g.fill(0, 0, width, height, 0x66000000);
     }
 
+    //? if <1.21.11 {
     @Override
     protected void renderBlurredBackground(float partialTick) {
     }
+    //?}
 
     @Override
     protected void renderMenuBackground(GuiGraphics g) {
@@ -181,10 +202,13 @@ public class XlrwScreen extends Screen {
         lastMx = mx;
         lastMy = my;
         long now = System.currentTimeMillis();
+        applyTheme();
         float open = ease(Mth.clamp((now - openedAt) / 420f, 0f, 1f));
         boolean d3 = BuilderConfig.getInstance().ui3d;
 
-        renderBackground(g, mx, my, pt);
+        //? if <1.21.11 {
+        renderBackground(g, mx, my, pt); // 1.21.11 draws the background itself before render()
+        //?}
 
         // Panels swing in from a steep angle and then follow the mouse a little (parallax)
         float nx = Mth.clamp((mx - width / 2f) / (width / 2f), -1f, 1f);
@@ -200,12 +224,18 @@ public class XlrwScreen extends Screen {
         tr.a = -(smooth("tiltR", base * (1.25f - 0.45f * nx), 0.12f) + swing);
         tr.ox = (d3 ? -nx * 5f : 0f) + (1f - open) * 40f;
         tr.oy = d3 ? -ny * 3f : 0f;
+        // inline login panel: the two panels slide apart to make room in the middle
+        float lo = ease(smooth("loginOpen", loginOpen ? 1f : 0f, 0.2f));
+        float push = lo * Math.min(LOGIN_W / 2f + 10, wx + 24f); // "a little": never far off-screen
+        tl.ox -= showPreview ? push : push * 0.5f;
+        tr.ox += push;
 
         // ---- left: control deck ----
         panel = 0;
         double[] l = tl.toLocal(mx, my);
         int smx = (int) Math.floor(l[0]), smy = (int) Math.floor(l[1]);
         beginPanels(g);
+        pushTilt(g, tl);
         drawStatusStrip(g, smx, smy, now);   // drawn first: it slides out from under the panel
         drawFrame(g, now, open);
         drawHeader(g, smx, smy, now, open);
@@ -213,16 +243,16 @@ public class XlrwScreen extends Screen {
 
         // Tab content: slide in from the right
         float tIn = ease(Mth.clamp((now - tabChangedAt) / 200f, 0f, 1f));
-        g.pose().pushPose();
-        g.pose().translate((1f - tIn) * 14f, 0, 0);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, (1f - tIn) * 14f, 0, 0);
         scissorLocal(g, tl, cx - 2, cy - 2, cx + cw + 2, cy + ch + 2);
         // huge slanted tab name as a watermark (Persona menu vibe)
-        g.pose().pushPose();
-        g.pose().translate(cx + cw - font.width(tab.label) * 4.2f - 4, cy + ch - 36, 0);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, cx + cw - font.width(tab.label) * 4.2f - 4, cy + ch - 36, 0);
         shear(g, -0.3f);
-        g.pose().scale(4.2f, 4.2f, 1f);
+        com.xlrw.compat.GuiCompat.scale(g, 4.2f, 4.2f, 1f);
         g.drawString(font, tab.label, 0, 0, 0x10E8D8C9, false);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
         UiImages.draw(g, tab.name(), true, cx, cy, smx, smy);   // pictures sent behind the widgets
         switch (tab) {
             case DECK -> drawDeck(g, smx, smy, now);
@@ -237,14 +267,18 @@ public class XlrwScreen extends Screen {
         if (UiImages.editing) drawImageToolbar(g, smx, smy);
         UiImages.drawPicker(g, font, cx, cy, cw, ch, smx, smy, this::hit, tab.name(), cx, cy);
         g.disableScissor();
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
         drawScanline(g, now);
+
+        popTilt(g);
 
         // ---- right: hologram preview ----
         if (showPreview) {
             panel = 1;
             double[] r = tr.toLocal(mx, my);
+            pushTilt(g, tr);
             drawPreviewPanel(g, (int) Math.floor(r[0]), (int) Math.floor(r[1]), now, open);
+            popTilt(g);
         }
         panel = 0;
         endPanels(g);
@@ -258,8 +292,14 @@ public class XlrwScreen extends Screen {
             float[] r0 = tr.toScreen(pvx + 4, pvy), r1 = tr.toScreen(pvx + pvw - 12, pvy);
             re = new Mascot.Edge(r0[0], r0[1], r1[0], r1[1]);
         }
+        panel = 2;
+        maybeStartLoginPrompt(now, open);
+        drawLoginPrompt(g, mx, my, now);
+        if (lo > 0.02f) drawLoginPanel(g, mx, my, now, lo);
+        drawPlusToast(g, now);
+        panel = 0;
         if (open > 0.85f) MASCOT.render(g, font, le, re, mx, my, now);
-        g.flush();
+        com.xlrw.compat.GuiCompat.flush(g);
 
         if (tooltip != null) drawTooltip(g, mx, my, tooltip);
     }
@@ -269,6 +309,7 @@ public class XlrwScreen extends Screen {
      * perspective applied. Drawing the widgets themselves through the perspective matrix made overlapping layers
      * (same depth, different w) fight in the depth buffer and flicker.
      */
+    //? if <1.21.11 {
     private TextureTarget panelTarget;
 
     private void beginPanels(GuiGraphics g) {
@@ -318,6 +359,16 @@ public class XlrwScreen extends Screen {
         mv.popMatrix();
         RenderSystem.applyModelViewMatrix();
     }
+    //?} else {
+    /*private void beginPanels(GuiGraphics g) {
+    }
+
+    private void endPanels(GuiGraphics g) {
+    }
+
+    private void composite(Tilt t, int x0, int y0, int x1, int y1) {
+    }
+    *///?}
 
     // ---- walk while the deck is open (bot off: WASD / jump / sneak / sprint pass through) ----
     private boolean passedKeys;
@@ -336,11 +387,10 @@ public class XlrwScreen extends Screen {
             if (passedKeys) for (var k : moveKeys()) k.setDown(false);
             return;
         }
-        long w = minecraft.getWindow().getWindow();
         for (var k : moveKeys()) {
             com.mojang.blaze3d.platform.InputConstants.Key key = com.mojang.blaze3d.platform.InputConstants.getKey(k.saveString());
             if (key.getType() == com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM) {
-                k.setDown(com.mojang.blaze3d.platform.InputConstants.isKeyDown(w, key.getValue()));
+                k.setDown(com.xlrw.compat.GuiCompat.keyDown(key.getValue()));
                 passedKeys = true;
             }
         }
@@ -352,11 +402,26 @@ public class XlrwScreen extends Screen {
             for (var k : moveKeys()) k.setDown(false);
             passedKeys = false;
         }
+        //? if <1.21.11 {
         if (panelTarget != null) {
             panelTarget.destroyBuffers();
             panelTarget = null;
         }
+        //?}
         super.removed();
+    }
+
+    /** 1.21.11: draw the following panel content through its (affine) tilt. 1.21.1 tilts in {@link #composite}. */
+    private void pushTilt(GuiGraphics g, Tilt t) {
+        if (!Tilt.AFFINE) return;
+        com.xlrw.compat.GuiCompat.push(g);
+        float sq = t.squeeze(), sl = t.slant();
+        // T(p + o) * [sq 0; sl 1] * T(-p)
+        com.xlrw.compat.GuiCompat.mulAffine(g, sq, sl, 0f, sq, t.px + t.ox - sq * t.px, t.py + t.oy - sq * t.py - sl * t.px);
+    }
+
+    private void popTilt(GuiGraphics g) {
+        if (Tilt.AFFINE) com.xlrw.compat.GuiCompat.pop(g);
     }
 
     /** Scissor around a panel-local rectangle. */
@@ -432,20 +497,20 @@ public class XlrwScreen extends Screen {
             int w = 18;
             x -= w + 3;
             float hv = hover("imgtb" + i, mx, my, x, y, w, 14);
-            g.pose().pushPose();
-            g.pose().translate(0, 0, 150);
+            com.xlrw.compat.GuiCompat.push(g);
+            com.xlrw.compat.GuiCompat.translate(g, 0, 0, 150);
             chamfer(g, x, y, w, 14, 3, i == 2 ? lerpColor(RED, 0xFFFF8F45, hv) : lerpColor(TEAL, TEAL_HI, hv));
             g.drawCenteredString(font, labels[i], x + w / 2, y + 3, i == 2 ? INK : CREAM);
-            g.pose().popPose();
+            com.xlrw.compat.GuiCompat.pop(g);
             hit(x, y, w, 14, acts[i]);
         }
         String hint = "kéo: dời · góc cam: co giãn · cuộn: scale · chuột phải: xoá · F: trước/sau";
-        g.pose().pushPose();
-        g.pose().translate(cx + 4, cy + ch - 9, 150);
-        g.pose().scale(0.6f, 0.6f, 1f);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, cx + 4, cy + ch - 9, 150);
+        com.xlrw.compat.GuiCompat.scale(g, 0.6f, 0.6f, 1f);
         g.fill(-2, -2, font.width(hint) + 2, 9, 0xCC141416);
         g.drawString(font, hint, 0, 0, CREAM, false);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
     }
 
     private void openEditor() {
@@ -485,22 +550,34 @@ public class XlrwScreen extends Screen {
 
     private void drawHeader(GuiGraphics g, int mx, int my, long now, float open) {
         BuilderConfig cfg = BuilderConfig.getInstance();
-        // logo block
+        // logo block: account avatar when logged in (click: account / Plus key)
+        com.xlrw.account.AccountManager acc = com.xlrw.account.AccountManager.get();
         chamfer(g, wx + 10, wy + 8, 26, 26, 5, RED);
-        g.drawString(font, "X", wx + 20, wy + 17, INK, false);
+        net.minecraft.resources.ResourceLocation av = acc.avatar();
+        if (av != null) com.xlrw.compat.GuiCompat.blitTex(g, av, wx + 12, wy + 10, 22, 22, 0, 0, 64, 64, 64, 64);
+        else g.drawString(font, "X", wx + 20, wy + 17, INK, false);
+        hit(wx + 10, wy + 8, 26, 26, () -> setLoginOpen(!loginOpen));
+        tip("account", acc.isLoggedIn() ? "Tài khoản " + acc.username() + (acc.isPlus() ? " · PLUS" : "") : "Đăng nhập tài khoản Xlrw",
+                mx, my, wx + 10, wy + 8, 26, 26);
+        hover("account", mx, my, wx + 10, wy + 8, 26, 26);
         // Persona-style title: tilted cream slab with an orange offset shadow, ink letters sheared forward
         String title = "XLRW";
         int gx = open < 1f && (now / 40) % 2 == 0 ? 1 : 0;
         int tw = (int) (font.width(title) * 1.6f) + 14;
         skewRect(g, wx + 44 + 3, wy + 9 + 2, tw, 14, 5, RED);
         skewRect(g, wx + 44, wy + 9, tw, 14, 5, CREAM);
-        g.pose().pushPose();
-        g.pose().translate(wx + 52 + gx, wy + 11, 0);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, wx + 52 + gx, wy + 11, 0);
         shear(g, -0.25f);
-        g.pose().scale(1.6f, 1.25f, 1f);
+        com.xlrw.compat.GuiCompat.scale(g, 1.6f, 1.25f, 1f);
         g.drawString(font, title, 0, 0, INK, false);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
         g.drawString(font, "PRINTER", wx + 44 + tw + 8, wy + 13, RED, false);
+        if (acc.isPlus()) {
+            int bx = wx + 44 + tw + 8 + font.width("PRINTER") + 6;
+            skewRect(g, bx, wy + 11, font.width("PLUS") + 8, 11, 4, 0xFFF3C04E);
+            g.drawString(font, "PLUS", bx + 4, wy + 13, INK, false);
+        }
         // diagonal halftone stripes (P5 flavour) behind the status dots
         for (int i = 0; i < 14; i++) {
             int sx = wx + ww / 2 - 30 + i * 6;
@@ -508,7 +585,12 @@ public class XlrwScreen extends Screen {
         }
         Schematic s = SchematicManager.getInstance().getActiveSchematic();
         String sub = s != null ? trim(s.getName().replaceFirst("\\.[^.]+$", ""), 26).toUpperCase() : "NO SCHEMATIC";
-        g.drawString(font, sub, wx + 44, wy + 27, TEXT_DIM, false);
+        if (acc.isLoggedIn()) {
+            fitString(g, acc.username().toUpperCase(), wx + 44, wy + 27, ww - 44 - 120, CREAM);
+        } else {
+            fitString(g, sub, wx + 44, wy + 27, ww - 44 - 120, TEXT_DIM);
+        }
+        hit(wx + 44, wy + 25, 120, 11, () -> setLoginOpen(!loginOpen));
 
         // compass-like status dots
         int dotsX = wx + ww / 2 + 10;
@@ -537,8 +619,8 @@ public class XlrwScreen extends Screen {
         boolean ie = UiImages.editing;
         chamfer(g, ix, py, 20, 18, 4, ie ? RED : lerpColor(TEAL, TEAL_HI, ih));
         g.drawCenteredString(font, "▣", ix + 10, py + 5, ie ? INK : lerpColor(TEXT_DIM, CREAM, ih));
-        hit(ix, py, 20, 18, () -> { UiImages.editing = !UiImages.editing; UiImages.picker = false; });
-        tip("imgEdit", "Thêm / chỉnh ảnh trên tab", mx, my, ix, py, 20, 18);
+        hit(ix, py, 20, 18, () -> { if (UiImages.editing || requirePlus("Thêm ảnh vào UI")) { UiImages.editing = !UiImages.editing; UiImages.picker = false; } });
+        tip("imgEdit", "Thêm / chỉnh ảnh trên tab (PLUS)", mx, my, ix, py, 20, 18);
     }
 
     private void drawNav(GuiGraphics g, int mx, int my, long now) {
@@ -553,12 +635,12 @@ public class XlrwScreen extends Screen {
             skewRect(g, x + pop, y, w, h - 4, 5, bg);
             int col = active ? INK : lerpColor(TEXT_DIM, CREAM, hv);
             g.drawCenteredString(font, t.icon, x + pop + w / 2, y + 6, active ? RED : col);
-            g.pose().pushPose();
-            g.pose().translate(x + pop + w / 2f, y + 19, 0);
+            com.xlrw.compat.GuiCompat.push(g);
+            com.xlrw.compat.GuiCompat.translate(g, x + pop + w / 2f, y + 19, 0);
             shear(g, -0.2f);
-            g.pose().scale(0.8f, 0.8f, 1f);
+            com.xlrw.compat.GuiCompat.scale(g, 0.8f, 0.8f, 1f);
             g.drawString(font, t.label, -font.width(t.label) / 2, 0, col, false);
-            g.pose().popPose();
+            com.xlrw.compat.GuiCompat.pop(g);
             final Tab tt = t;
             hit(x, y, w + 8, h - 4, () -> switchTab(tt));
             y += h;
@@ -587,11 +669,11 @@ public class XlrwScreen extends Screen {
         float target = s != null ? s.getProgressPercentage() : 0f;
         shownProgress += (target - shownProgress) * 0.12f;
         String pct = String.format("%.0f", shownProgress);
-        g.pose().pushPose();
-        g.pose().translate(x + 12, y + 14, 0);
-        g.pose().scale(3.5f, 3.5f, 1f);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, x + 12, y + 14, 0);
+        com.xlrw.compat.GuiCompat.scale(g, 3.5f, 3.5f, 1f);
         g.drawString(font, pct, 0, 0, RED, false);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
         g.drawString(font, "%", x + 15 + (int) (font.width(pct) * 3.5f), y + 34, RED_DIM, false);
         // segmented bar
         int bx = x + 12, by = y + 64, bw = w - 24, segs = 40;
@@ -773,19 +855,19 @@ public class XlrwScreen extends Screen {
             int ex = x + half - 104, ey = y + 20, ew = 96, eh = 58;
             float eh0 = hover("edit3dP", mx, my, ex, ey, ew, eh);
             skewRect(g, ex + 3, ey + 3, ew, eh, 6, alpha(RED, 0.55f + 0.45f * eh0));
-            g.pose().pushPose();
+            com.xlrw.compat.GuiCompat.push(g);
             float es = 1f + 0.05f * eh0;
-            g.pose().translate(ex + ew / 2f - 2f * eh0, ey + eh / 2f - 2.5f * eh0, 0);
-            g.pose().scale(es, es, 1f);
-            g.pose().translate(-(ex + ew / 2f), -(ey + eh / 2f), 0);
+            com.xlrw.compat.GuiCompat.translate(g, ex + ew / 2f - 2f * eh0, ey + eh / 2f - 2.5f * eh0, 0);
+            com.xlrw.compat.GuiCompat.scale(g, es, es, 1f);
+            com.xlrw.compat.GuiCompat.translate(g, -(ex + ew / 2f), -(ey + eh / 2f), 0);
             skewRect(g, ex, ey, ew, eh, 6, lerpColor(CREAM, 0xFFFFF1E4, eh0));
-            g.pose().pushPose();
-            g.pose().translate(ex + ew / 2f + 3, ey + 12, 0);
-            g.pose().scale(2f, 2f, 1f);
+            com.xlrw.compat.GuiCompat.push(g);
+            com.xlrw.compat.GuiCompat.translate(g, ex + ew / 2f + 3, ey + 12, 0);
+            com.xlrw.compat.GuiCompat.scale(g, 2f, 2f, 1f);
             g.drawCenteredString(font, "✥", 0, 0, RED);
-            g.pose().popPose();
+            com.xlrw.compat.GuiCompat.pop(g);
             g.drawCenteredString(font, "EDIT 3D", ex + ew / 2 + 2, ey + eh - 16, INK);
-            g.pose().popPose();
+            com.xlrw.compat.GuiCompat.pop(g);
             hit(ex, ey, ew + 6, eh, this::openEditor);
             tip("edit3dP", "Free cam: kéo mũi tên dời, kéo vòng xoay", mx, my, ex, ey, ew, eh);
 
@@ -802,11 +884,11 @@ public class XlrwScreen extends Screen {
         if (s != null) {
             int max = s.getMaxY() - s.getMinY();
             String big = String.valueOf(cfg.currentLayer);
-            g.pose().pushPose();
-            g.pose().translate(lx + 8, y + 22, 0);
-            g.pose().scale(2.5f, 2.5f, 1f);
+            com.xlrw.compat.GuiCompat.push(g);
+            com.xlrw.compat.GuiCompat.translate(g, lx + 8, y + 22, 0);
+            com.xlrw.compat.GuiCompat.scale(g, 2.5f, 2.5f, 1f);
             g.drawString(font, big, 0, 0, RED, false);
-            g.pose().popPose();
+            com.xlrw.compat.GuiCompat.pop(g);
             g.drawString(font, "/" + max + "   Y " + (s.getMinY() + cfg.currentLayer), lx + 12 + (int) (font.width(big) * 2.5f), y + 34, TEXT_DIM, false);
             // vertical layer meter
             int mxx = lx + half - 14, mtop = y + 20, mh = ch - 90;
@@ -847,17 +929,18 @@ public class XlrwScreen extends Screen {
                 {"FIX", "Tự đập block sai"}, {"AIR PLACE", "Đặt block giữa không trung"},
                 {"FAST", "Đặt nhanh block thường"}, {"SPOOF", "Đặt block có hướng không cần nhìn đúng hướng"},
                 {"CHORUS", "Ăn chorus thoát hố"}, {"CLEAN", "Dọn block tạm & trụ thừa"},
-                {"WALL", "Đặt xuyên tường ở mọi nơi trong tầm với (tắt nếu server có anti-cheat)"}, {"DRY MARK", "Hiện khung đánh dấu của chạy thử"},
+                {"WALL", "Đặt xuyên tường ở mọi nơi trong tầm với (tắt nếu server có anti-cheat)"},
+                {"SERVER SAFE", "Chơi server: chờ server xác nhận từng block, nhìn thật trước khi đặt, tự tắt xuyên tường / air place / spoof / đặt nhanh / REACH+"},
         };
         BooleanSupplier[] get = {
                 () -> cfg.autoMove, () -> cfg.useScaffolding, () -> cfg.autoDemolish, () -> cfg.airPlace,
                 () -> cfg.fastSimpleBlocks, () -> cfg.rotationSpoof, () -> cfg.chorusEscape, () -> cfg.cleanupTempBlocks,
-                () -> cfg.throughWallAnywhere, () -> cfg.renderDryRun
+                () -> cfg.throughWallAnywhere, () -> cfg.serverSafe
         };
         List<java.util.function.Consumer<Boolean>> set = List.of(
                 v -> cfg.autoMove = v, v -> cfg.useScaffolding = v, v -> cfg.autoDemolish = v, v -> cfg.airPlace = v,
                 v -> cfg.fastSimpleBlocks = v, v -> cfg.rotationSpoof = v, v -> cfg.chorusEscape = v, v -> cfg.cleanupTempBlocks = v,
-                v -> cfg.throughWallAnywhere = v, v -> cfg.renderDryRun = v
+                v -> cfg.throughWallAnywhere = v, v -> cfg.serverSafe = v
         );
         for (int i = 0; i < items.length; i++) {
             int tx = x + (i % 2) * (colW + 6), ty = y + (i / 2) * 24;
@@ -894,7 +977,7 @@ public class XlrwScreen extends Screen {
         // speed
         g.drawString(font, "⏱ " + cfg.placeDelayMs + "ms", x + 8, by + 7, RED, false);
         padButton(g, mx, my, "d-", x + 70, by, "−", () -> {
-            cfg.placeDelayMs = Math.max(50, cfg.placeDelayMs - 20);
+            cfg.placeDelayMs = Math.max(com.xlrw.account.Plus.minDelaySetting(), cfg.placeDelayMs - 20);
             BuilderConfig.save();
         }, "Nhanh hơn");
         padButton(g, mx, my, "d+", x + 96, by, "+", () -> {
@@ -930,6 +1013,432 @@ public class XlrwScreen extends Screen {
             int tx = cx + (i % 2) * (colW + 6), ty = cy + (i / 2) * 24;
             toggle(g, mx, my, "v" + i, tx, ty, colW, items[i][0], get[i], set.get(i), items[i][1]);
         }
+        // ---- Plus features ----
+        int n = items.length;
+        int[][] pos = new int[3][];
+        for (int k = 0; k < 3; k++) pos[k] = new int[]{cx + ((n + k) % 2) * (colW + 6), cy + ((n + k) / 2) * 24};
+        plusToggle(g, mx, my, "vp0", pos[0][0], pos[0][1], colW, "DRY MARK", () -> cfg.renderDryRun, v -> cfg.renderDryRun = v,
+                "Khung đánh dấu của chạy thử trong thế giới");
+        plusToggle(g, mx, my, "vp1", pos[1][0], pos[1][1], colW, "REACH+", () -> cfg.plusReach, v -> cfg.plusReach = v,
+                "Đặt block từ 5 block (server có anti-cheat có thể kick)");
+        bigButton(g, mx, my, "vp2", pos[2][0], pos[2][1], colW, 20, "★ ĐỔI AVATAR", TEAL, com.xlrw.account.Plus.on() ? 0xFFF3C04E : TEXT_DIM, () -> {
+            if (!com.xlrw.account.AccountManager.get().isLoggedIn()) {
+                setLoginOpen(true);
+                loginSay("Đăng nhập trước đã.", true);
+            } else if (requirePlus("Đổi avatar")) {
+                pickAvatar();
+            }
+        });
+        tip("vp2", "Ảnh đại diện ở góc trái menu (PLUS)", mx, my, pos[2][0], pos[2][1], colW, 20);
+        drawThemePicker(g, mx, my, cx, cy + ((n + 3 + 1) / 2) * 24 + 4, cw);
+    }
+
+    // ------------------------------------------------------------------------------------------------
+    // Account: inline login panel, Bit's login prompt, Plus gate
+    // ------------------------------------------------------------------------------------------------
+
+    private static final int LOGIN_W = 178;
+    private static final int GOLD = 0xFFF3C04E;
+    private static int themeApplied = -1;
+
+    /** Copies the active theme into the colour fields (Plus only; everyone else gets the original look). */
+    private static void applyTheme() {
+        int id = com.xlrw.account.Plus.on() ? BuilderConfig.getInstance().uiTheme : 0;
+        if (id == themeApplied) return;
+        themeApplied = id;
+        UiTheme t = UiTheme.get(id);
+        BG = t.bg; BG2 = t.bg2; RED = t.accent; RED_DIM = t.outline; RED_DEEP = t.accentDeep;
+        TEAL = t.widget; TEAL_HI = t.widgetHi; TEXT_DIM = t.textDim; CREAM = t.cream; CYAN = t.cream; INK = t.ink;
+        HubWidgets.theme(t);
+    }
+
+    /** Theme picker: a grid of 3-colour swatches. */
+    private void drawThemePicker(GuiGraphics g, int mx, int my, int x, int y, int w) {
+        boolean plus = com.xlrw.account.Plus.on();
+        int cur = plus ? BuilderConfig.getInstance().uiTheme : 0;
+        label(g, x, y, "MÀU UI");
+        int lw = font.width("MÀU UI") + 12;
+        int tw = font.width("PLUS") + 6;
+        skewRect(g, x + lw, y, tw, 9, 3, plus ? GOLD : 0xFF5A4A28);
+        g.drawString(font, "PLUS", x + lw + 3, y + 1, plus ? 0xFF141416 : 0xFFB89A55, false);
+        int n = UiTheme.ALL.length, cols = 7, gap = 4;
+        int sw = (w - gap * (cols - 1)) / cols, sh = 16;
+        String hoverName = UiTheme.get(cur).name;
+        for (int i = 0; i < n; i++) {
+            UiTheme t = UiTheme.ALL[i];
+            int sx = x + (i % cols) * (sw + gap), sy = y + 13 + (i / cols) * (sh + gap);
+            float hv = hover("th" + i, mx, my, sx, sy, sw, sh);
+            if (hv > 0.5f) hoverName = t.name;
+            int lift = Math.round(hv * 2);
+            int[] c = t.swatch;
+            chamfer(g, sx - 1 - lift, sy - 1 - lift, sw + 2, sh + 2, 4, i == cur ? CREAM : 0xFF0C0C0E);
+            int third = sw / 3;
+            // three stripes, like the reference cards
+            chamfer(g, sx - lift, sy - lift, sw, sh, 3, c[0] | 0xFF000000);
+            g.fill(sx - lift + third, sy - lift + sh / 2, sx - lift + 2 * third, sy - lift + sh, c[1] | 0xFF000000);
+            g.fill(sx - lift + 2 * third, sy - lift + sh / 2, sx - lift + sw - 3, sy - lift + sh, c[2] | 0xFF000000);
+            if (i == cur) g.drawCenteredString(font, "✓", sx - lift + sw / 2, sy - lift + 1, UiTheme.lum(c[0]) > 0.45f ? 0xFF141416 : 0xFFFFFFFF);
+            final int id = i;
+            hit(sx, sy, sw, sh, () -> {
+                if (id == 0 || requirePlus("Đổi màu UI")) {
+                    BuilderConfig.getInstance().uiTheme = id;
+                    BuilderConfig.save();
+                    MASCOT.react("edit");
+                }
+            });
+        }
+        int rows = (n + cols - 1) / cols;
+        fitString(g, hoverName, x + lw + tw + 8, y + 1, w - lw - tw - 8, TEXT_DIM);
+    }
+    private static final long PROMPT_EVERY_MS = 15 * 60_000L;
+    private static final long FIRST_PROMPT_MS = 20_000L;
+
+    private boolean loginOpen;
+    private int toggleReserve; // extra room taken on the right of a toggle (PLUS tag)
+    private String focus = "";
+    private final Map<String, StringBuilder> fields = new HashMap<>();
+    private String loginMsg = "";
+    private boolean loginMsgBad;
+    private long plusToastUntil;
+    private String plusToastText = "";
+    // Bit's "log in?" banner
+    private long bannerAt = -1, bannerCloseAt = -1;
+    private static long sessionPromptAt = 0;
+
+    private StringBuilder field(String id) {
+        return fields.computeIfAbsent(id, k -> new StringBuilder());
+    }
+
+    private void setLoginOpen(boolean open) {
+        if (open == loginOpen) return;
+        loginOpen = open;
+        focus = open ? (com.xlrw.account.AccountManager.get().isLoggedIn() ? "key" : "user") : "";
+        if (open && bannerAt >= 0 && bannerCloseAt < 0) bannerCloseAt = System.currentTimeMillis();
+        XlrwSounds.play(open ? "ui.open" : "ui.close", 1.2f, 0.4f);
+        soundDone = true;
+    }
+
+    private void loginSay(String m, boolean bad) {
+        loginMsg = m == null ? "" : m;
+        loginMsgBad = bad;
+    }
+
+    /** True if Plus is active; otherwise shows the Plus notice and lets Bit point it out. */
+    private boolean requirePlus(String what) {
+        if (com.xlrw.account.Plus.on()) return true;
+        plusToastText = "★ " + what + " là tính năng PLUS — "
+                + (com.xlrw.account.AccountManager.get().isLoggedIn() ? "nhập key để mở" : "đăng nhập và nhập key để mở");
+        plusToastUntil = System.currentTimeMillis() + 3200;
+        MASCOT.react("plus");
+        XlrwSounds.play("ui.power_off", 1.3f, 0.4f);
+        soundDone = true;
+        return false;
+    }
+
+    /** Toggle that only works with Plus (shown off and gold-tagged without it). */
+    private void plusToggle(GuiGraphics g, int mx, int my, String id, int x, int y, int w, String text,
+                            BooleanSupplier get, java.util.function.Consumer<Boolean> set, String tipText) {
+        boolean plus = com.xlrw.account.Plus.on();
+        toggleReserve = font.width("PLUS") + 12;
+        toggle(g, mx, my, id, x, y, w, text, () -> plus && get.getAsBoolean(), v -> {
+            if (requirePlus(text)) set.accept(v);
+        }, tipText + " (PLUS)");
+        toggleReserve = 0;
+        // gold PLUS tag next to the switch
+        int tw = font.width("PLUS") + 6, tx = x + w - 22 - 6 - tw - 4;
+        skewRect(g, tx, y + 5, tw, 10, 3, plus ? GOLD : 0xFF5A4A28);
+        g.drawString(font, "PLUS", tx + 3, y + 6, plus ? INK : 0xFFB89A55, false);
+    }
+
+    private void drawPlusToast(GuiGraphics g, long now) {
+        if (now > plusToastUntil) return;
+        float a = Mth.clamp((plusToastUntil - now) / 400f, 0f, 1f) * Mth.clamp((now - (plusToastUntil - 3200)) / 150f, 0f, 1f);
+        int w = Math.min(font.width(plusToastText) + 20, width - 16), h = 18;
+        int x = (width - w) / 2, y = height - 46 - (int) (6 * (1 - a));
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, 0, 0, 350);
+        skewRect(g, x + 2, y + 2, w, h, 6, alpha(0xFF000000, 0.5f * a));
+        skewRect(g, x, y, w, h, 6, alpha(0xFF2A2214, 0.96f * a));
+        g.fill(x + 6, y + h - 2, x + w - 2, y + h - 1, alpha(GOLD, a));
+        fitString(g, plusToastText, x + 10, y + 5, w - 16, alpha(GOLD, a));
+        com.xlrw.compat.GuiCompat.pop(g);
+    }
+
+    // ---- Bit's prompt: every ~15 minutes while not logged in ----
+
+    private void maybeStartLoginPrompt(long now, float open) {
+        if (open < 0.98f || loginOpen || bannerAt >= 0 || com.xlrw.account.AccountManager.get().isLoggedIn()) return;
+        BuilderConfig cfg = BuilderConfig.getInstance();
+        if (sessionPromptAt == 0) sessionPromptAt = now + FIRST_PROMPT_MS; // the first one 20 s after opening the deck
+        long due = Math.max(sessionPromptAt, cfg.loginPromptAt + PROMPT_EVERY_MS);
+        if (now < due) return;
+        bannerAt = now;
+        bannerCloseAt = -1;
+        cfg.loginPromptAt = now;
+        sessionPromptAt = now + PROMPT_EVERY_MS;
+        BuilderConfig.save();
+        MASCOT.bigJump();
+    }
+
+    private void drawLoginPrompt(GuiGraphics g, int mx, int my, long now) {
+        if (bannerAt < 0) return;
+        long t = now - bannerAt;
+        if (t < 450) return; // Bit is still flying up
+        if (bannerCloseAt < 0 && t > 30_000) bannerCloseAt = now; // nobody answered
+        int bw = 236, bh = 50;
+        int bx = (width - bw) / 2;
+        float targetY = 6;
+        float y;
+        if (bannerCloseAt >= 0) {
+            float k = Mth.clamp((now - bannerCloseAt) / 380f, 0f, 1f);
+            y = targetY + (-bh - 30 - targetY) * k * k;
+            if (k >= 1f) {
+                bannerAt = -1;
+                return;
+            }
+        } else {
+            float k = Mth.clamp((t - 450) / 650f, 0f, 1f);
+            // falls in from above with a little overshoot (as if Bit pulled it down)
+            float c1 = 1.70158f, c3 = c1 + 1;
+            float e = 1 + c3 * (float) Math.pow(k - 1, 3) + c1 * (float) Math.pow(k - 1, 2);
+            y = -bh - 30 + (targetY + bh + 30) * e;
+        }
+        int by = Math.round(y);
+        // strings it hangs from + the rope Bit pulled
+        g.fill(bx + 18, 0, bx + 19, by, alpha(CREAM, 0.6f));
+        g.fill(bx + bw - 19, 0, bx + bw - 18, by, alpha(CREAM, 0.6f));
+        float[] bit = MASCOT.head();
+        if (bit != null && bannerCloseAt < 0) ropeLine(g, bx + bw / 2f, by + bh, bit[0], bit[1], alpha(ORANGE_ROPE, 0.85f));
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, 0, 0, 320);
+        skewRect(g, bx + 3, by + 3, bw, bh, 8, 0x88000000);
+        skewRect(g, bx, by, bw, bh, 8, 0xF51A1A1D);
+        g.fill(bx + 8, by + bh - 2, bx + bw - 2, by + bh - 1, RED);
+        fitString(g, "Bạn có muốn đăng nhập Xlrw không?", bx + 14, by + 8, bw - 28, CREAM);
+        fitString(g, "Lưu tên, avatar và mở được bản PLUS.", bx + 14, by + 19, bw - 28, TEXT_DIM);
+        hit(bx, by, bw, bh, () -> soundDone = true);
+        int btY = by + 31;
+        smallButton(g, mx, my, "pr.yes", bx + bw - 136, btY, 60, 14, "CÓ", true, () -> {
+            setLoginOpen(true);
+            MASCOT.react("happy");
+        });
+        smallButton(g, mx, my, "pr.no", bx + bw - 70, btY, 60, 14, "ĐỂ SAU", false, () -> {
+            bannerCloseAt = System.currentTimeMillis();
+            MASCOT.react("click");
+        });
+        com.xlrw.compat.GuiCompat.pop(g);
+    }
+
+    private static final int ORANGE_ROPE = 0xFFF3701E;
+
+    /** A slightly sagging rope made of short segments. */
+    private void ropeLine(GuiGraphics g, float x0, float y0, float x1, float y1, int color) {
+        int n = 18;
+        float sag = Math.min(24f, Math.abs(x1 - x0) * 0.15f + 6f);
+        float px = x0, py = y0;
+        for (int i = 1; i <= n; i++) {
+            float t = i / (float) n;
+            float x = x0 + (x1 - x0) * t, y = y0 + (y1 - y0) * t + sag * 4 * t * (1 - t);
+            int ax = Math.round(Math.min(px, x)), ay = Math.round(Math.min(py, y));
+            int bx2 = Math.round(Math.max(px, x)) + 1, by2 = Math.round(Math.max(py, y)) + 1;
+            g.fill(ax, ay, Math.max(ax + 1, bx2), Math.max(ay + 1, by2), color);
+            px = x;
+            py = y;
+        }
+    }
+
+    // ---- inline login panel ----
+
+    private void drawLoginPanel(GuiGraphics g, int mx, int my, long now, float lo) {
+        com.xlrw.account.AccountManager acc = com.xlrw.account.AccountManager.get();
+        boolean in = acc.isLoggedIn();
+        int w = LOGIN_W, h = in ? 162 : 170;
+        float cxs = showPreview ? (wx + ww + pvx) / 2f : width / 2f;
+        int x = Math.round(cxs - w / 2f), y = wy + (wh - h) / 2;
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, 0, 0, 300);
+        float sc = 0.86f + 0.14f * lo;
+        com.xlrw.compat.GuiCompat.translate(g, cxs, y + h / 2f, 0);
+        com.xlrw.compat.GuiCompat.scale(g, sc, sc, 1f);
+        com.xlrw.compat.GuiCompat.translate(g, -cxs, -(y + h / 2f), 0);
+        int lmx = Math.round(cxs + (mx - cxs) / sc), lmy = Math.round(y + h / 2f + (my - (y + h / 2f)) / sc);
+        if (lo < 0.98f) { mx = -999; my = -999; } else { mx = lmx; my = lmy; }
+
+        hit(x, y, w, h, () -> { focus = ""; soundDone = true; }); // the panel itself swallows clicks
+        chamfer(g, x + 3, y + 4, w, h, 10, 0x88000000);
+        chamfer(g, x, y, w, h, 10, 0xFA1A1A1D);
+        chamferOutline(g, x, y, w, h, 10, alpha(RED_DIM, 0.9f));
+        g.fill(x + 3, y + 3, x + 14, y + 4, RED);
+        g.fill(x + 3, y + 3, x + 4, y + 14, RED);
+        // title slab
+        String title = in ? "TÀI KHOẢN" : "ĐĂNG NHẬP";
+        int tw = font.width(title) + 16;
+        skewRect(g, x + 12 + 2, y + 9 + 2, tw, 13, 5, RED);
+        skewRect(g, x + 12, y + 9, tw, 13, 5, CREAM);
+        g.drawString(font, title, x + 20, y + 12, INK, false);
+        smallButton(g, mx, my, "lg.close", x + w - 24, y + 8, 16, 14, "x", false, () -> setLoginOpen(false));
+
+        int fx = x + 12, fw = w - 24;
+        if (!in) {
+            textField(g, mx, my, "user", fx, y + 34, fw, "TÊN", "tên tài khoản", false, now);
+            textField(g, mx, my, "pass", fx, y + 66, fw, "MẬT KHẨU", "ít nhất 6 ký tự", true, now);
+            int bw = (fw - 6) / 2;
+            bigButton(g, mx, my, "lg.login", fx, y + 98, bw, 18, "ĐĂNG NHẬP", RED, INK, () -> doLogin(false));
+            bigButton(g, mx, my, "lg.reg", fx + bw + 6, y + 98, bw, 18, "ĐĂNG KÝ", TEAL, CREAM, () -> doLogin(true));
+            fitString(g, "Không đăng nhập vẫn dùng được.", fx, y + h - 14, fw, alpha(TEXT_DIM, 0.8f));
+        } else {
+            // avatar + name
+            chamfer(g, fx, y + 32, 26, 26, 5, RED);
+            net.minecraft.resources.ResourceLocation av = acc.avatar();
+            if (av != null) com.xlrw.compat.GuiCompat.blitTex(g, av, fx + 2, y + 34, 22, 22, 0, 0, 64, 64, 64, 64);
+            else g.drawString(font, "X", fx + 10, y + 41, INK, false);
+            fitString(g, acc.username(), fx + 34, y + 34, fw - 34, CREAM);
+            boolean plus = acc.isPlus();
+            if (plus) {
+                String d = new java.text.SimpleDateFormat("dd/MM/yyyy").format(new java.util.Date(acc.plusUntil()));
+                skewRect(g, fx + 34, y + 46, font.width("PLUS") + 8, 10, 3, GOLD);
+                g.drawString(font, "PLUS", fx + 38, y + 47, INK, false);
+                fitString(g, "đến " + d, fx + 34 + font.width("PLUS") + 12, y + 47, fw - 34 - font.width("PLUS") - 12, GOLD);
+            } else {
+                g.drawString(font, "Bản thường", fx + 34, y + 47, TEXT_DIM, false);
+            }
+            textField(g, mx, my, "key", fx, y + 66, fw, "KEY PLUS", "XLRW-XXXX-XXXX-XXXX", false, now);
+            bigButton(g, mx, my, "lg.redeem", fx, y + 98, fw, 18, plus ? "GIA HẠN PLUS" : "KÍCH HOẠT PLUS", GOLD, INK, this::doRedeem);
+            smallButton(g, mx, my, "lg.out", fx, y + h - 22, 70, 14, "ĐĂNG XUẤT", false, () -> {
+                acc.logout();
+                field("pass").setLength(0);
+                focus = "user";
+                loginSay("Đã đăng xuất.", false);
+            });
+        }
+        // message
+        String msg = acc.busy() ? "Đang kết nối" + ".".repeat((int) (now / 300 % 4)) : loginMsg;
+        if (!msg.isEmpty()) {
+            int my0 = y + 122;
+            for (var line : font.split(Component.literal(msg), fw)) {
+                g.drawString(font, line, fx, my0, acc.busy() ? TEXT_DIM : loginMsgBad ? 0xFFE0403A : 0xFF5FD38D, false);
+                my0 += 10;
+            }
+        }
+        com.xlrw.compat.GuiCompat.pop(g);
+    }
+
+    /** Custom text field (click to focus, type, Backspace, Ctrl+V, Tab to the next one, Enter to submit). */
+    private void textField(GuiGraphics g, int mx, int my, String id, int x, int y, int w, String label, String hint,
+                           boolean secret, long now) {
+        boolean f = id.equals(focus);
+        float hv = hover("tf." + id, mx, my, x, y + 10, w, 16);
+        fitString(g, label, x, y, w, f ? RED : TEXT_DIM);
+        chamfer(g, x, y + 10, w, 16, 4, f ? 0xFF2F3644 : lerpColor(0xFF22262F, TEAL, hv));
+        g.fill(x + 4, y + 25, x + w, y + 26, f ? RED : alpha(RED_DIM, 0.8f));
+        String v = field(id).toString();
+        String shown = secret ? "•".repeat(v.length()) : v;
+        while (font.width(shown) > w - 14 && shown.length() > 0) shown = shown.substring(1);
+        if (v.isEmpty() && !f) fitString(g, hint, x + 6, y + 14, w - 12, alpha(TEXT_DIM, 0.6f));
+        else g.drawString(font, shown, x + 6, y + 14, CREAM, false);
+        if (f && (now / 500) % 2 == 0) {
+            int cxp = x + 6 + font.width(shown);
+            g.fill(cxp, y + 13, cxp + 1, y + 23, RED);
+        }
+        hit(x, y + 8, w, 20, () -> focus = id);
+    }
+
+    private boolean loginChar(String s) {
+        if (!loginOpen || focus.isEmpty() || s == null || s.isEmpty()) return false;
+        int c = s.codePointAt(0);
+        if (c < 32 || c == 127) return true;
+        StringBuilder b = field(focus);
+        int max = focus.equals("user") ? 16 : focus.equals("key") ? 24 : 64;
+        if (focus.equals("user") && !(Character.isLetterOrDigit(c) && c < 128 || c == '_')) return true;
+        if (b.length() < max) b.append(focus.equals("key") ? s.toUpperCase() : s);
+        return true;
+    }
+
+    private boolean loginKey(int key, int mods) {
+        if (!loginOpen) return false;
+        if (key == 256) { // ESC closes the panel first
+            setLoginOpen(false);
+            return true;
+        }
+        if (focus.isEmpty()) return false;
+        StringBuilder b = field(focus);
+        boolean in = com.xlrw.account.AccountManager.get().isLoggedIn();
+        switch (key) {
+            case 259 -> { if (b.length() > 0) b.setLength(b.length() - 1); }                 // Backspace
+            case 258 -> focus = in ? "key" : focus.equals("user") ? "pass" : "user";        // Tab
+            case 257, 335 -> { if (in) doRedeem(); else if (focus.equals("user")) focus = "pass"; else doLogin(false); }
+            case 86 -> { // Ctrl+V
+                if ((mods & 2) != 0) {
+                    String clip = minecraft.keyboardHandler.getClipboard();
+                    if (clip != null) for (int i = 0; i < clip.length(); ) {
+                        int cp = clip.codePointAt(i);
+                        loginChar(new String(Character.toChars(cp)));
+                        i += Character.charCount(cp);
+                    }
+                } else return true;
+            }
+            default -> { return true; } // swallow letters etc. so they do not trigger shortcuts while typing
+        }
+        return true;
+    }
+
+    private void doLogin(boolean register) {
+        String u = field("user").toString().trim(), p = field("pass").toString();
+        if (u.isEmpty() || p.isEmpty()) {
+            loginSay("Nhập tên và mật khẩu.", true);
+            return;
+        }
+        com.xlrw.account.AccountManager acc = com.xlrw.account.AccountManager.get();
+        java.util.function.Consumer<String> done = m -> {
+            loginSay(m, !acc.isLoggedIn());
+            if (acc.isLoggedIn()) {
+                field("pass").setLength(0);
+                focus = "key";
+                MASCOT.react("win");
+            }
+        };
+        if (register) acc.register(u, p, done);
+        else acc.login(u, p, done);
+    }
+
+    private void doRedeem() {
+        String k = field("key").toString().trim();
+        if (k.isEmpty()) {
+            loginSay("Nhập key.", true);
+            return;
+        }
+        com.xlrw.account.AccountManager.get().redeem(k, m -> {
+            boolean ok = m != null && m.startsWith("Đã kích hoạt");
+            loginSay(m, !ok);
+            if (ok) {
+                field("key").setLength(0);
+                MASCOT.react("win");
+            }
+        });
+    }
+
+    /** Native file picker (LWJGL tinyfd); falls back to config/xlrw/avatar.png. */
+    private void pickAvatar() {
+        Thread t = new Thread(() -> {
+            String path = null;
+            try (org.lwjgl.system.MemoryStack stack = org.lwjgl.system.MemoryStack.stackPush()) {
+                org.lwjgl.PointerBuffer filters = stack.mallocPointer(4);
+                filters.put(stack.UTF8("*.png")).put(stack.UTF8("*.jpg")).put(stack.UTF8("*.jpeg")).put(stack.UTF8("*.gif"));
+                filters.flip();
+                path = org.lwjgl.util.tinyfd.TinyFileDialogs.tinyfd_openFileDialog("Chọn ảnh avatar", "", filters, "Ảnh", false);
+            } catch (Throwable e) {
+                File f = new File(net.fabricmc.loader.api.FabricLoader.getInstance().getConfigDir().toFile(), "xlrw/avatar.png");
+                if (f.exists()) path = f.getAbsolutePath();
+            }
+            if (path == null) return;
+            File file = new File(path);
+            minecraft.execute(() -> com.xlrw.account.AccountManager.get().uploadAvatar(file, m -> {
+                plusToastText = m == null ? "" : m;
+                plusToastUntil = System.currentTimeMillis() + 2600;
+            }));
+        }, "xlrw-avatar-picker");
+        t.setDaemon(true);
+        t.start();
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -944,7 +1453,7 @@ public class XlrwScreen extends Screen {
         liftBegin(g, hv, x, y, w, 20, 5);
         chamfer(g, x, y, w, 20, 5, lerpColor(TEAL, TEAL_HI, hv));
         if (k > 0.01f) g.fill(x + 5, y + 18, x + 5 + (int) ((w - 5) * k), y + 19, RED); // underline grows when on
-        g.drawString(font, text, x + 7, y + 6, lerpColor(TEXT_DIM, RED, Math.max(k, hv * 0.6f)), false);
+        fitString(g, text, x + 7, y + 6, w - 7 - 34 - toggleReserve, lerpColor(TEXT_DIM, RED, Math.max(k, hv * 0.6f)));
         // switch
         int sw = 22, sx = x + w - sw - 6, sy = y + 6;
         g.fill(sx, sy, sx + sw, sy + 8, lerpColor(0xFF2B2F3A, RED_DEEP, k));
@@ -966,7 +1475,7 @@ public class XlrwScreen extends Screen {
         chamfer(g, x, y, w, h, 6, lerpColor(bg, brighten(bg), hv));
         // hover sweep
         if (hv > 0.02f) g.fill(x + 6, y + h - 2, x + 6 + (int) ((w - 8) * hv), y + h - 1, fg);
-        g.drawCenteredString(font, text, x + w / 2, y + (h - 8) / 2, fg);
+        fitCentered(g, text, x + w / 2, y + (h - 8) / 2, w - 8, fg);
         liftEnd(g);
         hit(x, y, w, h, r);
     }
@@ -976,7 +1485,7 @@ public class XlrwScreen extends Screen {
         int bg = active ? RED : lerpColor(TEAL, TEAL_HI, hv);
         liftBegin(g, hv, x, y, w, h, 4);
         chamfer(g, x, y, w, h, 4, bg);
-        g.drawCenteredString(font, text, x + w / 2, y + (h - 8) / 2, active ? INK : lerpColor(TEXT_DIM, RED, hv));
+        fitCentered(g, text, x + w / 2, y + (h - 8) / 2, w - 4, active ? INK : lerpColor(TEXT_DIM, RED, hv));
         liftEnd(g);
         hit(x, y, w, h, r);
     }
@@ -991,15 +1500,15 @@ public class XlrwScreen extends Screen {
             g.fill(x + cut, y + h - 1, x + w + 1, y + h + 1, alpha(0xFF000000, 0.45f * hv));
             g.fill(x + cut + 2, y + h + 1, x + w - 1, y + h + 2, alpha(0xFF000000, 0.22f * hv));
         }
-        g.pose().pushPose();
+        com.xlrw.compat.GuiCompat.push(g);
         float s = 1f + 0.05f * hv, px = x + w / 2f, py = y + h / 2f;
-        g.pose().translate(px - 1.5f * hv, py - 2f * hv, 0);
-        g.pose().scale(s, s, 1f);
-        g.pose().translate(-px, -py, 0);
+        com.xlrw.compat.GuiCompat.translate(g, px - 1.5f * hv, py - 2f * hv, 0);
+        com.xlrw.compat.GuiCompat.scale(g, s, s, 1f);
+        com.xlrw.compat.GuiCompat.translate(g, -px, -py, 0);
     }
 
     private void liftEnd(GuiGraphics g) {
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
     }
 
     private void padButton(GuiGraphics g, int mx, int my, String id, int x, int y, String glyph, Runnable r, String tipText) {
@@ -1008,6 +1517,7 @@ public class XlrwScreen extends Screen {
     }
 
     private void label(GuiGraphics g, int x, int y, String s) {
+        if (font.width(s) > cw) s = trimToWidth(s, cw);
         skewRect(g, x, y, 4, 8, 2, RED);
         g.drawString(font, s, x + 7, y, CREAM, false);
     }
@@ -1023,22 +1533,29 @@ public class XlrwScreen extends Screen {
     }
 
     private void drawTooltip(GuiGraphics g, int mx, int my, String text) {
-        int w = font.width(text) + 10, h = 14;
-        int x = Math.min(mx + 8, width - w - 2), y = Math.max(2, my - 16);
-        g.pose().pushPose();
-        g.pose().translate(0, 0, 400);
+        int maxW = Math.min(200, width - 14);
+        var lines = font.split(Component.literal(text), maxW);
+        int tw = 0;
+        for (var l : lines) tw = Math.max(tw, font.width(l));
+        int w = tw + 10, h = lines.size() * 10 + 4;
+        int x = Mth.clamp(mx + 8, 2, width - w - 2), y = Mth.clamp(my - 6 - h, 2, height - h - 2);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, 0, 0, 400);
         chamfer(g, x, y, w, h, 3, 0xF0201418);
         g.fill(x, y + h - 1, x + w, y + h, RED);
-        g.drawString(font, text, x + 5, y + 3, 0xFFFFC9C4, false);
-        g.pose().popPose();
+        int ly = y + 3;
+        for (var l : lines) {
+            g.drawString(font, l, x + 5, ly, 0xFFFFC9C4, false);
+            ly += 10;
+        }
+        com.xlrw.compat.GuiCompat.pop(g);
     }
 
     // ------------------------------------------------------------------------------------------------
     // Input
     // ------------------------------------------------------------------------------------------------
 
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+    boolean xMouseClicked(double mouseX, double mouseY, int button) {
         if (UiImages.editing || UiImages.picker) {
             double[] el = tilts[0].toLocal(mouseX, mouseY);
             if (button == 0) {
@@ -1078,11 +1595,10 @@ public class XlrwScreen extends Screen {
                 }
             }
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return superMouseClicked(mouseX, mouseY, button);
     }
 
-    @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+    boolean xMouseReleased(double mouseX, double mouseY, int button) {
         holo.dragging = false;
         if (UiImages.mouseUp()) return true;
         if (tab == Tab.HUB) {
@@ -1090,11 +1606,10 @@ public class XlrwScreen extends Screen {
             HubWidgets.mouseUp(hl[0], hl[1], button);
         }
         if (MASCOT.held()) MASCOT.release();
-        return super.mouseReleased(mouseX, mouseY, button);
+        return superMouseReleased(mouseX, mouseY, button);
     }
 
-    @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dx, double dy) {
+    boolean xMouseDragged(double mouseX, double mouseY, int button, double dx, double dy) {
         double[] dl = tilts[0].toLocal(mouseX, mouseY);
         if (UiImages.mouseDrag(dl[0], dl[1], cx, cy)) return true;
         if (MASCOT.held() && button == 0) {
@@ -1107,7 +1622,7 @@ public class XlrwScreen extends Screen {
             holo.touch();
             return true;
         }
-        return super.mouseDragged(mouseX, mouseY, button, dx, dy);
+        return superMouseDragged(mouseX, mouseY, button, dx, dy);
     }
 
     private boolean overPreview(double mouseX, double mouseY) {
@@ -1157,18 +1672,18 @@ public class XlrwScreen extends Screen {
         super.onClose();
     }
 
-    @Override
-    public boolean keyPressed(int key, int scan, int mods) {
+    boolean xKeyPressed(int key, int scan, int mods) {
+        if (loginKey(key, mods)) return true;
         if (tab == Tab.HUB && HubWidgets.keyPressed(key)) return true;
         if (key == com.mojang.blaze3d.platform.InputConstants.KEY_F && UiImages.toggleLayer()) return true;
         // the same key that opens the deck (V by default) closes it again
         for (net.minecraft.client.KeyMapping km : minecraft.options.keyMappings) {
-            if ("key.xlrw.gui".equals(km.getName()) && km.matches(key, scan)) {
+            if ("key.xlrw.gui".equals(km.getName()) && com.xlrw.compat.GuiCompat.keyMatches(km, key, scan, mods)) {
                 onClose();
                 return true;
             }
         }
-        return super.keyPressed(key, scan, mods);
+        return superKeyPressed(key, scan, mods);
     }
 
     // ------------------------------------------------------------------------------------------------
@@ -1188,11 +1703,11 @@ public class XlrwScreen extends Screen {
         float target = s != null ? s.getProgressPercentage() : 0f;
         shownProgress += (target - shownProgress) * 0.12f;
         String pct = String.format("%.0f%%", shownProgress);
-        g.pose().pushPose();
-        g.pose().translate(x + 9, y + 6, 0);
-        g.pose().scale(1.5f, 1.5f, 1f);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, x + 9, y + 6, 0);
+        com.xlrw.compat.GuiCompat.scale(g, 1.5f, 1.5f, 1f);
         g.drawString(font, pct, 0, 0, RED, false);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
         String blocks = s != null ? compact(s.getPlacedBlocks()) + "/" + compact(s.getTotalBlocks()) : "-";
         String layer = s != null ? "L" + cfg.currentLayer + "/" + (s.getMaxY() - s.getMinY()) : "";
         int right = x + w - 10;
@@ -1254,7 +1769,7 @@ public class XlrwScreen extends Screen {
 
     /** Shear the current pose so text / shapes lean forward like Persona menus. */
     private static void shear(GuiGraphics g, float k) {
-        g.pose().last().pose().mul(new org.joml.Matrix4f().m10(k));
+        com.xlrw.compat.GuiCompat.shearX(g, (k));
     }
 
     /** Parallelogram leaning right: the top edge is shifted {@code slant} px to the right of the bottom edge. */
@@ -1290,16 +1805,40 @@ public class XlrwScreen extends Screen {
         }
     }
 
+    /** Draws text no wider than maxW: shrinks it a little first, then cuts it with "…". */
+    private void fitString(GuiGraphics g, String s, int x, int y, int maxW, int color) {
+        int tw = font.width(s);
+        if (tw <= maxW || maxW <= 8) {
+            g.drawString(font, s, x, y, color, false);
+            return;
+        }
+        float k = maxW / (float) tw;
+        if (k < 0.75f) {
+            s = trimToWidth(s, (int) (maxW / 0.75f));
+            k = Math.min(1f, maxW / (float) font.width(s));
+        }
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, x, y + (1f - k) * 4f, 0);
+        com.xlrw.compat.GuiCompat.scale(g, k, k, 1f);
+        g.drawString(font, s, 0, 0, color, false);
+        com.xlrw.compat.GuiCompat.pop(g);
+    }
+
+    private void fitCentered(GuiGraphics g, String s, int centerX, int y, int maxW, int color) {
+        int w = Math.min(font.width(s), maxW);
+        fitString(g, s, centerX - w / 2, y, maxW, color);
+    }
+
     private void drawRight(GuiGraphics g, String s, int rightX, int y, int color) {
         g.drawString(font, s, rightX - font.width(s), y, color, false);
     }
 
     private void drawCentered(GuiGraphics g, String s, int cxp, int y, int color, float scale) {
-        g.pose().pushPose();
-        g.pose().translate(cxp, y, 0);
-        g.pose().scale(scale, scale, 1f);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, cxp, y, 0);
+        com.xlrw.compat.GuiCompat.scale(g, scale, scale, 1f);
         g.drawString(font, s, -font.width(s) / 2, 0, color, false);
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
     }
 
     private String trimToWidth(String s, int w) {
@@ -1338,4 +1877,33 @@ public class XlrwScreen extends Screen {
     private static int brighten(int c) {
         return lerpColor(c, 0xFFFFFFFF, 0.15f) | 0xFF000000;
     }
+
+    //? if >=1.21.11 {
+    /*@Override public boolean charTyped(net.minecraft.client.input.CharacterEvent e) { return loginChar(e.codepointAsString()) || super.charTyped(e); }
+    *///?} else {
+    @Override public boolean charTyped(char c, int m) { return loginChar(String.valueOf(c)) || super.charTyped(c, m); }
+    //?}
+
+    //? if >=1.21.11 {
+    /*private net.minecraft.client.input.MouseButtonEvent xLastMouse;
+    private boolean xLastDbl;
+    private net.minecraft.client.input.KeyEvent xLastKey;
+    @Override public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent e, boolean dbl) { xLastMouse = e; xLastDbl = dbl; return xMouseClicked(e.x(), e.y(), e.button()); }
+    private boolean superMouseClicked(double x, double y, int b) { return super.mouseClicked(xLastMouse, xLastDbl); }
+    @Override public boolean mouseReleased(net.minecraft.client.input.MouseButtonEvent e) { xLastMouse = e; return xMouseReleased(e.x(), e.y(), e.button()); }
+    private boolean superMouseReleased(double x, double y, int b) { return super.mouseReleased(xLastMouse); }
+    @Override public boolean mouseDragged(net.minecraft.client.input.MouseButtonEvent e, double dx, double dy) { xLastMouse = e; return xMouseDragged(e.x(), e.y(), e.button(), dx, dy); }
+    private boolean superMouseDragged(double x, double y, int b, double dx, double dy) { return super.mouseDragged(xLastMouse, dx, dy); }
+    @Override public boolean keyPressed(net.minecraft.client.input.KeyEvent e) { xLastKey = e; return xKeyPressed(e.key(), e.scancode(), e.modifiers()); }
+    private boolean superKeyPressed(int k, int s, int m) { return super.keyPressed(xLastKey); }
+    *///?} else {
+    @Override public boolean mouseClicked(double x, double y, int b) { return xMouseClicked(x, y, b); }
+    private boolean superMouseClicked(double x, double y, int b) { return super.mouseClicked(x, y, b); }
+    @Override public boolean mouseReleased(double x, double y, int b) { return xMouseReleased(x, y, b); }
+    private boolean superMouseReleased(double x, double y, int b) { return super.mouseReleased(x, y, b); }
+    @Override public boolean mouseDragged(double x, double y, int b, double dx, double dy) { return xMouseDragged(x, y, b, dx, dy); }
+    private boolean superMouseDragged(double x, double y, int b, double dx, double dy) { return super.mouseDragged(x, y, b, dx, dy); }
+    @Override public boolean keyPressed(int k, int s, int m) { return xKeyPressed(k, s, m); }
+    private boolean superKeyPressed(int k, int s, int m) { return super.keyPressed(k, s, m); }
+    //?}
 }

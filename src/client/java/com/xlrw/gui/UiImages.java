@@ -73,7 +73,7 @@ final class UiImages {
     }
 
     static void openFolder() {
-        try { net.minecraft.Util.getPlatform().openFile(dir()); } catch (Throwable ignored) {}
+        try { com.xlrw.compat.GuiCompat.openFile(dir()); } catch (Throwable ignored) {}
     }
 
     private static List<Placed> all() {
@@ -117,7 +117,7 @@ final class UiImages {
             NativeImage img = load(f);
             if (img == null) return null;
             ResourceLocation loc = ResourceLocation.fromNamespaceAndPath("xlrw", "dynamic/ui_image_" + (texCounter++));
-            Minecraft.getInstance().getTextureManager().register(loc, new DynamicTexture(img));
+            Minecraft.getInstance().getTextureManager().register(loc, com.xlrw.compat.GuiCompat.texture(img));
             if (t != null) Minecraft.getInstance().getTextureManager().release(t.loc);
             t = new Tex(loc, img.getWidth(), img.getHeight(), f.lastModified());
             textures.put(file, t);
@@ -141,7 +141,7 @@ final class UiImages {
         for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) {
             int argb = bi.getRGB(x, y);
             int a = argb >>> 24, r = (argb >> 16) & 255, g = (argb >> 8) & 255, b = argb & 255;
-            img.setPixelRGBA(x, y, (a << 24) | (b << 16) | (g << 8) | r);
+            com.xlrw.compat.GuiCompat.setPixelABGR(img, x, y, (a << 24) | (b << 16) | (g << 8) | r);
         }
         return img;
     }
@@ -163,7 +163,7 @@ final class UiImages {
             if (t == null) continue;
             float[] r = rect(p, t, cx, cy);
             int x0 = Math.round(r[0]), y0 = Math.round(r[1]), w = Math.max(1, Math.round(r[2])), h = Math.max(1, Math.round(r[3]));
-            g.blit(t.loc, x0, y0, w, h, 0, 0, t.w, t.h, t.w, t.h);
+            com.xlrw.compat.GuiCompat.blitTex(g, t.loc, x0, y0, w, h, 0, 0, t.w, t.h, t.w, t.h);
             if (editing) {
                 boolean hov = mx >= x0 && mx < x0 + w && my >= y0 && my < y0 + h;
                 if (hov) hovered = p;
@@ -188,8 +188,8 @@ final class UiImages {
             pickList = l == null ? new ArrayList<>() : new ArrayList<>(Arrays.asList(l));
             pickList.sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
         }
-        g.pose().pushPose();
-        g.pose().translate(0, 0, 200);
+        com.xlrw.compat.GuiCompat.push(g);
+        com.xlrw.compat.GuiCompat.translate(g, 0, 0, 200);
         g.fill(x, y, x + w, y + h, 0xF0141416);
         g.fill(x, y, x + 3, y + h, 0xFFF3701E);
         g.drawString(font, "ẢNH  ·  " + tab, x + 8, y + 5, 0xFFE8D8C9, false);
@@ -213,17 +213,17 @@ final class UiImages {
             if (t != null) {
                 float s = Math.min(cell / (float) t.w, cell / (float) t.h);
                 int iw = Math.max(1, Math.round(t.w * s)), ih = Math.max(1, Math.round(t.h * s));
-                g.blit(t.loc, tx + (cell - iw) / 2, ty + (cell - ih) / 2, iw, ih, 0, 0, t.w, t.h, t.w, t.h);
+                com.xlrw.compat.GuiCompat.blitTex(g, t.loc, tx + (cell - iw) / 2, ty + (cell - ih) / 2, iw, ih, 0, 0, t.w, t.h, t.w, t.h);
             } else g.drawCenteredString(font, "?", tx + cell / 2, ty + cell / 2 - 4, 0xFFE0403A);
-            g.pose().pushPose();
-            g.pose().translate(tx, ty + cell + 1, 0);
-            g.pose().scale(0.5f, 0.5f, 1f);
+            com.xlrw.compat.GuiCompat.push(g);
+            com.xlrw.compat.GuiCompat.translate(g, tx, ty + cell + 1, 0);
+            com.xlrw.compat.GuiCompat.scale(g, 0.5f, 0.5f, 1f);
             g.drawString(font, font.plainSubstrByWidth(f.getName(), cell * 2), 0, 0, 0xFF8D97AB, false);
-            g.pose().popPose();
+            com.xlrw.compat.GuiCompat.pop(g);
             final String name = f.getName();
             hit.hit(tx, ty, cell, cell, () -> add(name, tab, w, h));
         }
-        g.pose().popPose();
+        com.xlrw.compat.GuiCompat.pop(g);
     }
 
     private static void add(String file, String tab, int areaW, int areaH) {
