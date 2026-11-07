@@ -75,6 +75,11 @@ public class BuilderConfig {
      * several blocks per tick). Your own settings for those switches are kept and apply again when this is OFF.
      */
     public boolean serverSafe = true;
+    /**
+     * Turbo (only with server-safe): plain blocks don't wait for the server's answer before the next click - the
+     * answers are checked in the background and refused blocks are placed again. Up to one block per tick.
+     */
+    public boolean serverTurbo = true;
 
     public boolean airPlaceOn() { return airPlace && !serverSafe; }
     public boolean throughWallOn() { return throughWallPlace && !serverSafe; }

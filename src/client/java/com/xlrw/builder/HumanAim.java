@@ -25,7 +25,7 @@ public class HumanAim {
     public static boolean stepRotation(LocalPlayer player, float targetYaw, float targetPitch) {
         BuilderConfig config = BuilderConfig.getInstance();
         if (!config.smoothAim) {
-            player.setYRot(targetYaw);
+            player.setYRot(player.getYRot() + Mth.wrapDegrees(targetYaw - player.getYRot()));
             player.setXRot(targetPitch);
             return true;
         }
@@ -41,7 +41,7 @@ public class HumanAim {
         float tolerance = Math.max(1.8f, config.aimTolerance);
 
         if (absDiffYaw <= tolerance && absDiffPitch <= tolerance) {
-            applyRotation(player, targetYaw, targetPitch);
+            applyRotation(player, player.getYRot() + Mth.wrapDegrees(targetYaw - player.getYRot()), targetPitch);
             return true;
         }
 
@@ -63,7 +63,7 @@ public class HumanAim {
         float newDiffYaw = Math.abs(Mth.wrapDegrees(targetYaw - player.getYRot()));
         float newDiffPitch = Math.abs(targetPitch - player.getXRot());
         if (newDiffYaw <= tolerance && newDiffPitch <= tolerance) {
-            applyRotation(player, targetYaw, targetPitch);
+            applyRotation(player, player.getYRot() + Mth.wrapDegrees(targetYaw - player.getYRot()), targetPitch);
             return true;
         }
         return false;

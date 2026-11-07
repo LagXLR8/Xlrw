@@ -930,21 +930,30 @@ public class XlrwScreen extends Screen {
                 {"FAST", "Đặt nhanh block thường"}, {"SPOOF", "Đặt block có hướng không cần nhìn đúng hướng"},
                 {"CHORUS", "Ăn chorus thoát hố"}, {"CLEAN", "Dọn block tạm & trụ thừa"},
                 {"WALL", "Đặt xuyên tường ở mọi nơi trong tầm với (tắt nếu server có anti-cheat)"},
-                {"SERVER SAFE", "Chơi server: chờ server xác nhận từng block, nhìn thật trước khi đặt, tự tắt xuyên tường / air place / spoof / đặt nhanh / REACH+"},
         };
         BooleanSupplier[] get = {
                 () -> cfg.autoMove, () -> cfg.useScaffolding, () -> cfg.autoDemolish, () -> cfg.airPlace,
                 () -> cfg.fastSimpleBlocks, () -> cfg.rotationSpoof, () -> cfg.chorusEscape, () -> cfg.cleanupTempBlocks,
-                () -> cfg.throughWallAnywhere, () -> cfg.serverSafe
+                () -> cfg.throughWallAnywhere
         };
         List<java.util.function.Consumer<Boolean>> set = List.of(
                 v -> cfg.autoMove = v, v -> cfg.useScaffolding = v, v -> cfg.autoDemolish = v, v -> cfg.airPlace = v,
                 v -> cfg.fastSimpleBlocks = v, v -> cfg.rotationSpoof = v, v -> cfg.chorusEscape = v, v -> cfg.cleanupTempBlocks = v,
-                v -> cfg.throughWallAnywhere = v, v -> cfg.serverSafe = v
+                v -> cfg.throughWallAnywhere = v
         );
         for (int i = 0; i < items.length; i++) {
             int tx = x + (i % 2) * (colW + 6), ty = y + (i / 2) * 24;
             toggle(g, mx, my, "e" + i, tx, ty, colW, items[i][0], get[i], set.get(i), items[i][1]);
+        }
+        // server-safe + turbo share the last cell
+        {
+            int i = items.length;
+            int tx = x + (i % 2) * (colW + 6), ty = y + (i / 2) * 24;
+            int half = (colW - 4) / 2;
+            toggle(g, mx, my, "e.safe", tx, ty, half, "SAFE", () -> cfg.serverSafe, v -> cfg.serverSafe = v,
+                    "SERVER SAFE: chờ server xác nhận từng block, nhìn thật trước khi đặt, tự tắt xuyên tường / air place / spoof / đặt nhanh / REACH+");
+            toggle(g, mx, my, "e.turbo", tx + half + 4, ty, colW - half - 4, "TURBO", () -> cfg.serverTurbo, v -> cfg.serverTurbo = v,
+                    "TURBO (cần SAFE): block thường không chờ server trả lời mới đặt tiếp - tối đa 1 block/tick, chỉnh tốc độ bằng ⏱");
         }
 
         // Supply chests

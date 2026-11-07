@@ -180,6 +180,7 @@ public class BuilderController {
         // Black-box monitor: status line every second, snapshot + escalation when nothing progresses
         com.xlrw.debug.BotMonitor.tick(mc, player, schematic, this);
         tickFastPending(mc.level);
+        tickInFlight(mc, player);
         ServerSafe.tickWatches(mc.level);
 
         // 0. Scaffold Jump Guard: If executing a multi-tick scaffold jump, let it run exclusively
@@ -214,7 +215,8 @@ public class BuilderController {
         // 2. Check if current layer is complete -> Auto Layer Advance
         if (config.layerMode && config.autoLayer) {
             checkLayerLeftovers(mc, schematic, config.currentLayer);
-            if (isLayerComplete(schematic, config.currentLayer, mc.level)) {
+            // (blocks still waiting for the server's answer only LOOK placed: wait for them before moving on)
+            if (inFlight.isEmpty() && isLayerComplete(schematic, config.currentLayer, mc.level)) {
                 // Remove throw-away bridge/pillar blocks before moving on
                 if (DemolishManager.getInstance().isBreaking()) {
                     DemolishManager.getInstance().tickBreaking(mc, player);
@@ -1790,6 +1792,80 @@ public class BuilderController {
         }
     }
 
+    // ------------------------------------------------------------------------------------------------
+    // Turbo pipeline (server-safe): several clicks may wait for the server's answer at the same time
+    // ------------------------------------------------------------------------------------------------
+
+    private record InFlight(BlockPos pos, BlockState expected, int seq, long sentAt, long timeout) {}
+    private final java.util.ArrayDeque<InFlight> inFlight = new java.util.ArrayDeque<>();
+    private static final int MAX_IN_FLIGHT = 8;
+
+    /** Plain placements (no facing to verify afterwards) don't need to wait for the server before the next click. */
+    private boolean pipelined(PlacementCandidate c) {
+        BuilderConfig config = BuilderConfig.getInstance();
+        return config.serverSafe && config.serverTurbo && c != null
+                && c.type == PlacementCandidate.Type.PLACE && c.item != null
+                && !BuildRules.hasOrientation(c.requiredState) && !BuildRules.isLiquid(c.requiredState);
+    }
+
+    private boolean inFlightContains(BlockPos pos) {
+        if (pos == null) return false;
+        for (InFlight f : inFlight) if (f.pos().equals(pos)) return true;
+        return false;
+    }
+
+    /** Picks the next block right after a click and turns toward it, so it is ready on the very next tick. */
+    private void prefetchNext(Minecraft mc, LocalPlayer player) {
+        PlacementCandidate next = PlacementFinder.findBestCandidate();
+        if (next == null) return;
+        currentCandidate = next;
+        candidateEye = player.getEyePosition();
+        candidateAlignTicks = 0;
+        if (pipelined(next) && next.item != null && player.getMainHandItem().is(next.item)) {
+            ServerSafe.faceForClick(player, next.targetYaw, next.targetPitch);
+        }
+    }
+
+    /** Reads the server's answers to pipelined clicks. */
+    private void tickInFlight(Minecraft mc, LocalPlayer player) {
+        if (inFlight.isEmpty() || mc.level == null) return;
+        long now = System.currentTimeMillis();
+        java.util.Iterator<InFlight> it = inFlight.iterator();
+        while (it.hasNext()) {
+            InFlight f = it.next();
+            boolean acked = ServerSafe.isAcked(mc.level, f.seq());
+            if (!acked && now <= f.timeout()) continue;
+            it.remove();
+            BlockState w = mc.level.getBlockState(f.pos());
+            String name = f.expected().getBlock().getName().getString();
+            boolean ok = w.getBlock() == f.expected().getBlock()
+                    || BuildRules.buildStatus(w, f.expected()) == BuildRules.BuildStatus.DONE;
+            if (ok) {
+                if (!acked) {
+                    XlrwDebug.log("SERVER/NO_ACK", "Không nhận được xác nhận cho " + f.pos().toShortString()
+                            + " sau " + (now - f.sentAt()) + "ms (ping " + ServerSafe.pingMs(mc) + "ms)");
+                }
+                ServerSafe.onAccepted();
+                ServerSafe.watch(f.pos(), f.expected());
+                XlrwDebug.logBuildSuccess(f.pos(), name, "turbo, " + (now - f.sentAt()) + "ms");
+                TaskTracker.getInstance().onSuccess(f.pos());
+                StationPlanner.getInstance().onPlaced(f.pos());
+                lastConfirmedPos = f.pos();
+            } else {
+                ServerSafe.onRejected(f.pos(), name, (acked ? "ack đã về nhưng ô vẫn là " : "không có ack, ô là ")
+                        + w.getBlock().getName().getString()
+                        + (ServerSafe.recentSetback(1500) ? ", vừa bị server kéo lại vị trí" : ""));
+                XlrwDebug.logBuildReject(f.pos(), name, "Turbo: server từ chối (sau " + (now - f.sentAt()) + "ms)");
+                if (TaskTracker.getInstance().getAttempts(f.pos()) >= 2) {
+                    PlacementFinder.recordBadPlacementSpot(f.pos(), player.blockPosition());
+                    TaskTracker.getInstance().blacklist(f.pos(), 3000);
+                }
+                // anything clicked against this cell will be refused too: pause the pipeline a moment
+                nextActionTime = Math.max(nextActionTime, now + 150 + ServerSafe.extraDelayMs());
+            }
+        }
+    }
+
     /** Holds / releases the real sneak key, so vanilla tells the server in its normal movement update. */
     private static void holdSneakKey(Minecraft mc, LocalPlayer player, boolean down) {
         mc.options.keyShift.setDown(down);
@@ -1818,6 +1894,15 @@ public class BuilderController {
                 if (candidate.requiresSneak) holdSneakKey(mc, player, true);
                 nextActionTime = System.currentTimeMillis() + 50;
                 return;
+            }
+            if (pipelined(candidate)) {
+                // Never click against a block the server has not confirmed yet: if that one gets refused, the server
+                // would put THIS block into its cell instead. Also keep the number of unanswered clicks bounded.
+                if (inFlightContains(candidate.neighborPos) || inFlight.size() >= MAX_IN_FLIGHT) {
+                    ServerSafe.faceForClick(player, candidate.targetYaw, candidate.targetPitch);
+                    nextActionTime = System.currentTimeMillis() + 20;
+                    return;
+                }
             }
         }
 
@@ -2037,7 +2122,21 @@ public class BuilderController {
         }
 
         if (safe) delay += ServerSafe.extraDelayMs();
-        nextActionTime = System.currentTimeMillis() + Math.max(100, delay);
+        boolean pipe = safe && pipelined(candidate);
+        // Turbo: the next click can go out one tick later (the rotation needs one movement packet)
+        nextActionTime = System.currentTimeMillis() + Math.max(pipe ? 45 : 100, delay);
+
+        if (pipe) {
+            // Don't stand still waiting for the server's answer: remember the click, check the answer in
+            // tickInFlight(), and already turn toward the next block so it can be clicked on the next tick.
+            int seq = ServerSafe.lastSentSequence(mc);
+            inFlight.addLast(new InFlight(candidate.targetPos.immutable(), candidate.requiredState, seq,
+                    System.currentTimeMillis(), System.currentTimeMillis() + ServerSafe.ackTimeoutMs(mc)));
+            TaskTracker.getInstance().onAction(candidate.targetPos, (int) ServerSafe.ackTimeoutMs(mc) + 200);
+            currentCandidate = null;
+            prefetchNext(mc, player);
+            return;
+        }
 
         // Await server placement confirmation: DO NOT pre-fetch or whip camera to next block prematurely!
         pendingPlacementPos = candidate.targetPos;
@@ -2295,6 +2394,7 @@ public class BuilderController {
         pendingExpectedState = null;
         pendingSeq = -1;
         fastPending.clear();
+        inFlight.clear();
         ServerSafe.reset();
         lastConfirmedPos = null;
         standstillTicks = 0;
