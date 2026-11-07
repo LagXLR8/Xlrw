@@ -15,8 +15,9 @@ public final class Plus {
     /** Reach used for placing / planning. Plus + "REACH+" toggle: 5.0 (vanilla servers accept up to ~5.5). */
     public static double reach() {
         BuilderConfig c = BuilderConfig.getInstance();
-        if (on() && c.plusReach) return Math.max(c.reachDistance, 5.0);
-        return c.reachDistance;
+        // Server-safe: a 5-block reach is refused by every server (vanilla survival allows ~4.5)
+        if (on() && c.plusReach && !c.serverSafe) return Math.max(c.reach(), 5.0);
+        return c.reach();
     }
 
     /** Shortest pause between two normal placements (ms). */

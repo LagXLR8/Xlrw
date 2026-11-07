@@ -270,7 +270,7 @@ public class DemolishManager {
         Vec3 blockCenter = Vec3.atCenterOf(activeBreakPos);
         float[] rots = HumanAim.calculateRotations(eyePos, blockCenter);
         HumanAim.stepRotation(player, rots[0], rots[1]);
-        player.connection.send(com.xlrw.compat.MC.rot(player.getYRot(), player.getXRot(), player.onGround()));
+        ServerSafe.syncCurrentRotation(player); // server-safe: vanilla's own movement packet carries it
 
         // 6. Execute authentic destroy packets
         breakFace = com.xlrw.compat.MC.nearestDir(eyePos.x - blockCenter.x, eyePos.y - blockCenter.y, eyePos.z - blockCenter.z);

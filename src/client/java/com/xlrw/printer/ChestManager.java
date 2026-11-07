@@ -1,5 +1,6 @@
 package com.xlrw.printer;
 
+import com.xlrw.builder.ServerSafe;
 import com.xlrw.builder.InventoryHelper;
 import com.xlrw.config.BuilderConfig;
 import com.xlrw.schematic.Schematic;
@@ -335,10 +336,16 @@ public class ChestManager {
 
         long now = System.currentTimeMillis();
         if (now - lastChestInteract < 1000) return;
-        lastChestInteract = now;
 
         Vec3 hitVec = new Vec3(chestPos.getX() + 0.5, chestPos.getY() + 0.8, chestPos.getZ() + 0.5);
-        player.connection.send(com.xlrw.compat.MC.rot(player.getYRot(), player.getXRot(), player.onGround()));
+        if (ServerSafe.enabled()) {
+            // look at the chest for real before opening it (anti-cheats check that the click is in view)
+            float[] rots = com.xlrw.builder.HumanAim.calculateRotations(player.getEyePosition(), hitVec);
+            if (!ServerSafe.faceForClick(player, rots[0], rots[1])) return;
+        } else {
+            player.connection.send(com.xlrw.compat.MC.rot(player.getYRot(), player.getXRot(), player.onGround()));
+        }
+        lastChestInteract = now;
 
         BlockHitResult hitResult = new BlockHitResult(hitVec, Direction.UP, chestPos, false);
         mc.gameMode.useItemOn(player, InteractionHand.MAIN_HAND, hitResult);

@@ -1,5 +1,6 @@
 package com.xlrw.printer;
 
+import com.xlrw.builder.ServerSafe;
 import com.xlrw.builder.BuildRules;
 import com.xlrw.builder.HumanAim;
 import com.xlrw.builder.InventoryHelper;
@@ -182,8 +183,13 @@ public class ScaffoldManager {
                     return true;
                 }
 
-                // Send look packet to server without snapping client camera
-                player.connection.send(com.xlrw.compat.MC.rot(player.getYRot(), 90.0f, player.onGround()));
+                // Look straight down (server-safe: with the real camera, so the server gets it in the normal
+                // movement packet long before the click at the top of the jump)
+                if (ServerSafe.enabled()) {
+                    ServerSafe.faceForClick(player, player.getYRot(), 90.0f);
+                } else {
+                    player.connection.send(com.xlrw.compat.MC.rot(player.getYRot(), 90.0f, player.onGround()));
+                }
 
                 // Jump straight up!
                 mc.options.keyJump.setDown(true);
@@ -242,7 +248,12 @@ public class ScaffoldManager {
                 mc.options.keyShift.setDown(false);
                 if (player.input != null) com.xlrw.compat.InputCompat.shiftKeyDown(player, false);
 
-                player.connection.send(com.xlrw.compat.MC.rot(player.getYRot(), 90.0f, false));
+                if (ServerSafe.enabled()) {
+                    // still in the air: wait (at most a few ticks) until the server has the downward look
+                    if (!ServerSafe.faceForClick(player, player.getYRot(), 90.0f) && jumpTicks < 10) return true;
+                } else {
+                    player.connection.send(com.xlrw.compat.MC.rot(player.getYRot(), 90.0f, false));
+                }
                 BlockHitResult hitResult = new BlockHitResult(hitVec, clickFace, clickPos, false);
 
                 net.minecraft.world.InteractionResult res = mc.gameMode.useItemOn(player, InteractionHand.MAIN_HAND, hitResult);
@@ -725,10 +736,12 @@ public class ScaffoldManager {
             BlockPos groundPos = basePos.below();
             Vec3 hitVec = new Vec3(basePos.getX() + 0.5, groundPos.getY() + 1.0, basePos.getZ() + 0.5);
             float[] rots = HumanAim.calculateRotations(player.getEyePosition(), hitVec);
-            player.connection.send(com.xlrw.compat.MC.rot(rots[0], rots[1], player.onGround()));
-
             mc.options.keyShift.setDown(false);
             if (player.input != null) com.xlrw.compat.InputCompat.shiftKeyDown(player, false);
+            // Look at the click for real; server-safe waits until the server has that rotation (and no sneak)
+            if (!ServerSafe.faceForClick(player, rots[0], rots[1]) || !ServerSafe.sneakSynced(player, false) && ServerSafe.enabled()) {
+                return false;
+            }
 
             BlockHitResult hitResult = new BlockHitResult(hitVec, Direction.UP, groundPos, false);
             mc.gameMode.useItemOn(player, InteractionHand.MAIN_HAND, hitResult);
@@ -759,11 +772,13 @@ public class ScaffoldManager {
             );
 
             float[] rots = HumanAim.calculateRotations(player.getEyePosition(), hitVec);
-            player.connection.send(com.xlrw.compat.MC.rot(rots[0], rots[1], player.onGround()));
 
             // Sneaking MUST be disabled so vanilla does not place normally against the face!
             mc.options.keyShift.setDown(false);
             if (player.input != null) com.xlrw.compat.InputCompat.shiftKeyDown(player, false);
+            if (!ServerSafe.faceForClick(player, rots[0], rots[1]) || !ServerSafe.sneakSynced(player, false) && ServerSafe.enabled()) {
+                return false;
+            }
 
             BlockHitResult hitResult = new BlockHitResult(hitVec, sideFace, basePos, false);
             mc.gameMode.useItemOn(player, InteractionHand.MAIN_HAND, hitResult);
@@ -813,13 +828,12 @@ public class ScaffoldManager {
         // Set player rotation so player.getDirection() on client matches extendDir
         float targetYaw = extendDir.toYRot();
         float targetPitch = 60.0f;
-        player.setYRot(targetYaw);
-        player.setXRot(targetPitch);
-        player.connection.send(com.xlrw.compat.MC.rot(targetYaw, targetPitch, player.onGround()));
-
         // Ensure sneak is OFF
         mc.options.keyShift.setDown(false);
         if (player.input != null) com.xlrw.compat.InputCompat.shiftKeyDown(player, false);
+        if (!ServerSafe.faceForClick(player, targetYaw, targetPitch) || !ServerSafe.sneakSynced(player, false) && ServerSafe.enabled()) {
+            return false;
+        }
 
         // TOP face + facing direction => vanilla extends the row horizontally
         Direction clickFace = Direction.UP;

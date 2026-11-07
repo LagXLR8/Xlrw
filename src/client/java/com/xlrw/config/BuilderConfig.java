@@ -69,6 +69,21 @@ public class BuilderConfig {
     public boolean fastSimpleBlocks = true; // plain blocks (no facing / no redstone / no state) are placed in bursts
     public int fastBlocksPerTick = 3; // max plain blocks per tick in fast mode
         public boolean airPlace = true; // Place blocks directly in the air (no neighbour needed), like the AirPlace mod
+    /**
+     * Server-safe placement (default ON): legit rotation timing, waits for the server's acknowledgement before a
+     * block counts as placed, and disables tricks anti-cheats reject (through-wall, air place, rotation spoof,
+     * several blocks per tick). Your own settings for those switches are kept and apply again when this is OFF.
+     */
+    public boolean serverSafe = true;
+
+    public boolean airPlaceOn() { return airPlace && !serverSafe; }
+    public boolean throughWallOn() { return throughWallPlace && !serverSafe; }
+    public boolean rotationSpoofOn() { return rotationSpoof && !serverSafe; }
+    public boolean fastSimpleBlocksOn() { return fastSimpleBlocks && !serverSafe; }
+    /** Server-safe never goes past the vanilla survival reach (4.5 from the eye). */
+    public boolean strictRaycastOn() { return strictRaycast || serverSafe; }
+    public double reach() { return serverSafe ? Math.min(reachDistance, 4.4) : reachDistance; }
+
     public boolean debugLog = true; // Large-scale diagnostic logging to logs/xlrw_debug.log
     public boolean debugChat = false; // Echo debug warnings into player chat
 

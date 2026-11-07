@@ -349,7 +349,7 @@ public class PlacementFinder {
                     Vec3 targetCenter = findInteractPoint(level, player, eyePos, targetPos, maxReachSq);
                     boolean unseen = false;
                     if (targetCenter == null) {
-                        if (config.strictRaycast && !throughWallAnywhere()) continue;
+                        if (config.strictRaycastOn() && !throughWallAnywhere()) continue;
                         targetCenter = Vec3.atCenterOf(targetPos);
                         unseen = true;
                     }
@@ -371,7 +371,7 @@ public class PlacementFinder {
                     Vec3 targetCenter = findInteractPoint(level, player, eyePos, targetPos, maxReachSq);
                     boolean unseen = false;
                     if (targetCenter == null) {
-                        if (config.strictRaycast && !throughWallAnywhere()) continue;
+                        if (config.strictRaycastOn() && !throughWallAnywhere()) continue;
                         targetCenter = Vec3.atCenterOf(targetPos);
                         unseen = true;
                     }
@@ -408,16 +408,16 @@ public class PlacementFinder {
             }
 
             // Search neighbor faces and simulate placement to guarantee correct orientation!
-            PlacementCandidate bestForPos = findValidNeighborPlacement(level, player, targetPos, requiredState, requiredItem, eyePos, maxReachSq, config.strictRaycast);
+            PlacementCandidate bestForPos = findValidNeighborPlacement(level, player, targetPos, requiredState, requiredItem, eyePos, maxReachSq, config.strictRaycastOn());
             // Air place: no usable neighbour face (floating part, or the needed facing is impossible against the
             // neighbours) -> click the empty cell itself, exactly like the AirPlace mod does
-            if (bestForPos == null && config.airPlace) {
-                bestForPos = findAirPlacement(level, player, targetPos, requiredState, requiredItem, eyePos, maxReachSq, config.strictRaycast);
+            if (bestForPos == null && config.airPlaceOn()) {
+                bestForPos = findAirPlacement(level, player, targetPos, requiredState, requiredItem, eyePos, maxReachSq, config.strictRaycastOn());
             }
             // Boxed-in cell nothing can see: place "through the wall" (the server only checks the distance)
             if (bestForPos == null && throughWallAllowed(level, targetPos, eyePos)) {
                 bestForPos = findValidNeighborPlacement(level, player, targetPos, requiredState, requiredItem, eyePos, maxReachSq, false);
-                if (bestForPos == null && config.airPlace) {
+                if (bestForPos == null && config.airPlaceOn()) {
                     bestForPos = findAirPlacement(level, player, targetPos, requiredState, requiredItem, eyePos, maxReachSq, false);
                 }
                 if (bestForPos != null) bestForPos.throughWall = true;
@@ -433,7 +433,7 @@ public class PlacementFinder {
      * its 6 sides (a hole / pocket in the build), and only from close by (eye within 4 blocks of it).
      */
     public static boolean throughWallAllowed(ClientLevel level, BlockPos target, Vec3 eye) {
-        if (!BuilderConfig.getInstance().throughWallPlace) return false;
+        if (!BuilderConfig.getInstance().throughWallOn()) return false;
         // Anywhere mode: the vanilla server only checks the distance and that the hit point lies on the clicked
         // block, never the line of sight or which way the face points -> allowed for every cell in reach
         if (throughWallAnywhere()) return true;
@@ -514,7 +514,7 @@ public class PlacementFinder {
                     if (hitResult.getType() == HitResult.Type.BLOCK && hitResult.getBlockPos().equals(targetPos)) {
                         clickFace = hitResult.getDirection();
                         hitPoint = hitResult.getLocation();
-                    } else if (config.strictRaycast) {
+                    } else if (config.strictRaycastOn()) {
                         continue;
                     }
                     float[] rots = HumanAim.calculateRotations(eyePos, hitPoint);
@@ -538,7 +538,7 @@ public class PlacementFinder {
 
                 // Pour against a neighbor solid block
                 PlacementCandidate pourCandidate = findNeighborFaceSimple(level, player, targetPos, requiredState, bucketItem,
-                        PlacementCandidate.Type.FLUID_SOURCE, eyePos, maxReachSq, config.strictRaycast);
+                        PlacementCandidate.Type.FLUID_SOURCE, eyePos, maxReachSq, config.strictRaycastOn());
                 if (pourCandidate != null) {
                     candidates.add(pourCandidate);
                 }
@@ -675,7 +675,7 @@ public class PlacementFinder {
         if (!oriented) return geom;
         if (BuildRules.orientationMatches(sim.state(), requiredState)
                 && isOrientationRobust(level, player, stack, bhr, geom, targetPos, requiredState)) return geom;
-        if (!BuilderConfig.getInstance().rotationSpoof) return null;
+        if (!BuilderConfig.getInstance().rotationSpoofOn()) return null;
         float[] pitches = {0f, -90f, 90f, -60f, 60f, -30f, 30f};
         float[] yaws = {0f, 90f, 180f, -90f};
         for (float pitch : pitches) {
@@ -692,7 +692,7 @@ public class PlacementFinder {
 
     public static boolean throughWallAnywhere() {
         BuilderConfig c = BuilderConfig.getInstance();
-        return c.throughWallPlace && c.throughWallAnywhere;
+        return c.throughWallOn() && c.throughWallAnywhere;
     }
 
     /**
@@ -723,7 +723,8 @@ public class PlacementFinder {
         if (face == Direction.UP) {
             // In Minecraft, players can reach the top face rim even if eyes are slightly below or level (-0.25m)
             // as long as raycast validation passes!
-            return dot > -0.25;
+            // Server-safe: anti-cheats only accept the top face when the eye is really above it
+            return dot > (BuilderConfig.getInstance().serverSafe ? 0.02 : -0.25);
         }
         return dot > 0.05;
     }
@@ -735,7 +736,7 @@ public class PlacementFinder {
      */
     public static boolean canPlaceFrom(ClientLevel level, LocalPlayer player, BlockPos targetPos, BlockState requiredState,
                                        Vec3 eye, double reach) {
-        boolean strict = BuilderConfig.getInstance().strictRaycast;
+        boolean strict = BuilderConfig.getInstance().strictRaycastOn();
         if (canPlaceFrom(level, player, targetPos, requiredState, eye, reach, strict)) return true;
         return strict && throughWallAllowed(level, targetPos, eye) && canPlaceFrom(level, player, targetPos, requiredState, eye, reach, false);
     }
@@ -772,7 +773,7 @@ public class PlacementFinder {
                 return true;
             }
         }
-        if (BuilderConfig.getInstance().airPlace && item != null) {
+        if (BuilderConfig.getInstance().airPlaceOn() && item != null) {
             return findAirPlacement(level, player, targetPos, requiredState, item, eye, reachSq, strict) != null;
         }
         return false;
@@ -874,7 +875,7 @@ public class PlacementFinder {
         }
         if (status == BuildRules.FluidStatus.PLACE_SOURCE) {
             double reachSq = reach * reach;
-            boolean strict = BuilderConfig.getInstance().strictRaycast;
+            boolean strict = BuilderConfig.getInstance().strictRaycastOn();
             for (Direction dir : DIRECTIONS) {
                 BlockPos neighborPos = targetPos.relative(dir);
                 BlockState neighborState = level.getBlockState(neighborPos);

@@ -614,7 +614,7 @@ public class StationPlanner {
                 if (!player.isCreative() && !InventoryHelper.hasItem(player, item)) continue;
                 // Nothing to place against yet: part of a floating section, handled by support columns
                 // (with Air Place on, such blocks are placed directly in the air instead)
-                if (!config.airPlace && !BuilderController.hasSolidNeighbor(level, pos)) {
+                if (!config.airPlaceOn() && !BuilderController.hasSolidNeighbor(level, pos)) {
                     lastFloating.add(pos.immutable());
                     continue;
                 }

@@ -306,7 +306,7 @@ public final class DryRun {
         }
 
         boolean supported(BlockPos p) {
-            if (cfg.airPlace) return true;
+            if (cfg.airPlaceOn()) return true;
             for (Direction d : Direction.values()) {
                 if (solid(p.relative(d))) return true;
             }
@@ -499,7 +499,7 @@ public final class DryRun {
         if (player == null) return;
 
         double perBlockSec = (cfg.placeDelayMs + cfg.jitterMs * 0.5 + 60) / 1000.0;
-        if (cfg.fastSimpleBlocks) perBlockSec *= 0.6;
+        if (cfg.fastSimpleBlocksOn()) perBlockSec *= 0.6;
         double sec = r.actions * perBlockSec
                 + r.walkMeters / 4.3
                 + r.scaffoldBlocks * 0.75
@@ -530,7 +530,7 @@ public final class DryRun {
             chat(mc, "§a✔ Không có block nào bị kẹt.");
         }
         if (!r.floatingWarnings.isEmpty()) {
-            chat(mc, "§6• " + r.floatingWarnings.size() + " block lơ lửng cần cột đỡ" + (cfg.airPlace ? "" : " §7(bật AIR PLACE để bỏ qua)"));
+            chat(mc, "§6• " + r.floatingWarnings.size() + " block lơ lửng cần cột đỡ" + (cfg.airPlaceOn() ? "" : cfg.serverSafe ? " §7(SERVER SAFE: bot tự dựng cột đỡ)" : " §7(bật AIR PLACE để bỏ qua)"));
         }
         if (!missing.isEmpty()) {
             chat(mc, "§6• Thiếu vật liệu (trong túi): §f" + String.join(", ", missing.subList(0, Math.min(5, missing.size())))

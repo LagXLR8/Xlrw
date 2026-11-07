@@ -930,16 +930,17 @@ public class XlrwScreen extends Screen {
                 {"FAST", "Đặt nhanh block thường"}, {"SPOOF", "Đặt block có hướng không cần nhìn đúng hướng"},
                 {"CHORUS", "Ăn chorus thoát hố"}, {"CLEAN", "Dọn block tạm & trụ thừa"},
                 {"WALL", "Đặt xuyên tường ở mọi nơi trong tầm với (tắt nếu server có anti-cheat)"},
+                {"SERVER SAFE", "Chơi server: chờ server xác nhận từng block, nhìn thật trước khi đặt, tự tắt xuyên tường / air place / spoof / đặt nhanh / REACH+"},
         };
         BooleanSupplier[] get = {
                 () -> cfg.autoMove, () -> cfg.useScaffolding, () -> cfg.autoDemolish, () -> cfg.airPlace,
                 () -> cfg.fastSimpleBlocks, () -> cfg.rotationSpoof, () -> cfg.chorusEscape, () -> cfg.cleanupTempBlocks,
-                () -> cfg.throughWallAnywhere
+                () -> cfg.throughWallAnywhere, () -> cfg.serverSafe
         };
         List<java.util.function.Consumer<Boolean>> set = List.of(
                 v -> cfg.autoMove = v, v -> cfg.useScaffolding = v, v -> cfg.autoDemolish = v, v -> cfg.airPlace = v,
                 v -> cfg.fastSimpleBlocks = v, v -> cfg.rotationSpoof = v, v -> cfg.chorusEscape = v, v -> cfg.cleanupTempBlocks = v,
-                v -> cfg.throughWallAnywhere = v
+                v -> cfg.throughWallAnywhere = v, v -> cfg.serverSafe = v
         );
         for (int i = 0; i < items.length; i++) {
             int tx = x + (i % 2) * (colW + 6), ty = y + (i / 2) * 24;
